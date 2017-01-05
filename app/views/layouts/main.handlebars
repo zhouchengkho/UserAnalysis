@@ -30,25 +30,19 @@
                 <li class="active"><a href="homepage.do"><i class="glyphicon glyphicon-home"></i> 首页</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <i class="glyphicon glyphicon-user"></i>
-                        <span id="username">周骋</span>
-                        <input type='hidden' id="curId" value="10132510237" />
-
-
-                        <input type="hidden" id="curFaceIcon" value="/resource/img/blank.jpg" />
-
-
-
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="" id="psd-change" data-toggle="modal" data-target="#change-psd">
-                            <i class="glyphicon glyphicon-pencil"></i> 修改密码</a>
-                        </li>
-                        <li><a href="login.do?method=logout"><i class="glyphicon glyphicon-off"></i> 注销</a></li>
-                    </ul>
+                <li>
+                  {{#if login}}
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                          <i class="glyphicon glyphicon-user"></i>
+                          <span id="username">{{login.userName}}</span>
+                          <input type='hidden' id="curId" value="{{login.userId}}" />
+                          <input type="hidden" id="curFaceIcon" value="/resource/img/blank.jpg" />
+                          <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="/logout"><i class="glyphicon glyphicon-off"></i> 注销</a></li>
+                      </ul>
+                  {{/if}}
                 </li>
             </ul>
         </div><!--/.nav-collapse -->
@@ -96,6 +90,9 @@
 </div><!-- /.modal -->
 
 <div class="container main">{{{body}}}</div>
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script src="/js/bootstrap.js"></script>
 {{{script}}}
+
   </body>
 </html>

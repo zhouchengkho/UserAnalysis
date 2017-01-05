@@ -30,8 +30,10 @@ function login() {
       }
     }).then(function(users) {
       if(users) {
+        // console.log(JSON.stringify(users));
         req.session.login = {
-          userId: req.body.userId
+          userId: users[0].userId,
+          userName: users[0].userName
         };
         req.session.save();
         callback(true)

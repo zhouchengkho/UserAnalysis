@@ -26,6 +26,8 @@ module.exports = function(app, config) {
 
   // app.use(favicon(config.root + '/public/img/favicon.ico'));
 
+
+  // use session
   app.use(session({
     secret: 'now-you-see-me',
     resave: true,
