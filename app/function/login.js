@@ -1,0 +1,56 @@
+/**
+ * Created by zhoucheng on 1/3/17.
+ */
+
+
+function login() {
+  /**
+   * login
+   * check session first
+   * if has session
+   *  jump to index
+   * else
+   *  check login form valid
+   *  if valid
+   *    store session send success msg
+   *  else
+   *    send fail msg
+   * @param db
+   * @param req
+   * @param callback
+   */
+  this.login = function(db, req, callback) {
+    if(req.session.login)
+      callback(true)
+
+    db.User.findAll({
+      where: {
+        userId: req.body.userId,
+        psd: getEncryptPassword(req.body.psd)
+      }
+    }).then(function(users) {
+      if(users) {
+        req.session.login = {
+          userId: req.body.userId
+        };
+        req.session.save();
+        callback(true)
+      }
+      else
+        callback(false)
+    })
+  }
+}
+
+/**
+ * should encrypt password here
+ *
+ * @param password
+ * @returns {*}
+ */
+function getEncryptPassword(password) {
+  return password;
+}
+
+
+module.exports = new login();
