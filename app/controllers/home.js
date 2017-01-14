@@ -1,7 +1,7 @@
 var express = require('express'),
   router = express.Router(),
   db = require('../models'),
-  login = require('../function/login');
+  login = require('../service/login');
 
 module.exports = function (app) {
   app.use('/', router);
