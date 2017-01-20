@@ -1,6 +1,63 @@
 @charset "utf-8";
 
+/* CSS Document */
 
+/*
+
+ Template Name : Borrow - A Loan Company Website Template
+ Author : Jitu Chauhan;
+ Version: 1.0.0;
+
++ General css
++ Space css
++ Background & Block color
++ Buttons
++ Input Form
++ Bullet
++ Icon
++ Navigation CSS
+
++ HOME
+  - Home
+  - Home-1
+  - Home-2
++ LOAN PRODUCT
+  - Loan Image Listing
+  - Loan Icon Listing
+  - Car Loan Single
+  - Personal Loan Single
+  - Home Loan Single
+  - Education Loan Single
++ ABOUT US
+  - About us
+  - Team
++ BLOG
+  - Blog Listing
+  - Blog Single
+  - Two Column Masonry
+  - Three Column Masonry
++ FEATURES
+  - Compare Loan
+  - Faq page
+  - Testimonial
+  - 404 Error
+    - Gallery
+      - Filterable Gallery 2 column
+      - Filterable Gallery 3 column
+      - Masonry Gallery
+      - Zoom Gallery
+    - Shortcodes
+      - Tab
+      - Accordion
+      - Alert
+
+- CONTACT US
+
+*/
+
+/*-----------------------------------
+General css class
+-----------------------------------*/
 
 body { font-size: 15px; font-family: 'Poppins', sans-serif; line-height: 1.4; color: #778191; background-color: #f4f6f8; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 h1, h2, h3, h4, h5, h6 { margin: 0px 0px 10px 0px; color: #3c4d6b; font-weight: 500; }
@@ -111,9 +168,23 @@ Section Space
 * Section space help to create top bottom space.
 *
 -----------------*/
-.section-space20 { padding-top: 20px; padding-bottom: 20px; }
-.section-space40 { padding-top: 40px; padding-bottom: 40px; }
-.section-space60 { padding-top: 60px; padding-bottom: 60px; }
+.section-space20 {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.section-space40 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.section-space60 {
+  padding-top: 30px;
+  padding-bottom: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px; }
 .section-space80 {
   padding-top: 40px;
   padding-bottom: 40px;

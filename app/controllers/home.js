@@ -1,7 +1,8 @@
 var express = require('express'),
   router = express.Router(),
   db = require('../models'),
-  login = require('../service/login');
+  login = require('../service/login'),
+  score = require('../service/score');
 
 module.exports = function (app) {
   app.use('/', router);
@@ -17,15 +18,17 @@ router.all('/*', function(req, res, next) {
   next()
 })
 
+/**
+ * For now, list all service data on main page
+ * DO NOT DO QUERY in router, keep it simple
+ */
 router.get('/', function (req, res, next) {
-  db.Friend.findAll({where: {userId: req.session.login.userId}, include: [db.User]}).then(function (friends) {
-    // console.log('yo session ' + JSON.stringify(req.session.login))
-    // console.log('yo '+JSON.stringify(friends));
+  score.getOverallScore(req.session.login.userId, function(data) {
     res.render('index', getRenderOption(req, {
       title: 'Education User Analysis',
-      friends: friends
+      data: data
     }));
-  });
+  })
 });
 
 router.get('/login', function (req, res, next) {

@@ -5,7 +5,7 @@
             <div class="rate-counter-block">
                 <div class="icon rate-icon  "> <img src="/img/mortgage.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
                 <div class="rate-box">
-                    <h1 class="loan-rate">9</h1>
+                    <h1 class="loan-rate">{{ data.overallScore}}</h1>
                   <a href="#overall">
                       <small class="rate-title">Overall Score</small>
                   </a>
@@ -16,7 +16,7 @@
             <div class="rate-counter-block">
                 <div class="icon rate-icon  "> <img src="/img/loan.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
                 <div class="rate-box">
-                    <h1 class="loan-rate">20 Friends</h1>
+                    <h1 class="loan-rate">{{ data.socialScore}}</h1>
                   <a href="#social">
                       <small class="rate-title">Social</small>
                   </a>
@@ -27,9 +27,9 @@
             <div class="rate-counter-block">
                 <div class="icon rate-icon  "> <img src="/img/car.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
                 <div class="rate-box">
-                    <h1 class="loan-rate">6.70%</h1>
+                    <h1 class="loan-rate">{{ data.dormScore}}</h1>
                     <a href="#dorm">
-                      <small class="rate-title">Dorm Rank</small>
+                      <small class="rate-title">Dorm</small>
                     </a>
                 </div>
             </div>
@@ -38,12 +38,29 @@
             <div class="rate-counter-block">
                 <div class="icon rate-icon  "> <img src="/img/credit-card.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
                 <div class="rate-box">
-                    <h1 class="loan-rate">9.00%</h1>
-                    <a href="#summary"><small class="rate-title">Summary</small></a>
+                    <h1 class="loan-rate">{{ data.homeworkScore}}</h1>
+                    <a href="#dorm">
+                        <small class="rate-title">Homework</small>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="bg-white section-space80" id="summary">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class="mb100 text-center section-title">
+                <!-- section title start-->
+                <h1>SUMMARY</h1>
+                <p>{{ data.summary}}</p>
+            </div>
+            <!-- /.section title start-->
+        </div>
+
+    </div>
+
 </div>
 
 <div class="bg-white section-space80" id="overall">
@@ -64,13 +81,8 @@
             <div class="mb100 text-center section-title">
                 <!-- section title start-->
                 <h1>SOCIAL</h1>
-                <h1>{{title }}</h1>
+              <p>Graphs here</p>
                 <div>
-                    <h1>yo these are my friends</h1>
-                  {{#each friends}}
-                      <p>{{ friendId}}</p>
-                      <p>{{ User.userName}}</p>
-                  {{/each}}
                 </div>
             </div>
             <!-- /.section title start-->
@@ -84,24 +96,10 @@
             <div class="mb100 text-center section-title">
                 <!-- section title start-->
                 <h1>DORM</h1>
-
             </div>
             <!-- /.section title start-->
         </div>
     </div>
 </div>
 
-<div class="bg-white section-space80" id="summary">
-    <div class="row">
-        <div class="col-md-offset-2 col-md-8 col-xs-12">
-            <div class="mb100 text-center section-title">
-                <!-- section title start-->
-                <h1>SUMMARY</h1>
-            </div>
-            <!-- /.section title start-->
-        </div>
-
-    </div>
-
-</div>
 

@@ -5,21 +5,33 @@
 $(document).ready(function() {
 
   $('#login-btn').on('click', function() {
-    var userId = $('#userId').val();
-    var psd = $('#password').val();
-    var url = '/login';
-    $.ajax({
-      type: 'POST',
-      contentType: 'application/json; charset=utf-8',
-      url: url,
-      data: JSON.stringify({userId: userId, psd: psd}),
-      dataType: 'json'
-    }).done(function(res){
-      if(res.status == 'success')
-        location.reload()
-      else {
-        alert('login fail')
-      }
-    });
+    loginAjax();
+  })
+
+  $('#password').on('keydown', function(e) {
+    if(e.which == 13) {
+      // enter
+      loginAjax();
+    }
   })
 })
+
+
+function loginAjax() {
+  var userId = $('#userId').val();
+  var psd = $('#password').val();
+  var url = '/login';
+  $.ajax({
+    type: 'POST',
+    contentType: 'application/json; charset=utf-8',
+    url: url,
+    data: JSON.stringify({userId: userId, psd: psd}),
+    dataType: 'json'
+  }).done(function(res){
+    if(res.status == 'success')
+      location.reload()
+    else {
+      alert('login fail')
+    }
+  });
+}

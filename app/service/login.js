@@ -3,7 +3,7 @@
  */
 
 
-function login() {
+function Login() {
   /**
    * login
    * check session first
@@ -55,4 +55,4 @@ function getEncryptPassword(password) {
 }
 
 
-module.exports = new login();
+module.exports = new Login();
