@@ -1,20 +1,20 @@
 
 <div class="rate-table">
     <div class="row">
-        <div class="col-md-3 col-sm-6 col-xs-6" href="#overall">
+        <div class="col-md-3 col-sm-6 col-xs-6">
             <div class="rate-counter-block">
-                <div class="icon rate-icon  "> <img src="/img/mortgage.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
+                <div class="icon rate-icon  "> <img src="/img/activity.svg"  class="icon-svg-1x"></div>
                 <div class="rate-box">
-                    <h1 class="loan-rate">{{ data.overallScore}}</h1>
-                  <a href="#overall">
-                      <small class="rate-title">Overall Score</small>
+                    <h1 class="loan-rate">{{ data.activityScore}}</h1>
+                  <a href="#activity">
+                      <small class="rate-title">Activity</small>
                   </a>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6 col-xs-6">
             <div class="rate-counter-block">
-                <div class="icon rate-icon  "> <img src="/img/loan.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
+                <div class="icon rate-icon  "> <img src="/img/social.svg"  class="icon-svg-1x"></div>
                 <div class="rate-box">
                     <h1 class="loan-rate">{{ data.socialScore}}</h1>
                   <a href="#social">
@@ -25,7 +25,7 @@
         </div>
         <div class="col-md-3 col-sm-6 col-xs-6">
             <div class="rate-counter-block">
-                <div class="icon rate-icon  "> <img src="/img/car.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
+                <div class="icon rate-icon  "> <img src="/img/dorm.svg"  class="icon-svg-1x"></div>
                 <div class="rate-box">
                     <h1 class="loan-rate">{{ data.dormScore}}</h1>
                     <a href="#dorm">
@@ -36,7 +36,7 @@
         </div>
         <div class="col-md-3 col-sm-6 col-xs-6">
             <div class="rate-counter-block">
-                <div class="icon rate-icon  "> <img src="/img/credit-card.svg" alt="Borrow - Loan Company Website Template" class="icon-svg-1x"></div>
+                <div class="icon rate-icon  "> <img src="/img/homework.svg"  class="icon-svg-1x"></div>
                 <div class="rate-box">
                     <h1 class="loan-rate">{{ data.homeworkScore}}</h1>
                     <a href="#dorm">
@@ -51,9 +51,10 @@
 <div class="bg-white section-space80" id="summary">
     <div class="row">
         <div class="col-md-offset-2 col-md-8 col-xs-12">
-            <div class="mb100 text-center section-title">
+            <div class=" text-center section-title">
                 <!-- section title start-->
                 <h1>SUMMARY</h1>
+              <h2>Your Overall Score is {{data.overallScore}}</h2>
                 <p>{{ data.summary}}</p>
             </div>
             <!-- /.section title start-->
@@ -63,25 +64,27 @@
 
 </div>
 
-<div class="bg-white section-space80" id="overall">
+<div class="bg-white section-space80" id="activity">
     <div class="row">
         <div class="col-md-offset-2 col-md-8 col-xs-12">
-            <div class="mb100 text-center section-title">
+            <div class=" text-center section-title">
                 <!-- section title start-->
-                <h1>OVERALL</h1>
+                <h1>Activity</h1>
+              <canvas id="activity-chart" width="750" height="400"></canvas>
+                <div>
+                </div>
             </div>
             <!-- /.section title start-->
         </div>
     </div>
 </div>
-
 <div class="bg-white section-space80" id="social">
     <div class="row">
         <div class="col-md-offset-2 col-md-8 col-xs-12">
-            <div class="mb100 text-center section-title">
+            <div class=" text-center section-title">
                 <!-- section title start-->
                 <h1>SOCIAL</h1>
-              <p>Graphs here</p>
+                <canvas id="social-chart" width="750" height="400"></canvas>
                 <div>
                 </div>
             </div>
@@ -93,7 +96,7 @@
 <div class="bg-white section-space80" id="dorm">
     <div class="row">
         <div class="col-md-offset-2 col-md-8 col-xs-12">
-            <div class="mb100 text-center section-title">
+            <div class=" text-center section-title">
                 <!-- section title start-->
                 <h1>DORM</h1>
             </div>
@@ -103,3 +106,14 @@
 </div>
 
 
+<div class="bg-white section-space80" id="homework">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class=" text-center section-title">
+                <!-- section title start-->
+                <h1>HOMEWORK</h1>
+            </div>
+            <!-- /.section title start-->
+        </div>
+    </div>
+</div>

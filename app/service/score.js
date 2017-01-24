@@ -3,7 +3,7 @@
  */
 
 var dorm = require('./dorm'),
-  homework = require('./homework'),
+  activity = require('./activity'),
   social = require('./social'),
   summary = require('./summary'),
   homework = require('./homework'),
@@ -22,22 +22,26 @@ function Score() {
       dorm: 'dorm',
       social: 'social',
       summary: 'summary',
-      homework: 'homework'
+      homework: 'homework',
+      activity: 'activity'
     }
     var ep = new EventProxy();
 
-    ep.all([epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
-      function(dormScore, socialScore, homeworkScore, summary) {
-      console.log('?')
+    ep.all([epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
+      function(activityScore, dormScore, socialScore, homeworkScore, summary) {
       callback({
-        overallScore: (dormScore + socialScore + homeworkScore) / 3,
+        overallScore: (activityScore + dormScore + socialScore + homeworkScore) / 4,
         dormScore: dormScore,
         socialScore: socialScore,
         homeworkScore: homeworkScore,
+        activityScore: activityScore,
         summary: summary
       });
     })
 
+    activity.getScore(userId, function(activityScore) {
+      ep.emit(epEmitter.activity, activityScore);
+    })
     dorm.getScore(userId, function(dormScore) {
       ep.emit(epEmitter.dorm, dormScore);
     })

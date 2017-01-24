@@ -26,7 +26,9 @@ router.get('/', function (req, res, next) {
   score.getOverallScore(req.session.login.userId, function(data) {
     res.render('index', getRenderOption(req, {
       title: 'Education User Analysis',
-      data: data
+      data: data,
+      script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
+      '<script type="text/javascript" src="/js/home.js"></script>'
     }));
   })
 });

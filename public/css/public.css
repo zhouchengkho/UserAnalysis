@@ -27,6 +27,7 @@ fieldset > span{
 .navbar-default{
   background-color: #428bca;
   border-color: #357ebd;
+  margin-bottom: 0px;
 }
 #navbar{
   border-color: #1A5281;
@@ -83,7 +84,7 @@ span#new-msg{
 /* top navigation END */
 
 .container.main{
-  margin-top: 60px;
+  margin-top: 50px;
 }
 
 nav{
@@ -188,4 +189,8 @@ p.loading{
   color: #666;
   font-weight: bold;
   margin-top: 20px;
+}
+
+.icon-svg-1x {
+  width: 50px;
 }

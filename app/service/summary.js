@@ -9,7 +9,7 @@ function Summary() {
    * @param callback
    */
   this.getSummary = function(userId, callback) {
-    callback('you are doing great');
+    callback('You are doing great');
   }
 }
 
