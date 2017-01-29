@@ -21,6 +21,63 @@ function Social() {
   this.getScore = function(userId, callback) {
     callback(6);
   }
+  /**
+   * getRadarData
+   * get data for the radar chart
+   * @param userId
+   * @param callback
+   */
+  this.getRadarChartData = function(userId, callback) {
+    var radarChartData = {
+      type: 'radar',
+      data: {
+        labels: ['Friends', 'Status', 'Source Reply', 'Topic Reply'],
+        datasets: [
+          {
+            label: 'Mine',
+            backgroundColor : 'rgba(207,220,229,0.5)',
+            borderColor : 'rgba(160,185,204,1)',
+            pointBackgroundColor: 'rgba(160,185,204,1)',
+            pointBorderColor : 'rgba(255,255,255,1)',
+            data: []
+          },
+          {
+            label: 'Average',
+            backgroundColor : 'rgba(247,223,229,0.5)',
+            borderColor : 'rgba(226,97,128,1)',
+            pointBackgroundColor: 'rgba(226,97,128,1)',
+            pointBorderColor : 'rgba(255,255,255,1)',
+            data: []
+          }
+        ]
+      }
+    };
+    var userCount = 0;
+    db.sequelize.transaction(function(t) {
+      return db.User.count({}, {transaction: t}).then(function(count) {
+        userCount = count;
+        return db.Friend.count({where: {userId: userId}}, {transaction: t})
+      }).then(function(count) {
+        radarChartData.data.datasets[0].data.push(count)
+        return db.Status.count({where: {userId: userId}}, {transaction: t})
+      }).then(function(count) {
+        radarChartData.data.datasets[0].data.push(count)
+        // fake data now
+        radarChartData.data.datasets[0].data.push(2)
+        radarChartData.data.datasets[0].data.push(3)
+        return db.Friend.count({where: {}}, {transaction: t})
+      }).then(function(count) {
+        radarChartData.data.datasets[1].data.push(count / userCount)
+        return db.Status.count({where: {}}, {transaction: t})
+      }).then(function(count) {
+        radarChartData.data.datasets[1].data.push(count / userCount)
+        // fake data now
+        radarChartData.data.datasets[1].data.push(4)
+        radarChartData.data.datasets[1].data.push(5)
+        callback(radarChartData)
+      })
+    });
+  }
 }
 
 

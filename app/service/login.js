@@ -2,6 +2,7 @@
  * Created by zhoucheng on 1/3/17.
  */
 
+var db = require('../models');
 
 function Login() {
   /**
@@ -15,11 +16,10 @@ function Login() {
    *    store session send success msg
    *  else
    *    send fail msg
-   * @param db
    * @param req
    * @param callback
    */
-  this.login = function(db, req, callback) {
+  this.login = function(req, callback) {
     if(req.session.login)
       callback(true)
 

@@ -1,6 +1,5 @@
 var express = require('express'),
   router = express.Router(),
-  db = require('../models'),
   login = require('../service/login'),
   score = require('../service/score');
 
@@ -8,6 +7,9 @@ module.exports = function (app) {
   app.use('/', router);
 };
 
+/**
+ * Login Authentication
+ */
 router.all('/*', function(req, res, next) {
   if(req.url === '/login') {
     return next()
@@ -50,7 +52,7 @@ router.get('/logout', function(req, res, next) {
 })
 
 router.post('/login', function (req, res, next) {
-  login.login(db, req, function(valid) {
+  login.login(req, function(valid) {
     if(valid)
       res.status(200).send({status: 'success'})
     else
