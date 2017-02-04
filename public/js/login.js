@@ -8,12 +8,13 @@ $(document).ready(function() {
     loginAjax();
   })
 
-  $('#password').on('keydown', function(e) {
-    if(e.which == 13) {
-      // enter
-      loginAjax();
-    }
-  })
+  // $('#password').on('keydown', function(e) {
+  //   if(e.which == 13) {
+  //     // enter
+  //     alert('key down')
+  //     loginAjax();
+  //   }
+  // })
 })
 
 
@@ -28,7 +29,8 @@ function loginAjax() {
     data: JSON.stringify({userId: userId, psd: psd}),
     dataType: 'json'
   }).done(function(res){
-    if(res.status == 'success')
+    // alert(JSON.stringify(res))
+    if(res.status === 1)
       location.reload()
     else {
       alert('login fail')

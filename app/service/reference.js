@@ -13,7 +13,7 @@ var reference = {
     },
     February: {
       gte: moment().format(currentYear + '-02-01 00:00:00'),
-      lte: moment().isLeapYear ? moment().utc().format(currentYear + '-02-29 24:00:00') : moment().utc().format(currentYear + '-02-28 24:00:00')
+      lte: moment().isLeapYear ? moment().format(currentYear + '-02-29 24:00:00') : moment().format(currentYear + '-02-28 24:00:00')
     },
     March: {
       gte: moment().format(currentYear + '-03-01 00:00:00'),
@@ -60,7 +60,13 @@ var reference = {
   springSemester: {
     gte: moment().format(currentYear + '-02-01 00:00:00'),
     lte: moment().format(currentYear + '-07-31 24:00:00')
-  }
+  },
+  fallSemester: {
+    gte: moment().format(currentYear + '-08-01 00:00:00'),
+    lte: moment().format(nextYear + '-01-31 24:00:00')
+  },
+  isInSpringSemester: moment().isBetween(moment().format(currentYear + '-02-01 00:00:00'), moment().format(currentYear + '-07-31 24:00:00'))
 };
+
 
 module.exports = reference;

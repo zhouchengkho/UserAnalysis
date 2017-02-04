@@ -39,19 +39,19 @@ function Score() {
       });
     })
 
-    activity.getScore(userId, function(activityScore) {
+    activity.getScore(userId, function(err, activityScore) {
       ep.emit(epEmitter.activity, activityScore);
     })
-    dorm.getScore(userId, function(dormScore) {
+    dorm.getScore(userId, function(err, dormScore) {
       ep.emit(epEmitter.dorm, dormScore);
     })
-    social.getScore(userId, function(socialScore) {
+    social.getScore(userId, function(err, socialScore) {
       ep.emit(epEmitter.social, socialScore)
     })
-    homework.getScore(userId, function(homeworkScore) {
+    homework.getScore(userId, function(err, homeworkScore) {
       ep.emit(epEmitter.homework, homeworkScore)
     })
-    summary.getSummary(userId, function(summary) {
+    summary.getSummary(userId, function(err, summary) {
       ep.emit(epEmitter.summary, summary)
     })
 

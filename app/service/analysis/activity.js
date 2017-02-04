@@ -1,6 +1,6 @@
-var db = require('../models');
+var db = require('../../models/index');
 var moment  = require('moment');
-var reference = require('./reference');
+var reference = require('./../reference');
 var month = reference.month;
 var springSemester = reference.springSemester;
 var Promise = require('bluebird');
@@ -13,7 +13,7 @@ function Activity() {
    * @returns {number} score number
    */
   this.getScore = function(userId, callback) {
-    callback(5);
+    callback(null, 5);
   }
 
   /**
@@ -27,7 +27,7 @@ function Activity() {
         userId: userId
       }
     }).then(function(count) {
-      callback({
+      callback(null, {
         count: count
       })
     });
@@ -75,7 +75,7 @@ function Activity() {
 
 
     // spring semester
-    if (moment().isBetween(springSemester.gte, springSemester.lte)) {
+    if (reference.isInSpringSemester) {
       lineChartData.data.labels = ['February', 'March', 'April', 'May', 'June', 'July'];
     }
     else { // fall
@@ -107,7 +107,7 @@ function Activity() {
           })
         })
       }).then(function() {
-        callback(lineChartData)
+        callback(null, lineChartData)
       }).catch(function(err) {
         callback(err)
       })

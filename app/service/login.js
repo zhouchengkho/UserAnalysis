@@ -36,10 +36,10 @@ function Login() {
           userName: users[0].userName
         };
         req.session.save();
-        callback(true)
+        callback(null, true)
       }
       else
-        callback(false)
+        callback(null, false)
     })
   }
 }

@@ -1,4 +1,4 @@
-var db = require('../models')
+var db = require('../../models/index')
 
 function Summary() {
 
@@ -9,7 +9,7 @@ function Summary() {
    * @param callback
    */
   this.getSummary = function(userId, callback) {
-    callback('You are doing great');
+    callback(null, 'You are doing great');
   }
 }
 
