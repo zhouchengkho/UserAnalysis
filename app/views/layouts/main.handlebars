@@ -12,6 +12,7 @@
     <link href="/css/fontello.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="/css/animsition.min.css">
     <link rel="stylesheet" href="/css/public.css">
+  {{css}}
   {{#if ENV_DEVELOPMENT}}
     <script src="http://localhost:35729/livereload.js"></script>
   {{/if}}
@@ -45,6 +46,7 @@
                           <span class="caret"></span>
                       </a>
                       <ul class="dropdown-menu" role="menu">
+                          <li><a href="/settings/"><i class="glyphicon glyphicon-wrench"></i> 设置</a></li>
                           <li><a href="/logout"><i class="glyphicon glyphicon-off"></i> 注销</a></li>
                       </ul>
                   {{/if}}

@@ -113,36 +113,37 @@ function Activity() {
       })
     });
   }
-}
-/**
- *
- * @param userId: if null, cancel this condition
- * @param gte
- * @param lte
- * @returns {{}}
- */
-function getQuery(userId, gte, lte) {
-  if (!userId) {
-    return {
-      where: {
-        time: {
-          gte: gte,
-          lte: lte
+  /**
+   *
+   * @param userId: if null, cancel this condition
+   * @param gte
+   * @param lte
+   * @returns {{}}
+   */
+  function getQuery(userId, gte, lte) {
+    if (!userId) {
+      return {
+        where: {
+          time: {
+            gte: gte,
+            lte: lte
+          }
+        }
+      }
+    }
+    else {
+      return {
+        where: {
+          userId: userId,
+          time: {
+            gte: gte,
+            lte: lte
+          }
         }
       }
     }
   }
-  else {
-    return {
-      where: {
-        userId: userId,
-        time: {
-          gte: gte,
-          lte: lte
-        }
-      }
-    }
-  }
 }
+
 
 module.exports = new Activity();

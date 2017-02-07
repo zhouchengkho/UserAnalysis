@@ -2,23 +2,11 @@ var express = require('express'),
   router = express.Router(),
   login = require('../service/login'),
   score = require('../service/analysis/score');
-
 module.exports = function (app) {
   app.use('/', router);
 };
 
-/**
- * Login Authentication
- */
-router.all('/*', function(req, res, next) {
-  if(req.url === '/login') {
-    return next()
-  }
-  if(!req.session.login) {
-    return res.redirect('/login');
-  }
-  next()
-})
+
 
 /**
  * For now, list all service data on main page
@@ -35,7 +23,8 @@ router.get('/', function (req, res, next) {
   })
 });
 
-router.get('/login', function (req, res, next) {
+
+router.get('/login', function (req, res) {
   if(req.session.login)
     res.redirect('/');
   else {
@@ -60,6 +49,7 @@ router.post('/login', function (req, res, next) {
   })
 })
 
+
 /**
  * add common data to render
  * @param req: get session data
@@ -67,6 +57,7 @@ router.post('/login', function (req, res, next) {
  * @returns {*}
  */
 function getRenderOption(req, data) {
+  data = data ? data : {};
   data.login = req.session.login;
   return data;
 }

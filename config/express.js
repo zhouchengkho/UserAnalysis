@@ -27,6 +27,18 @@ module.exports = function(app, config) {
   // app.use(favicon(config.root + '/public/img/favicon.ico'));
 
 
+  // Login Authentication
+  // app.all('/*', function(req, res, next) {
+  //   console.log('yo '+req.url);
+  //   if(req.url === '/login') {
+  //     return next()
+  //   }
+  //   if(!req.session.login) {
+  //     return res.redirect('/login');
+  //   }
+  //   next()
+  // })
+
   // use session
   app.use(session({
     secret: 'now-you-see-me',
@@ -48,10 +60,26 @@ module.exports = function(app, config) {
   app.use(express.static(config.root + '/public'));
   app.use(methodOverride());
 
+  /**
+   * Login Authentication
+   * Add specialized logic here
+   */
+  app.all('/*', function(req, res, next) {
+    if(req.url === '/login') {
+      return next()
+    }
+    if(!req.session.login) {
+      return res.redirect('/login');
+    }
+    next()
+  })
+
+  // routes
   var controllers = glob.sync(config.root + '/app/controllers/*.js');
   controllers.forEach(function (controller) {
     require(controller)(app);
   });
+
 
   app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -79,6 +107,7 @@ module.exports = function(app, config) {
         title: 'error'
       });
   });
+
 
 
 

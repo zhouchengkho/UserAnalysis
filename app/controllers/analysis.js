@@ -11,42 +11,42 @@ module.exports = function (app) {
   app.use('/analysis', router);
 };
 
-/**
- * Login Authentication
- */
-router.all('/*', function(req, res, next) {
-  if(!req.session.login) {
-    res.json({
-      msg: 'login first'
-    })
-  }
-  else {
-    next()
-  }
-})
+
 
 router.get('/action-count', function(req, res) {
   activity.getActionCount(req.session.login.userId, function(err, result) {
-    res.json(result)
+    if(err)
+      res.json({status: 0, err: err.message})
+    else
+      res.json(result)
   })
 })
 
 
 router.get('/activity-line-chart-data', function(req, res) {
   activity.getLineChartData(req.session.login.userId, function(err, result) {
-    res.json(result)
+    if(err)
+      res.json({status: 0, err: err.message})
+    else
+      res.json(result)
   })
 })
 
 router.get('/social-radar-chart-data', function(req, res) {
   social.getRadarChartData(req.session.login.userId, function(err, result) {
-    res.json(result)
+    if(err)
+      res.json({status: 0, err: err.message})
+    else
+      res.json(result)
   })
 })
 
 
 router.get('/homework-student-assignment', function(req, res) {
   homework.getHomeWorkData(req.session.login.userId, function(err, result) {
-    res.json(result)
+    if(err)
+      res.json({status: 0, err: err.message})
+    else
+      res.json(result)
   })
 })
