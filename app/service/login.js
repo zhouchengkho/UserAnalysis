@@ -35,7 +35,8 @@ function Login() {
           userId: users[0].userId,
           userName: users[0].userName,
           settings: {
-            time: refer.isInSpringSemester ? refer.springSemester : refer.fallSemester
+            time: refer.getTimePeriod({timePeriod: 'academic-year'}),
+            timePeriod: 'academic-year'
           }
         };
 

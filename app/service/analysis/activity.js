@@ -1,8 +1,6 @@
 var db = require('../../models/index');
 var moment  = require('moment');
 var reference = require('./../reference');
-var month = reference.month;
-var springSemester = reference.springSemester;
 var Promise = require('bluebird');
 var async = require('async')
 function Activity() {
@@ -37,9 +35,14 @@ function Activity() {
    * fall: 8 - 1
    * spring: 2 - 7
    * @param userId
+   * @param timePeriod [optional] if not provided, set as 'academic-year'
    * @param callback
    */
-  this.getLineChartData = function(userId, callback) {
+  this.getLineChartData = function(userId, timePeriod, callback) {
+    if((typeof timePeriod) == 'function') {
+      callback = timePeriod;
+      timePeriod = 'academic-year'
+    }
     var userCount = 0;
     var lineChartData = {
       type: 'line',
@@ -74,20 +77,19 @@ function Activity() {
     }
 
 
-    // spring semester
-    if (reference.isInSpringSemester) {
-      lineChartData.data.labels = ['February', 'March', 'April', 'May', 'June', 'July'];
-    }
-    else { // fall
-      lineChartData.data.labels = ['August', 'September', 'October', 'November', 'December', 'January'];
-    }
+    // set labels
+    lineChartData.data.labels = reference.getPartitionLabels(timePeriod)
+
+
+    var nodes = reference.getPartition(timePeriod)
+
     db.sequelize.transaction(function(t) {
       // find total user count
       return db.User.count({}, {transaction: t}).then(function(count) {
         userCount = count;
         return new Promise(function(resolve, reject) {
-          async.eachSeries(lineChartData.data.labels, function(label, done) {
-            db.Action.count(getQuery(userId, month[label].gte, month[label].lte)).then(function(count) {
+          async.eachSeries(nodes, function(node, done) {
+            db.Action.count(getQuery(userId, node.gte, node.lte)).then(function(count) {
               lineChartData.data.datasets[0].data.push(count);
               done();
             }).catch(function(err) {reject(err)})
@@ -97,8 +99,8 @@ function Activity() {
         })
       }).then(function() {
         return new Promise(function(resolve, reject) {
-          async.eachSeries(lineChartData.data.labels, function(label, done) {
-            db.Action.count(getQuery(null, month[label].gte, month[label].lte)).then(function(count) {
+          async.eachSeries(nodes, function(node, done) {
+            db.Action.count(getQuery(null, node.gte, node.lte)).then(function(count) {
               lineChartData.data.datasets[1].data.push(count / userCount);
               done();
             }).catch(function(err) {reject(err)})

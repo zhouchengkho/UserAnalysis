@@ -24,7 +24,7 @@ router.get('/action-count', function(req, res) {
 
 
 router.get('/activity-line-chart-data', function(req, res) {
-  activity.getLineChartData(req.session.login.userId, function(err, result) {
+  activity.getLineChartData(req.session.login.userId, req.session.login.settings.timePeriod,function(err, result) {
     if(err)
       res.json({status: 0, err: err.message})
     else
@@ -33,7 +33,7 @@ router.get('/activity-line-chart-data', function(req, res) {
 })
 
 router.get('/social-radar-chart-data', function(req, res) {
-  social.getRadarChartData(req.session.login.userId, function(err, result) {
+  social.getRadarChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
     if(err)
       res.json({status: 0, err: err.message})
     else

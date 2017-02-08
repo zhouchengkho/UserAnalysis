@@ -27,7 +27,7 @@ function HomeWork() {
   this.getHomeWorkData = function(userId, timePeriod, callback) {
     if((typeof timePeriod) == 'function') {
       callback = timePeriod;
-      timePeriod = reference.isInSpringSemester ? reference.springSemester : reference.fallSemester
+      timePeriod = reference.getAcademicYear()
     }
     db.StudentAssignment.count(query.genWhereQuery({userId: userId, time: timePeriod})).then(function(count) {
       callback(null, {count: count})

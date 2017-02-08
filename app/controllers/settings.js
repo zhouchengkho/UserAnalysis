@@ -3,7 +3,8 @@
  */
 var express = require('express'),
   router = express.Router(),
-  settings = require('../service/settings');
+  settings = require('../service/settings'),
+  ref = require('../service/reference');
 
 module.exports = function (app) {
   app.use('/settings', router);
@@ -23,16 +24,21 @@ router.get('/get-settings', function(req, res) {
 })
 
 router.get('/time/get-last-semester', function(req, res) {
-  settings.getLastSemesterTime(function(err, time) {
-    res.json(time)
-  })
+  res.json({time: ref.getTimePeriod({timePeriod: 'last-semester'})});
+})
+
+router.get('/time/get-this-semester', function(req, res) {
+  res.json({time: ref.getTimePeriod({timePeriod: 'this-semester'})});
+})
+
+router.get('/time/get-academic-year', function(req, res) {
+  res.json({time: ref.getTimePeriod({timePeriod: 'academic-year'})});
 })
 
 router.get('/time/get-college-career', function(req, res) {
-  settings.getCollegeCareerTime(req, function(err, time) {
-    res.json(time)
-  })
+  res.json({time: ref.getTimePeriod({timePeriod: 'college-career', userId: req.session.login.userId})});
 })
+
 
 router.post('/change-settings', function(req, res) {
   settings.changeSettings(req, function(err, ok) {
