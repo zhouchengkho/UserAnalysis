@@ -11,6 +11,7 @@ module.exports = function (sequelize, DataTypes) {
       classMethods: {
         associate: function (models) {
           // example on how to add relations
+          Term.hasMany(models.Class, {foreignKey: 'termId'})
         }
       },
       freezeTableName: true,

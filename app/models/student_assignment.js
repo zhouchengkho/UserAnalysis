@@ -14,10 +14,12 @@ module.exports = function (sequelize, DataTypes) {
       classMethods: {
         associate: function (models) {
           // example on how to add relations
+          StudentAssignment.belongsTo(models.Assignment, {foreignKey: 'assignmentId'})
+
         }
       },
       freezeTableName: true,
-      tableName: 'student-assignment'
+      tableName: 'student_assignment'
     });
 
   return StudentAssignment;

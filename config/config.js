@@ -25,7 +25,8 @@ var config = {
         define: {
           timestamps: false // education db doesn't use timestamps
         },
-        timezone: '+8:00' // compare time in e 8 zone
+        timezone: '+8:00'
+        // logging: false
       }
     }
   },

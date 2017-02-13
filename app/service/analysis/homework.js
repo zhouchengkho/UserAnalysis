@@ -27,10 +27,36 @@ function HomeWork() {
   this.getHomeWorkData = function(userId, timePeriod, callback) {
     if((typeof timePeriod) == 'function') {
       callback = timePeriod;
-      timePeriod = reference.getAcademicYear()
+      timePeriod = reference.getTimePeriod('academic-year')
     }
-    db.StudentAssignment.count(query.genWhereQuery({userId: userId, time: timePeriod})).then(function(count) {
-      callback(null, {count: count})
+
+    var result = {};
+    var userCount = 0;
+
+    db.sequelize.transaction(function(t) {
+      return db.User.count({})
+    }).then(function(count) {
+      userCount = count;
+      return db.StudentAssignment.findAll({where: {userId: userId, time: reference.getTimePeriod(timePeriod)}, include: [db.Assignment]})
+    }).then(function(assignment) {
+      result.assignmentInfo = assignment;
+      return db.StudentClass.findAll({where: {userId: userId}, include: [{model: db.Class, include: [
+        {model: db.Term, where: {termName: {$or: reference.getTermStrs(timePeriod, userId)}}}, {model: db.Course}
+        ]}]})
+    }).then(function(classInfo) {
+      result.classInfo = classInfo;
+      return db.SourceScore.findAll({where: {userId: userId}})
+    }).then(function(source) {
+      result.sourceInfo = source;
+      return db.StudentAssignment.count({where: {time: reference.getTimePeriod(timePeriod)}, include: [db.Assignment]})
+    }).then(function(assignmentCount) {
+      result.assignmentAverage = assignmentCount / userCount;
+      return db.StudentClass.count({where: {userId: userId}, include: [{model: db.Class, include: [
+        {model: db.Term, where: {termName: {$or: reference.getTermStrs(timePeriod, userId)}}}
+      ]}]})
+    }).then(function(classAverage) {
+      result.classAverage = classAverage / userCount;
+      callback(null, result)
     }).catch(function(err) {
       callback(err)
     })

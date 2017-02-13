@@ -81,22 +81,23 @@ function Activity() {
     lineChartData.data.labels = reference.getPartitionLabels(timePeriod)
 
 
-    var nodes = reference.getPartition(timePeriod)
+    var nodes = reference.getPartition(timePeriod, userId)
 
     db.sequelize.transaction(function(t) {
       // find total user count
-      return db.User.count({}, {transaction: t}).then(function(count) {
-        userCount = count;
-        return new Promise(function(resolve, reject) {
-          async.eachSeries(nodes, function(node, done) {
-            db.Action.count(getQuery(userId, node.gte, node.lte)).then(function(count) {
-              lineChartData.data.datasets[0].data.push(count);
-              done();
-            }).catch(function(err) {reject(err)})
-          }, function done() {
-            resolve()
+      return db.User.count({}, {transaction: t})
+        .then(function(count) {
+          userCount = count;
+          return new Promise(function(resolve, reject) {
+            async.eachSeries(nodes, function(node, done) {
+              db.Action.count(getQuery(userId, node.gte, node.lte)).then(function(count) {
+                lineChartData.data.datasets[0].data.push(count);
+                done();
+              }).catch(function(err) {reject(err)})
+            }, function done() {
+              resolve()
+            })
           })
-        })
       }).then(function() {
         return new Promise(function(resolve, reject) {
           async.eachSeries(nodes, function(node, done) {

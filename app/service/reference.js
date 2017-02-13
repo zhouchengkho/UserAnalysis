@@ -10,13 +10,16 @@ function Reference() {
 
   var currentYear = '2015'; // set current year at 2015 for test
   var lastYear = (Number(currentYear) - 1).toString();
+  var theYearBeforeLast = (Number(currentYear) - 2).toString();
   var currentMonth = moment().month();
-  var isInSpringSemester =  moment().isBetween(moment().format(currentYear + '-02-01 00:00:00'), moment().format(currentYear + '-07-31 24:00:00'));
-
+  // var isInSpringSemester =  moment().isBetween(moment().format(currentYear + '-02-01 00:00:00'), moment().format(currentYear + '-07-31 24:00:00'));
+  var isInSpringSemester = currentMonth >=1 && currentMonth <= 6
   function getSpringMonths(year) {
     var result = [];
     for(var i = 1; i < 7; i++)
       result.push(getMonth(year, i));
+    console.log('refer');
+    console.log(result);
     return result;
   }
 
@@ -185,15 +188,26 @@ function Reference() {
                     getSemester(secondYear, 'fall'), getSemester(thirdYear, 'spring'),
                     getSemester(thirdYear, 'fall'), getSemester(fourthYear, 'spring'),
                     getSemester(fourthYear, 'fall'), getSemester(fifthYear, 'spring')];
+
+    return semesters;
+  }
+
+  function getTermStr(year, term) {
+    if(term == 'fall')
+      return year + '-' + (Number(year) + 1).toString() + '学年第一学期'
+    else
+      return year + '-' + (Number(year) + 1).toString() + '学年第二学期'
+
   }
 
   /**
    *
-   * @param data
+   * @param timePeriod
+   * @param userId
    * @returns {*}
    */
-  this.getPartition = function(data) {
-    var timePeriod = data.timePeriod;
+  this.getPartition = function(timePeriod, userId) {
+    var timePeriod = timePeriod;
     switch (timePeriod) {
       case 'last-semester':
         return getLastSemesterMonths();
@@ -205,7 +219,7 @@ function Reference() {
         return getAcademicYearMonths();
         break;
       case 'college-career':
-        return getCollegeCareerSemesters(data.userId);
+        return getCollegeCareerSemesters(userId);
         break;
       default:
         return getAcademicYearMonths();
@@ -274,6 +288,64 @@ function Reference() {
         return getAcademicYear();
         break;
     }
+  }
+
+  /**
+   *
+   * @param timePeriod
+   * @param userId [optional]
+   */
+  this.getTermStrs = function(timePeriod, userId) {
+    var result = [];
+    var year = '';
+
+    switch (timePeriod) {
+      case 'last-semester':
+        if (isInSpringSemester)
+          year = lastYear;
+        else {
+          if(currentMonth == 0)
+            year = theYearBeforeLast;
+          else
+            year = lastYear
+        }
+        result.push(getTermStr(year, isInSpringSemester ? 'fall' : 'spring'))
+        break;
+      case 'this-semester':
+        if (isInSpringSemester)
+          year = lastYear;
+        else {
+          if(currentMonth == 0)
+            year = lastYear;
+          else
+            year = currentYear
+        }
+        result.push(getTermStr(year, isInSpringSemester ? 'spring' : 'fall'))
+        break;
+      case 'academic-year':
+        if (isInSpringSemester)
+          year = lastYear;
+        else {
+          if(currentMonth == 0)
+            year = lastYear;
+          else
+            year = currentYear
+        }
+        result.push(getTermStr(year, 'fall'))
+        result.push(getTermStr(year, 'spring'))
+        break;
+      case 'college-career':
+        year = '20' + userId.substring(2, 4);
+        for(var i = 0; i < 4; i++) {
+          result.push(getTermStr(year, 'fall'))
+          result.push(getTermStr(year, 'spring'))
+          year = (Number(year) + 1).toString()
+        }
+        break;
+      default:
+        break;
+    }
+    return result;
   }
 
 
