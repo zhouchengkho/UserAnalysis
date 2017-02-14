@@ -21,10 +21,26 @@ function fetchData() {
   $.ajax({
     type: 'GET',
     contentType: 'application/json; charset=utf-8',
+    url: '/analysis/activity-html-data'
+  }).done(function(data){
+    $('#activity-html').html(data.html);
+  });
+
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json; charset=utf-8',
     url: '/analysis/social-radar-chart-data'
   }).done(function(data){
     socialChartData = data;
     var radarChart = new Chart(socialChart, socialChartData);
+  });
+
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json; charset=utf-8',
+    url: '/analysis/homework-html-data'
+  }).done(function(data){
+    $('#homework-html').html(data.html);
   });
 }
 

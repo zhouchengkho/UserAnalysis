@@ -52,6 +52,26 @@ router.get('/homework-data', function(req, res) {
   })
 })
 
+router.get('/homework-html-data', function(req, res) {
+  homework.getHtmlData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
+    if(err)
+      res.json({status: 0, err: err.message})
+    else
+      res.json(result)
+  })
+})
+
+router.get('/activity-html-data', function(req, res) {
+  activity.getHtmlData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
+    if(err)
+      res.json({status: 0, err: err.message})
+    else
+      res.json(result)
+  })
+})
+
+
+
 router.get('/refer-test', function(req, res) {
   res.json({data: refer.getTermStrs('academic-year')});
 })

@@ -116,6 +116,57 @@ function Activity() {
       })
     });
   }
+
+  /**
+   *
+   * @param userId
+   * @param timePeriod
+   * @param callback
+   */
+  this.getHtmlData = function(userId, timePeriod, callback) {
+    if((typeof timePeriod) == 'function') {
+      callback = timePeriod;
+      timePeriod = 'academic-year'
+    }
+    var result = {};
+    Promise.all([
+      db.User.count({}),
+      db.Action.count({where: {userId: userId, time: reference.getTimePeriod(timePeriod, userId), actionName: '下载课件'}}),
+      db.Action.count({where: {userId: userId, time: reference.getTimePeriod(timePeriod, userId), actionName: '发起讨论'}}),
+      db.Action.count({where: {userId: userId, time: reference.getTimePeriod(timePeriod, userId), actionName: '提交作业'}}),
+      db.Action.count({where: {userId: userId, time: reference.getTimePeriod(timePeriod, userId), actionName: '下载资源'}}),
+      db.Action.count({where: {time: reference.getTimePeriod(timePeriod, userId), actionName: '下载课件'}}),
+      db.Action.count({where: {time: reference.getTimePeriod(timePeriod, userId), actionName: '发起讨论'}}),
+      db.Action.count({where: {time: reference.getTimePeriod(timePeriod, userId), actionName: '提交作业'}}),
+      db.Action.count({where: {time: reference.getTimePeriod(timePeriod, userId), actionName: '下载资源'}})
+
+    ]).spread(function(userCount, downloadPPTCount, discussCount, submitHomeworkCount, downloadResourceCount, downloadPPTSum, discussSum, submitHomeworkSum, downloadResourceSum) {
+      result.downloadPPTCount = downloadPPTCount;
+      result.discussCount = discussCount;
+      result.submitHomeworkCount = submitHomeworkCount;
+      result.downloadResourceCount = downloadResourceCount;
+      result.downloadPPTAvg = downloadPPTSum / userCount;
+      result.discussAvg = discussSum / userCount;
+      result.submitHomeworkAvg = submitHomeworkSum / userCount;
+      result.downloadResourceAvg = downloadResourceCount / userCount;
+      var html = '<div style="float: left">' +
+        '<p>Downloaded ' + downloadPPTCount + ' PPT(s)</p>' +
+        '<p>Initiated ' + discussCount + ' Discussion(s)</p>' +
+        '<p>Submitted ' + submitHomeworkCount + ' Homework(s)</p>' +
+        '<p>Downloaded ' + downloadResourceCount + ' Resource(s)</p>' +
+        '</div>' +
+        '<div style="float: right">' +
+        '<p>Avg Downloaded ' + downloadPPTSum / userCount + ' PPT(s)</p>' +
+        '<p>Avg Initiated ' + discussSum / userCount + ' Discussion(s)</p>' +
+        '<p>Avg Submitted ' + submitHomeworkSum / userCount + ' Homework(s)</p>' +
+        '<p>Avg Downloaded ' + downloadResourceSum / userCount + ' Resource(s)</p>' +
+        '</div>';
+      callback(null, {html: html})
+    }).catch(function(err) {
+      callback(err)
+    })
+
+  }
   /**
    *
    * @param userId: if null, cancel this condition

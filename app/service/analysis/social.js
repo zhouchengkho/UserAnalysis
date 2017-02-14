@@ -60,35 +60,32 @@ function Social() {
       }
     };
     var userCount = 0;
-    var opt = {
-      timePeriod: timePeriod,
-      userId: userId
-    }
+
     db.sequelize.transaction(function(t) {
       return db.User.count({}, {transaction: t}).then(function(count) {
         userCount = count;
         return db.Friend.count(query.genWhereQuery({userId: userId}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[0].data.push(count)
-        return db.Status.count(query.genWhereQuery({userId: userId, time: reference.getTimePeriod(opt)}), {transaction: t})
+        return db.Status.count(query.genWhereQuery({userId: userId, time: reference.getTimePeriod(timePeriod, userId)}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[0].data.push(count)
-        return db.SourceReply.count(query.genWhereQuery({replyId: userId, time: reference.getTimePeriod(opt)}), {transaction: t})
+        return db.SourceReply.count(query.genWhereQuery({replyId: userId, time: reference.getTimePeriod(timePeriod, userId)}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[0].data.push(count)
-        return db.TopicReply.count(query.genWhereQuery({replyId: userId, time: reference.getTimePeriod(opt)}), {transaction: t})
+        return db.TopicReply.count(query.genWhereQuery({replyId: userId, time: reference.getTimePeriod(timePeriod, userId)}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[0].data.push(count)
         return db.Friend.count(query.genWhereQuery({userId: null}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[1].data.push(count / userCount)
-        return db.Status.count(query.genWhereQuery({userId: null, time: reference.getTimePeriod(opt)}), {transaction: t})
+        return db.Status.count(query.genWhereQuery({userId: null, time: reference.getTimePeriod(timePeriod, userId)}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[1].data.push(count / userCount)
-        return db.SourceReply.count(query.genWhereQuery({time: reference.getTimePeriod(opt)}), {transaction: t})
+        return db.SourceReply.count(query.genWhereQuery({time: reference.getTimePeriod(timePeriod, userId)}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[1].data.push(count / userCount)
-        return db.TopicReply.count(query.genWhereQuery({time: reference.getTimePeriod(opt)}), {transaction: t})
+        return db.TopicReply.count(query.genWhereQuery({time: reference.getTimePeriod(timePeriod, userId)}), {transaction: t})
       }).then(function(count) {
         radarChartData.data.datasets[1].data.push(count / userCount)
         callback(null, radarChartData)

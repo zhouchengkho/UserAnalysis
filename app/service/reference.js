@@ -18,8 +18,6 @@ function Reference() {
     var result = [];
     for(var i = 1; i < 7; i++)
       result.push(getMonth(year, i));
-    console.log('refer');
-    console.log(result);
     return result;
   }
 
@@ -267,10 +265,11 @@ function Reference() {
 
   /**
    *
-   * @param data json, attr: timePeriod, userId(optional)
+   * @param timePeriod
+   * @param userId
+   * @returns {*}
    */
-  this.getTimePeriod = function(data) {
-    var timePeriod = data.timePeriod;
+  this.getTimePeriod = function(timePeriod, userId) {
     switch (timePeriod) {
       case 'last-semester':
         return getLastSemester();
@@ -282,7 +281,7 @@ function Reference() {
         return getAcademicYear();
         break;
       case 'college-career':
-        return getCollegeCareer(data.userId);
+        return getCollegeCareer(userId);
         break;
       default:
         return getAcademicYear();
