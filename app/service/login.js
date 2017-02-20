@@ -34,6 +34,7 @@ function Login() {
         req.session.login = {
           userId: users[0].userId,
           userName: users[0].userName,
+          character: (users[0].isTeacher == '0' ? 'student' : 'teacher'),
           settings: {
             time: refer.getTimePeriod('academic-year'),
             timePeriod: 'academic-year'

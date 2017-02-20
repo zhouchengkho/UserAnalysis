@@ -30,7 +30,7 @@ function loginAjax() {
     dataType: 'json'
   }).done(function(res){
     // alert(JSON.stringify(res))
-    if(res.status === 1)
+    if(res.status === 200)
       location.reload()
     else {
       alert('login fail')

@@ -30,7 +30,7 @@ function Score() {
     ep.all([epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
       function(activityScore, dormScore, socialScore, homeworkScore, summary) {
       callback({
-        overallScore: (activityScore + dormScore + socialScore + homeworkScore) / 4,
+        overallScore: Math.random() * 10,
         dormScore: dormScore,
         socialScore: socialScore,
         homeworkScore: homeworkScore,

@@ -9,14 +9,15 @@
 ### Session JSON
 ```javascript
 {
-  userId: '',
-  userName: '',
+  userId: '10131111111',
+  userName: 'yo',
+  character: 'teahcer' | 'student',
   settings: {
     time: {
-      gte: '',
-      lte: ''
+      gte: '2015-01-01 00:00:00',
+      lte: '2016-01-01 00:00:00'
     },
-    timePeriod: '' // 'last-semester' | 'this-semester' | 'academic-year' | 'college-career'
-  }
-}
+    timePeriod: 'this-semester' | 'last-semester' | 'academic-year' | 'college-career',
+    }
+};
 ```

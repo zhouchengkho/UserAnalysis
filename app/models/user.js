@@ -25,7 +25,8 @@ module.exports = function (sequelize, DataTypes) {
     classMethods: {
       associate: function (models) {
         // example on how to add relations
-        User.hasMany(models.Friend, {foreignKey: 'userId'})
+        User.hasMany(models.Friend, {foreignKey: 'userId'});
+        User.hasMany(models.StudentClass, {foreignKey: 'userId'});
       }
     },
       freezeTableName: true,
