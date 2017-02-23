@@ -10,10 +10,41 @@ function Activity() {
    * @param callback
    * @returns {number} score number
    */
-  this.getScore = function(userId, callback) {
-    callback(null, 5);
+  this.getOverallScore = function(userId, callback) {
+    callback(null, Math.random() * 10);
   }
 
+  this.getClassScore = function(userId, classId, callback) {
+    callback(null, Math.random() * 10);
+  }
+
+  this.getClassStudentScore = function(classId, userId, callback) {
+    callback(null, Math.random() * 10);
+  }
+
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   */
+  this.getClassStudentActivityCount = function(classId, userId, callback) {
+    db.sequelize.transaction(function(t) {
+      return db.Action.count({where: {classId: classId, userId: userId}})
+    }).then(function(result) {
+      callback(null, {count: result})
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param userId
+   * @param timePeriod
+   * @param callback
+   */
+  this.getStudentActivityCount = function(userId, timePeriod, callback) {
+
+  }
   /**
    * return user's action count
    * @param userId

@@ -7,7 +7,8 @@ var express = require('express'),
   social = require('../service/analysis/social'),
   homework = require('../service/analysis/homework'),
   refer = require('../service/reference'),
-  teacher = require('../service/analysis/teacher');
+  teacher = require('../service/teacher'),
+  scoreFiller = require('../service/scorefiller');
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -73,16 +74,10 @@ router.get('/activity-html-data', function(req, res) {
 
 
 
-router.get('/refer-test', function(req, res) {
-  res.json({data: refer.getTermStrs('academic-year')});
-})
-
-
-router.get('/get_class_students', function(req, res) {
-  teacher.getClassStu(req.session.login.userId, 'C180001201403', function(err, result) {
-    if(err)
-      res.json({status: 400, message: err.message})
-    else
-      res.json(result)
+router.get('/test/:classId/:userId', function(req, res) {
+  activity.getClassStudentOverallActivity(req.params.classId, req.params.userId, function(err, result) {
+    res.json(result)
   })
 })
+
+

@@ -1,8 +1,8 @@
 var express = require('express'),
   router = express.Router(),
   login = require('../service/login'),
-  score = require('../service/analysis/score'),
-  teacher = require('../service/analysis/teacher')
+  score = require('../service/scoregetter'),
+  teacher = require('../service/teacher')
 module.exports = function (app) {
   app.use('/', router);
 };
@@ -14,12 +14,16 @@ module.exports = function (app) {
 router.get('/', function (req, res, next) {
   switch (req.session.login.character) {
     case 'student':
-      score.getOverallScore(req.session.login.userId, function(data) {
-        res.render('student', getRenderOption(req, {
-          data: data,
-          script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
-          '<script type="text/javascript" src="/js/home.js"></script>'
-        }));
+      score.getStudentScore(req.session.login.userId, function(err, data) {
+        if(err)
+          res.json(err)
+        else {
+          res.render('student', getRenderOption(req, {
+            data: data,
+            script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
+            '<script type="text/javascript" src="/js/home.js"></script>'
+          }));
+        }
       })
       break;
     case 'teacher':
@@ -39,9 +43,17 @@ router.get('/', function (req, res, next) {
 router.get('/student/:id', function(req, res) {
   // check if is teacher
   if(req.session.login.character == 'teacher') {
-    res.render('student', {
-      title: 'Education User Analysis'
-    });
+    score.getStudentScore(req.params.id, function(err, data) {
+      if(err)
+        res.json(err)
+      else {
+        res.render('student', getRenderOption(req, {
+          data: data,
+          script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
+          '<script type="text/javascript" src="/js/home.js"></script>'
+        }));
+      }
+    })
   } else {
     res.redirect('/noaccess');
   }

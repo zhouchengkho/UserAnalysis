@@ -19,6 +19,25 @@ Object.keys(db).forEach(function (modelName) {
   }
 });
 
+/**
+ * Define upsert yourself
+ */
+Sequelize.Model.prototype.findCreateUpdate = function(findWhere, newValues) {
+  var self = this;
+  return self.findAll({
+    where: findWhere
+  }).then(function(result) {
+    console.log(result)
+    if(result[0]) {
+      // do update
+      return this.update(newValues, {where: findWhere})
+    } else {
+      // do create
+      return this.create(newValues)
+    }
+  });
+};
+
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 

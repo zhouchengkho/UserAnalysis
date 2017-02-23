@@ -8,7 +8,7 @@ var config = {
     app: {
       name: 'useranalysis'
     },
-    port: process.env.PORT || 3000,
+    port: 4000,
     // db: 'mysql://root:123456@localhost/useranalysis-development?user=root&password=123456',
     db: {
       database: 'useranalysis-development',
@@ -25,8 +25,8 @@ var config = {
         define: {
           timestamps: false // education db doesn't use timestamps
         },
-        timezone: '+8:00'
-        // logging: false
+        timezone: '+8:00',
+        logging: false
       }
     }
   },

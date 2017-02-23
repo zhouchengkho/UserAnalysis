@@ -19,8 +19,16 @@ function Social() {
    * @param userId
    * @param callback
    */
-  this.getScore = function(userId, callback) {
-    callback(null, 6);
+  this.getOverallScore = function(userId, callback) {
+    callback(null, Math.random() * 10);
+  }
+
+  this.getClassScore = function(userId, classId, callback) {
+    callback(null, Math.random() * 10);
+  }
+
+  this.getClassStudentScore = function(classId, userId, callback) {
+    callback(null, Math.random() * 10);
   }
   /**
    * getRadarData
