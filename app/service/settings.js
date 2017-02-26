@@ -14,7 +14,9 @@ function Settings() {
     try {
       var timePeriod = req.body.timePeriod;
       req.session.login.settings.timePeriod = timePeriod;
-      req.session.login.settings.time = ref.getTimePeriod(timePeriod, req.session.login.userId);
+      // req.session.login.settings.time = ref.getTimePeriod(timePeriod, req.session.login.userId);
+      // req.session.login.settings.terms = req.body.terms;
+
       callback(null, true)
     } catch(err) {
       callback(err)

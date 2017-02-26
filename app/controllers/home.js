@@ -40,7 +40,7 @@ router.get('/', function (req, res, next) {
   }
 });
 
-router.get('/student/:id', function(req, res) {
+router.get('/student/overall/:id', function(req, res) {
   // check if is teacher
   if(req.session.login.character == 'teacher') {
     score.getStudentScore(req.params.id, function(err, data) {
@@ -59,6 +59,24 @@ router.get('/student/:id', function(req, res) {
   }
 })
 
+router.get('/student/class/:studentId/:classId', function(req, res) {
+  // check if is teacher
+  if(req.session.login.character == 'teacher') {
+    score.getStudentScore(req.params.id, function(err, data) {
+      if(err)
+        res.json(err)
+      else {
+        res.render('student', getRenderOption(req, {
+          data: data,
+          script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
+          '<script type="text/javascript" src="/js/home.js"></script>'
+        }));
+      }
+    })
+  } else {
+    res.redirect('/noaccess');
+  }
+})
 router.get('/noaccess', function(req, res) {
   res.render('noaccess', {});
 })

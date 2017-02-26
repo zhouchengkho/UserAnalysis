@@ -2,7 +2,7 @@
  * Created by zhoucheng on 1/29/17.
  */
 var moment = require('moment');
-
+var db = require('../models/index');
 
 function Reference() {
 
@@ -165,6 +165,7 @@ function Reference() {
 
   function getCollegeCareer(userId) {
     var enrollYear = '20' + userId.substring(2, 4);
+    console.log('enroll: ' + enrollYear)
     var gradYear = (Number(enrollYear) + 4).toString();
     enrollYear = moment().format(enrollYear + '-09-01 00:00:00');
     gradYear = moment().format(gradYear + '-06-30 24:00:00');
@@ -349,6 +350,115 @@ function Reference() {
 
 
 
+  this.getCollegeTerms = function(userId, callback) {
+    var enrollYear = '20' + userId.substring(2, 4);
+
+    var terms = [];
+    terms.push(getTermStr(enrollYear, 'fall'));
+    terms.push(getTermStr(enrollYear, 'spring'));
+    terms.push(getTermStr((Number(enrollYear) + 1).toString(), 'fall'));
+    terms.push(getTermStr((Number(enrollYear) + 1).toString(), 'spring'));
+    terms.push(getTermStr((Number(enrollYear) + 2).toString(), 'fall'));
+    terms.push(getTermStr((Number(enrollYear) + 2).toString(), 'spring'));
+    terms.push(getTermStr((Number(enrollYear) + 3).toString(), 'fall'));
+    terms.push(getTermStr((Number(enrollYear) + 3).toString(), 'spring'));
+
+    db.Term.findAll({where: {termName: {$in: terms}}}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) { callback(err) })
+
+
+  }
+
+  this.getAcademicYearTerms = function(callback) {
+    var terms = [];
+    if(isInSpringSemester) {
+      terms.push(getTermStr(lastYear, 'fall'))
+      terms.push(getTermStr(lastYear, 'spring'))
+    }
+    else if (!isInSpringSemester && currentMonth == 0) {
+      terms.push(getTermStr(theYearBeforeLast, 'spring'))
+      terms.push(getTermStr(lastYear, 'fall'))
+    }
+    else {
+      terms.push(getTermStr(lastYear, 'spring'))
+      terms.push(getTermStr(currentYear, 'fall'))
+    }
+    db.Term.findAll({where: {termName: {$in: terms}}}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) { callback(err) })
+  }
+
+  this.getCurrentTerm = function(callback) {
+    var term = '';
+    if(isInSpringSemester)
+      term = getTermStr(lastYear, 'spring')
+    else if (!isInSpringSemester && currentMonth == 0)
+      term = getTermStr(lastYear, 'fall')
+    else
+      term = getTermStr(currentYear, 'fall')
+    db.Term.findAll({where: {termName: term}}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) { callback(err) })
+  }
+
+  function getTermButton(termId, termName) {
+    return '<button type="button" class="btn btn-default col-sm-6 setting-terms" id="' + termId + '">' + termName + '</button>';
+  }
+  this.getTerms = function(userId, timePeriod, callback) {
+    // var data = [];
+    // var terms = [];
+    var terms = this.getTermStrs(timePeriod, userId);
+    // switch (timePeriod) {
+    //   case 'last-semester':
+    //     terms = get
+    //     if(isInSpringSemester)
+    //       terms.push(getTermStr(lastYear, 'fall'))
+    //     else if (!isInSpringSemester && currentMonth == 0)
+    //       terms.push(getTermStr(theYearBeforeLast, 'spring'))
+    //     else
+    //       terms.push(getTermStr(lastYear, 'spring'))
+    //     break;
+    //   case 'this-semester':
+    //     if(isInSpringSemester)
+    //       terms.push(getTermStr(lastYear, 'spring'))
+    //     else if (!isInSpringSemester && currentMonth == 0)
+    //       terms.push(getTermStr(theYearBeforeLast, 'fall'))
+    //     else
+    //       terms.push(getTermStr(currentYear, 'fall'))
+    //     break;
+    //   case 'academic-year':
+    //     if(isInSpringSemester) {
+    //       terms.push(getTermStr(lastYear, 'fall'))
+    //       terms.push(getTermStr(lastYear, 'spring'))
+    //     }
+    //     else if (!isInSpringSemester && currentMonth == 0) {
+    //       terms.push(getTermStr(theYearBeforeLast, 'spring'))
+    //       terms.push(getTermStr(lastYear, 'fall'))
+    //     }
+    //     else {
+    //       terms.push(getTermStr(lastYear, 'spring'))
+    //       terms.push(getTermStr(currentYear, 'fall'))
+    //     }
+    //     break;
+    //   case 'college-career':
+    //     var enrollYear = '20' + userId.substring(2, 4);
+    //     terms.push(getTermStr(enrollYear, 'fall'));
+    //     terms.push(getTermStr(enrollYear, 'spring'));
+    //     terms.push(getTermStr((Number(enrollYear) + 1).toString(), 'fall'));
+    //     terms.push(getTermStr((Number(enrollYear) + 1).toString(), 'spring'));
+    //     terms.push(getTermStr((Number(enrollYear) + 2).toString(), 'fall'));
+    //     terms.push(getTermStr((Number(enrollYear) + 2).toString(), 'spring'));
+    //     terms.push(getTermStr((Number(enrollYear) + 3).toString(), 'fall'));
+    //     terms.push(getTermStr((Number(enrollYear) + 3).toString(), 'spring'));
+    //     break;
+    //   default:
+    //     break;
+    // }
+    db.Term.findAll({where: {termName: {$in: terms}}}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) {callback(err)} )
+  }
 }
 
 

@@ -8,7 +8,8 @@ var express = require('express'),
   homework = require('../service/analysis/homework'),
   refer = require('../service/reference'),
   teacher = require('../service/teacher'),
-  scoreFiller = require('../service/scorefiller');
+  scoreFiller = require('../service/scorefiller'),
+  db = require('../models/index');
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -27,7 +28,7 @@ router.get('/action-count', function(req, res) {
 
 
 router.get('/activity-line-chart-data', function(req, res) {
-  activity.getLineChartData(req.session.login.userId, req.session.login.settings.timePeriod,function(err, result) {
+  activity.getLineChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else
@@ -74,10 +75,17 @@ router.get('/activity-html-data', function(req, res) {
 
 
 
-router.get('/test/:classId/:userId', function(req, res) {
-  activity.getClassStudentOverallActivity(req.params.classId, req.params.userId, function(err, result) {
-    res.json(result)
-  })
+router.get('/test', function(req, res) {
+
+      db.Action.findAll(query).then(function(result) {
+        res.json(result)
+      }).catch(function(err) {res.json({status: 400, message: err.message})})
+  // refer.getAcademicYearTerms(function(err, result) {
+  //   if(err)
+  //     res.json({status: 400, message: err.message})
+  //   else
+  //     res.json(result)
+  // })
 })
 
 

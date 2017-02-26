@@ -6,21 +6,25 @@
                 <h1>Settings</h1>
               <div>
                   <p>Period of Time</p>
-                  <div class="btn-group" role="group" aria-label="...">
-                      <button type="button" class="btn btn-default" id="last-semester">Last Semester</button>
-                      <button type="button" class="btn btn-default" id="this-semester">This Semester</button>
-                      <button type="button" class="btn btn-default" id="academic-year">Academic Year</button>
-                      <button type="button" class="btn btn-default" id="college-career">College Career</button>
+                  <div class="btn-group col-sm-12" role="group" aria-label="...">
+                      <button type="button" class="btn btn-default col-sm-6" id="last-semester">Last Semester</button>
+                      <button type="button" class="btn btn-default col-sm-6" id="this-semester">This Semester</button>
+                      <button type="button" class="btn btn-default col-sm-6" id="academic-year">Academic Year</button>
+                      <button type="button" class="btn btn-default col-sm-6" id="college-career">College Career</button>
                   </div>
-                <div>
-                    <div class="blank-space"></div>
-                    From <input size="18" type="text"  readonly disabled id="from">
-                    To <input size="18" type="text" readonly disabled id="to">
-                </div>
+
+                  <p>Current Terms</p>
+                  <div class="btn-group col-sm-12 current-terms" role="group" aria-label="...">
+                      {{#each terms}}
+                          <button type="button" class="btn btn-default col-sm-6 setting-terms" id="{{termId}}">{{termName}}</button>
+                        {{/each}}
+                  </div>
               </div>
                 <div>
                     <div class="blank-space"></div>
                     <button class="btn btn-primary" id="ok">OK</button>
+                    <button class="btn btn-primary" id="cancel">Cancel</button>
+
                 </div>
             </div>
         </div>

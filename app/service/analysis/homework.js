@@ -12,10 +12,44 @@ function HomeWork() {
    * getOverallScore
    * @param userId
    * @param callback
-   * @returns {number} score number
+   * @returns {JSON}
+   * {
+   *  "overallScore": 8.33
+   *  "classScores":
+   *    [
+   *      {
+   *        "classId": "C12312312",
+   *        "score": 7.33
+   *      },
+   *      {
+   *      "classId": "C12312312",
+   *        "score": "9.33"
+   *      }
+   *    ]
+   * }
    */
-  this.getOverallScore = function(userId, callback) {
-    callback(null, Math.random() * 10);
+  this.getStudentScore = function(userId, callback) {
+    var self = this;
+    var data = {};
+    data.classScores = [];
+    query.getStudentClasses(userId).then(function(data) {
+      var classId = data[index];
+      async.eachSeries(data, function(classId, done) {
+        self.getClassStudentScore(classId, userId, function(err, score) {
+          if(err)
+            throw new Error(err)
+          classScores.push({classId: classId, score: score})
+          done()
+        })
+      }, function done() {
+        // compute avg
+        var sum = 0;
+        for(var index in classScores)
+          sum += classScores[index].score
+        data.overallScore = sum / classScores.length
+        callback(null, data);
+      })
+    }).catch(function(err) {callback(err)})
   }
 
   this.getClassScore = function(userId, classId, callback) {
@@ -45,12 +79,12 @@ function HomeWork() {
       return db.User.count({})
     }).then(function(count) {
       userCount = count;
-      return db.StudentAssignment.findAll({where: {userId: userId, time: reference.getTimePeriod(timePeriod)}, include: [db.Assignment]})
+      return db.StudentAssignment.findAll({where: {userId: userId, time: reference.getTimePeriod(timePeriod, userId)}, include: [db.Assignment]})
     }).then(function(assignment) {
       result.assignmentInfo = assignment;
       result.assignmentCount = assignment.length;
       return db.StudentClass.findAll({where: {userId: userId}, include: [{model: db.Class, include: [
-        {model: db.Term, where: {termName: {$or: reference.getTermStrs(timePeriod, userId)}}}, {model: db.Course}
+        {model: db.Term, where: {termName: {$in: reference.getTermStrs(timePeriod, userId)}}}, {model: db.Course}
         ]}]})
     }).then(function(classInfo) {
       result.classInfo = classInfo;
@@ -65,7 +99,7 @@ function HomeWork() {
       }
 
       result.sourceScoreAvg = sum / source.length;
-      return db.StudentAssignment.count({where: {time: reference.getTimePeriod(timePeriod)}, include: [db.Assignment]})
+      return db.StudentAssignment.count({where: {time: reference.getTimePeriod(timePeriod, userId)}, include: [db.Assignment]})
     }).then(function(assignmentCount) {
       result.assignmentAverage = assignmentCount / userCount;
       return db.StudentClass.count({where: {userId: userId}, include: [{model: db.Class, include: [

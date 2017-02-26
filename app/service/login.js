@@ -31,18 +31,22 @@ function Login() {
     }).then(function(users) {
       if(users) {
         // console.log(JSON.stringify(users));
-        req.session.login = {
-          userId: users[0].userId,
-          userName: users[0].userName,
-          character: (users[0].isTeacher == '0' ? 'student' : 'teacher'),
-          settings: {
-            time: refer.getTimePeriod('academic-year'),
-            timePeriod: 'academic-year'
-          }
-        };
-
-        req.session.save();
-        callback(null, true)
+        refer.getAcademicYearTerms(function(err, terms) {
+          if(err)
+            return callback(err)
+          req.session.login = {
+            userId: users[0].userId,
+            userName: users[0].userName,
+            character: (users[0].isTeacher == '0' ? 'student' : 'teacher'),
+            settings: {
+              // time: refer.getTimePeriod('academic-year'),
+              timePeriod: 'academic-year',
+              // terms: terms
+            }
+          };
+          req.session.save();
+          callback(null, true)
+        })
       }
       else
         callback(null, false)

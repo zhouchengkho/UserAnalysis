@@ -4,11 +4,11 @@
 
 
 $(document).ready(function() {
-  getSettings();
+  // getSettings();
 
-  $('#from').datetimepicker({format: 'yyyy-mm-dd mm:ss'});
+  // $('#from').datetimepicker({format: 'yyyy-mm-dd mm:ss'});
 
-  $('#to').datetimepicker({format: 'yyyy-mm-dd mm:ss'});
+  // $('#to').datetimepicker({format: 'yyyy-mm-dd mm:ss'});
 
   $('#ok').on('click', function() {
     updateSettings();
@@ -35,9 +35,36 @@ $(document).ready(function() {
   })
 
 
+  $('#cancel').on('click', function() {
+    location.href = '/';
+  })
+
+  $('.all-terms').on('click', function() {
+    var self = $(this);
+    $('.setting-terms[id=' + self.attr('id')+ ']').remove();
+    $('.current-terms:last').append(genSettingTerm(self.attr('id'), self.text()))
+
+    // if(self.hasClass('active')) {
+    //   $('.setting-terms[id=' + self.attr('id')+ ']').remove();
+    // } else {
+    //   $('.current-terms:last').append(genSettingTerm(self.attr('id'), self.text()))
+    // }
+    // self.toggleClass('active')
+  })
+
 
 
 })
+
+// $(document).on('click', '.setting-terms', function()
+// {
+//   // alert('removing')
+//   $(this).remove()
+// })
+
+function genSettingTerm(id, val) {
+  return '<button type="button" class="btn btn-default col-sm-6 setting-terms" id=\"' + id + '\">' + val + '</button>'
+}
 
 function setActive(cssSelector) {
   var elements = ['#last-semester', '#this-semester', '#academic-year', '#college-career'];
@@ -48,8 +75,8 @@ function setActive(cssSelector) {
 }
 
 function updateSettings() {
-  var from = $('#from').val();
-  var to = $('#to').val();
+  // var from = $('#from').val();
+  // var to = $('#to').val();
 
   var timePeriod = $('.btn.btn-default.active').attr('id');
 
@@ -57,7 +84,7 @@ function updateSettings() {
     type: 'POST',
     contentType: 'application/json; charset=utf-8',
     url: '/settings/change-settings',
-    data: JSON.stringify({timePeriod: timePeriod}),
+    data: JSON.stringify({timePeriod: timePeriod, terms: getNewTerms()}),
     dataType: 'json'
   }).done(function(res){
     if(res.status === 1)
@@ -68,9 +95,17 @@ function updateSettings() {
   });
 }
 
-function getSettings() {
-  setTimeAjax('/settings/get-settings');
+function getNewTerms() {
+  var terms = []
+  $('.setting-terms').each(function() {
+    terms.push({termId: $(this).attr('id'), termName: $(this).text()})
+  })
+  return terms;
 }
+
+// function getSettings() {
+//   setTimeAjax('/settings/get-settings');
+// }
 
 function setTimeAjax(url) {
   $.ajax({
@@ -78,8 +113,14 @@ function setTimeAjax(url) {
     contentType: 'application/json; charset=utf-8',
     url: url,
     dataType: 'json'
-  }).done(function(data){
-    $('#from').val(data.time.gte)
-    $('#to').val(data.time.lte)
+  }).done(function(result){
+    // $('#from').val(data.time.gte)
+    // $('#to').val(data.time.lte)
+    var data = result.data;
+    var currentTerms = $('.current-terms');
+    currentTerms.empty();
+    for(var i in data) {
+      currentTerms.append(genSettingTerm(data[i].termId, data[i].termName))
+    }
   });
 }

@@ -2,16 +2,51 @@ var db = require('../../models/index');
 var moment  = require('moment');
 var reference = require('./../reference');
 var Promise = require('bluebird');
-var async = require('async')
+var async = require('async');
+var query = require('../query');
 function Activity() {
   /**
    * getOverallScore
    * @param userId
    * @param callback
-   * @returns {number} score number
+   * @returns {JSON}
+   * {
+   *  "overallScore": 8.33
+   *  "classScores":
+   *    [
+   *      {
+   *        "classId": "C12312312",
+   *        "score": 7.33
+   *      },
+   *      {
+   *      "classId": "C12312312",
+   *        "score": "9.33"
+   *      }
+   *    ]
+   * }
    */
-  this.getOverallScore = function(userId, callback) {
-    callback(null, Math.random() * 10);
+  this.getStudentScore = function(userId, callback) {
+    var self = this;
+    var data = {};
+    data.classScores = [];
+    query.getStudentClasses(userId).then(function(data) {
+      var classId = data[index];
+      async.eachSeries(data, function(classId, done) {
+        self.getClassStudentScore(classId, userId, function(err, score) {
+          if(err)
+            throw new Error(err)
+          classScores.push({classId: classId, score: score})
+          done()
+        })
+      }, function done() {
+        // compute avg
+        var sum = 0;
+        for(var index in classScores)
+          sum += classScores[index].score
+        data.overallScore = sum / classScores.length
+        callback(null, data);
+      })
+    }).catch(function(err) {callback(err)})
   }
 
   this.getClassScore = function(userId, classId, callback) {
@@ -66,14 +101,15 @@ function Activity() {
    * fall: 8 - 1
    * spring: 2 - 7
    * @param userId
-   * @param timePeriod [optional] if not provided, set as 'academic-year'
+   * @param timePeriod
    * @param callback
    */
   this.getLineChartData = function(userId, timePeriod, callback) {
     if((typeof timePeriod) == 'function') {
       callback = timePeriod;
-      timePeriod = 'academic-year'
+      timePeriod = reference.getTimePeriod('academic-year')
     }
+
     var userCount = 0;
     var lineChartData = {
       type: 'line',
@@ -114,11 +150,15 @@ function Activity() {
 
     var nodes = reference.getPartition(timePeriod, userId)
 
+
+
+
     db.sequelize.transaction(function(t) {
       // find total user count
       return db.User.count({}, {transaction: t})
         .then(function(count) {
           userCount = count;
+          // user
           return new Promise(function(resolve, reject) {
             async.eachSeries(nodes, function(node, done) {
               db.Action.count(getQuery(userId, node.gte, node.lte)).then(function(count) {
@@ -130,6 +170,7 @@ function Activity() {
             })
           })
       }).then(function() {
+        // average
         return new Promise(function(resolve, reject) {
           async.eachSeries(nodes, function(node, done) {
             db.Action.count(getQuery(null, node.gte, node.lte)).then(function(count) {
