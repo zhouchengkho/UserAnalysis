@@ -46,6 +46,14 @@ router.get('/social-radar-chart-data', function(req, res) {
   })
 })
 
+router.get('/student-class-line-chart-data/:studentId/:classId', function(req, res) {
+  activity.getClassStudentLineChartData(req.params.classId, req.params.studentId, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json(result)
+  })
+})
 
 router.get('/homework-data', function(req, res) {
   homework.getHomeWorkData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
@@ -94,6 +102,16 @@ router.get('/test', function(req, res) {
 
 router.get('/get-class-detail/:id', function(req, res) {
   scoreGetter.getClassBadScores(req.params.id, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json({status: 200, data: result})
+  })
+})
+
+
+router.get('/fill-all', function(req, res) {
+  scoreFiller.fillAllScore(function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else

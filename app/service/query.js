@@ -88,6 +88,21 @@ function Query() {
   this.getClassDetail = function(classId, callback) {
 
   }
+
+  /**
+   *
+   * @param callback
+   * @returns {Array}
+   * ['classId_1', 'classId_2'...]
+   */
+  this.getClassesInDb = function(callback) {
+    db.Class.findAll({}).then(function(result) {
+      var data = [];
+      for(var index in result)
+        data.push(result[index].classId)
+      callback(null, data)
+    }).catch(function(err) {callback(err)})
+  }
 }
 
 module.exports = new Query();

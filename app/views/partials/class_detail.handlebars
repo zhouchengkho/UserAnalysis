@@ -1,4 +1,8 @@
+{{#if this}}
 <p>Bad Scorers</p>
 {{#each this}}
-    <p><a href="/student/overall/{{userId}}">{{userId}} </a>{{userName}} {{overallScore}}</p>
+    <p><a href="/student/class/{{userId}}/{{classId}}">{{userId}} </a>{{userName}} {{overallScore}}
+        <a href="/student/class/{{userId}}/{{classId}}">View Class</a>/
+        <a href="/student/overall/{{userId}}">View full</a></p>
 {{/each}}
+{{/if}}

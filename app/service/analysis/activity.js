@@ -121,46 +121,6 @@ function Activity() {
         console.log('final ' + classId + ' ' + final)
         callback(null, final)
       })
-      // Promise.all([
-      //   query.getClassActionCountAvgAsync(classId, ['401']),
-      //   query.getClassActionCountAvgAsync(classId, ['402']),
-      //   query.getClassActionCountAvgAsync(classId, ['502', '503', '504', '505', '507']),
-      //   query.getClassActionCountAvgAsync(classId, ['301']),
-      //   // query.getClassActionCountAvgAsync(classId, ['201', '202', '203'])
-      // ]).spread(function(initAvg, checkoutAvg, rscAvg, pptAvg, assignmentAvg) {
-      //   // assignmentAvg = 2;
-      //   score.initDiscussionScore = getScore(initCount, initAvg);
-      //   score.checkoutDiscussionScore = getScore(checkoutCount, checkoutAvg);
-      //   score.resourceScore = getScore(rscCount, rscAvg);
-      //   score.pptScore = getScore(pptCount, pptAvg);
-      //   score.assignmentScore = getScore(assignmentCount, assignmentAvg);
-      //   var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
-      //   console.log('param: '+initCount + ' '+ initAvg + ' '+ checkoutCount + ' ' + checkoutAvg + ' '+ rscCount + ' ' +rscAvg + ' '+ pptCount + ' '+ pptAvg + ' '+ assignmentCount + ' '+ assignmentAvg)
-      //   console.log('score: '+JSON.stringify(score))
-      //   console.log('final ' + classId + ' ' + final)
-      //   callback(null, final)
-      // })
-      // query.getClassActionCountAvgAsync(classId, ['201', '202', '203']).then(function(assignmentAvg) {
-      //   // console.log(assignmentAvg)
-      //   score.initDiscussionScore = getScore(initCount, initAvg);
-      //   score.checkoutDiscussionScore = getScore(checkoutCount, checkoutAvg);
-      //   score.resourceScore = getScore(rscCount, rscAvg);
-      //   score.pptScore = getScore(pptCount, pptAvg);
-      //   score.assignmentScore = getScore(assignmentCount, assignmentAvg);
-      //   var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
-      //   console.log('param: '+initCount + ' '+ initAvg + ' '+ checkoutCount + ' ' + checkoutAvg + ' '+ rscCount + ' ' +rscAvg + ' '+ pptCount + ' '+ pptAvg + ' '+ assignmentCount + ' '+ assignmentAvg)
-      //   console.log('score: '+JSON.stringify(score))
-      //   console.log('final ' + classId + ' ' + final)
-      //   callback(null, final)
-      // })
-
-      // console.log(initCount)
-
-      // var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
-      // var final = score.initDiscussionScore * 0.5 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 ;
-      //
-      // console.log(final)
-      // callback(null, final)
     }).catch(function(err) {callback(err)})
   }
 
@@ -296,6 +256,95 @@ function Activity() {
     });
   }
 
+
+  /**
+   * class score
+   * initiate discussion - code: 401
+   * checkout discussion - code: 402
+   * resource (check out / edit / download / rate) - (502  / 503 / 505 / 507)
+   * ppt download  - code: 301
+   * assignment (submit / resubmit / download) -  (201 / 202 / 203)
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   */
+  this.getClassStudentLineChartData = function(classId, userId, callback) {
+
+    var userCount = 0;
+    var lineChartData = {
+      type: 'line',
+      option: {
+        title: {
+          text: 'Visit Frequency',
+          display: true
+        },
+        responsive: false
+      },
+      data: {
+        labels : ['发起讨论', '查看讨论', '下载资源', '下载ppt', '下载资源'],
+        datasets : [
+          {
+            label: 'Mine',
+            backgroundColor : 'rgba(207,220,229,0.5)',
+            borderColor : 'rgba(160,185,204,1)',
+            pointBackgroundColor: 'rgba(160,185,204,1)',
+            pointBorderColor : 'rgba(255,255,255,1)',
+            data : []
+          },
+          {
+            label: 'Average',
+            backgroundColor : 'rgba(247,223,229,0.5)',
+            borderColor : 'rgba(226,97,128,1)',
+            pointBackgroundColor: 'rgba(226,97,128,1)',
+            pointBorderColor : 'rgba(255,255,255,1)',
+            data : []
+          }
+        ]
+      }
+    }
+
+    Promise.all([
+      query.getClassStudentActionCountAsync(classId, userId, ['401']),
+      query.getClassStudentActionCountAsync(classId, userId, ['402']),
+      query.getClassStudentActionCountAsync(classId, userId, ['505']),
+      query.getClassStudentActionCountAsync(classId, userId, ['301']),
+      query.getClassStudentActionCountAsync(classId, userId, ['203'])
+    ]).spread(function(initScore, checkoutScore, rscScore, pptScore, assignmentScore) {
+      var initAvg, checkoutAvg, rscAvg, pptAvg, assignmentAvg;
+      query.getClassActionCountAvgAsync(classId, ['401']).then(function(count) {
+        initAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['402'])
+      }).then(function(count) {
+        checkoutAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['505'])
+      }).then(function(count) {
+        rscAvg = count;
+        return  query.getClassActionCountAvgAsync(classId, ['301'])
+      }).then(function(count) {
+        pptAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['203'])
+      }).then(function(count) {
+        assignmentAvg = count;
+        lineChartData.data.datasets[0].data.push(initScore)
+        lineChartData.data.datasets[0].data.push(checkoutScore)
+        lineChartData.data.datasets[0].data.push(rscScore)
+        lineChartData.data.datasets[0].data.push(pptScore)
+        lineChartData.data.datasets[0].data.push(assignmentScore)
+        lineChartData.data.datasets[1].data.push(initAvg)
+        lineChartData.data.datasets[1].data.push(checkoutAvg)
+        lineChartData.data.datasets[1].data.push(rscAvg)
+        lineChartData.data.datasets[1].data.push(pptAvg)
+        lineChartData.data.datasets[1].data.push(assignmentAvg)
+
+        callback(null, lineChartData)
+      })
+
+    })
+
+
+
+  }
   /**
    *
    * @param userId

@@ -10,6 +10,7 @@ var Promise = require('bluebird');
 var EventProxy = require('eventproxy');
 var summary = require('./analysis/summary');
 var scoreGetter = require('./scoregetter');
+var query = require('./query');
 var async = require('async');
   function ScoreFiller() {
   /**
@@ -24,7 +25,7 @@ var async = require('async');
     db.sequelize.transaction(function(t) {
       return getStudentsByClass(classId)
     }).then(function(result) {
-      // console.log('... ' + JSON.stringify(result[0].User.userId))
+
       for(var index in result) {
         if(result[index].User)
           studentIds.push(result[index].User.userId)
@@ -59,11 +60,21 @@ var async = require('async');
    * @param callback
    */
   this.fillAllScore = function(callback) {
-
+    var self = this;
+    query.getClassesInDb(function(err, result) {
+      if(err)
+        return callback(err)
+      async.eachSeries(result, function(classId, done) {
+        self.fillClassScore(classId, function() {
+          done()
+        })
+      }, function done() {
+        callback(null, 'success')
+      })
+    })
   }
 
   this.fillClassStudentScore = function(classId, userId, callback) {
-    console.log('go south')
     this.getClassStudentScore(classId, userId, function(err, data) {
       db.AnalysisScore.findCreateUpdate({classId: classId, userId: userId}, data).then(function(result) {
         callback(null, 'success')

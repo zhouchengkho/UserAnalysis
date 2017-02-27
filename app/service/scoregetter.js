@@ -92,16 +92,19 @@ function ScoreGetter() {
    * [
    *  {
    *    "userId": "",
+   *    "classId": "",
    *    "userName": "",
    *    "overallScore": ""
    *  },
    *  {
    *    "userId": "",
+   *    "classId": "",
    *    "userName": "",
    *    "overallScore": ""
    *  },
    *  {
    *    "userId": "",
+   *    "classId": "",
    *    "userName": "",
    *    "overallScore": ""
    *  }
@@ -111,17 +114,17 @@ function ScoreGetter() {
     scoreFiller.fillClassScore(classId,function(err, result) {
       if(err)
         return callback(err)
-      db.AnalysisScore.findAll({where: {classId: classId}, limit: 3, order: 'overallScore asc', include:[db.User]}).then(function (result) {
+      db.AnalysisScore.findAll({where: {classId: classId}, limit: 3, order: 'overallScore asc', include:[{model: db.User}]}).then(function (result) {
         var data = [];
         for(var index = 0; index < result.length; index++) {
           var temp = {
             userId: result[index].userId,
+            classId: classId,
             userName: result[index].User.userName,
-            overallScore: result[index].overallScore
+            overallScore: fixToTwo(result[index].overallScore)
           }
           data.push(temp)
         }
-        console.log('amigo '+JSON.stringify(data))
         callback(null, data)
       })
     })
@@ -152,7 +155,9 @@ function ScoreGetter() {
    * result:
    * {
    *  userId: '1O132510237',
+   *  userName: 'cheng',
    *  classId: 'CABLABLABLA',
+   *  className: 'shujujiegou',
    *  overallScore: 5,
    *  dormScore: 6,
    *  socialScore: 5,
@@ -162,21 +167,25 @@ function ScoreGetter() {
    * }
    */
   this.getClassStudentScore = function(classId, userId, callback) {
-    db.AnalysisScore.findAll({where: {classId: classId, userId: userId}}).then(function(result) {
+    db.AnalysisScore.findAll({where: {classId: classId, userId: userId}, include: [{model: db.Class, include: [{model: db.Course}]}, {model: db.User}]}).then(function(result) {
       if(result[0]) {
+        console.log(JSON.stringify(result[0]))
         var data = {
           userId: result[0].userId,
+          userName: result[0].User.userName,
           classId: result[0].classId,
-          overallScore: result[0].overallScore,
-          dormScore: result[0].dormScore,
-          socialScore: result[0].socialScore,
-          homeworkScore: result[0].homeworkScore,
-          activityScore: result[0].activityScore,
-          summary: summary
+          className: result[0].Class.Course.courseName,
+          overallScore: fixToTwo(result[0].overallScore),
+          dormScore: fixToTwo(result[0].dormScore),
+          socialScore: fixToTwo(result[0].socialScore),
+          homeworkScore: fixToTwo(result[0].homeworkScore),
+          activityScore: fixToTwo(result[0].activityScore),
+          summary: result[0].summary
         }
         callback(null, data)
       } else {
         var epEmitter = {
+          name: 'name',
           dorm: 'dorm',
           social: 'social',
           summary: 'summary',
@@ -186,17 +195,18 @@ function ScoreGetter() {
         }
         var ep = new EventProxy();
 
-        ep.all([epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
-          function(activityScore, dormScore, socialScore, homeworkScore, summary) {
+        ep.all([epEmitter.name, epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
+          function(className, activityScore, dormScore, socialScore, homeworkScore, summary) {
           console.log('summary is: '+summary)
             var data = {
               userId: userId,
               classId: classId,
-              overallScore: (activityScore + dormScore + socialScore +homeworkScore ) /4,
-              dormScore: dormScore,
-              socialScore: socialScore,
-              homeworkScore: homeworkScore,
-              activityScore: activityScore,
+              className: className,
+              overallScore: fixToTwo((activityScore + dormScore + socialScore +homeworkScore ) /4),
+              dormScore: fixToTwo(dormScore),
+              socialScore: fixToTwo(socialScore),
+              homeworkScore: fixToTwo(homeworkScore),
+              activityScore: fixToTwo(activityScore),
               summary: summary
             }
             callback(null, data)
@@ -209,6 +219,10 @@ function ScoreGetter() {
           callback(err);
         })
 
+        db.Class.findAll({where: {classId: classId}, include:[db.Course]}).then(function(result) {
+          ep.emit(epEmitter.name, result[0].Course.courseName);
+
+        }).catch(function(err){ep.emit(epEmitter.error, err);})
         activity.getClassStudentScore(classId, userId, function(err, activityScore) {
 
           if(err)

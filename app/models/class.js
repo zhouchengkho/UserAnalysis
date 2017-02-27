@@ -18,6 +18,7 @@ module.exports = function (sequelize, DataTypes) {
           Class.belongsTo(models.Term, {foreignKey: 'termId'})
           Class.belongsTo(models.Course, {foreignKey: 'courseId'})
           Class.hasMany(models.Action, {foreignKey: 'classId'})
+          Class.hasMany(models.AnalysisScore, {foreignKey: 'classId'})
         }
       },
       freezeTableName: true,

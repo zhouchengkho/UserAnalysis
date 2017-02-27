@@ -65,14 +65,15 @@ router.get('/student/overall/:id', function(req, res) {
 router.get('/student/class/:studentId/:classId', function(req, res) {
   // check if is teacher
   if(req.session.login.character == 'teacher') {
-    score.getStudentScore(req.params.id, function(err, data) {
+    score.getClassStudentScore(req.params.classId, req.params.studentId, function(err, data) {
+      console.log(JSON.stringify(data))
       if(err)
         res.json(err)
       else {
-        res.render('student', getRenderOption(req, {
+        res.render('student_class', getRenderOption(req, {
           data: data,
           script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
-          '<script type="text/javascript" src="/js/home.js"></script>'
+          '<script type="text/javascript" src="/js/student_class.js"></script>'
         }));
       }
     })

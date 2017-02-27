@@ -39,7 +39,6 @@ $(document).on('click', '.class-detail', function()
       url: '/analysis/get-class-detail/'+id,
       dataType: 'json'
     }).done(function(res){
-      alert(JSON.stringify(res))
       if(res.status === 200) {
         var html = Handlebars.templates["class_detail"](res.data);
         $('#'+id+' .panel-body').html(html)
