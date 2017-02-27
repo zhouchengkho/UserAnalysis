@@ -33,7 +33,7 @@ router.get('/', function (req, res, next) {
           data: data,
           script: '<script type="text/javascript" src="/js/teacher.js"></script>' +
           '<script type="text/javascript" src="js/handlebars-v4.0.5.js"></script>' +
-          '<script type="text/javascript" src="js/partials/class_detail.js"></script>' +
+          '<script type="text/javascript" src="js/partials/class_detail.js"></script>'
           }));
       })
       break;
