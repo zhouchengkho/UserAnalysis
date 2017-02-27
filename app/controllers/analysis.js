@@ -9,6 +9,7 @@ var express = require('express'),
   refer = require('../service/reference'),
   teacher = require('../service/teacher'),
   scoreFiller = require('../service/scorefiller'),
+  scoreGetter = require('../service/scoregetter')
   db = require('../models/index');
 
 module.exports = function (app) {
@@ -77,15 +78,25 @@ router.get('/activity-html-data', function(req, res) {
 
 router.get('/test', function(req, res) {
 
-      db.Action.findAll(query).then(function(result) {
-        res.json(result)
-      }).catch(function(err) {res.json({status: 400, message: err.message})})
+      // db.Action.findAll(query).then(function(result) {
+      //   res.json(result)
+      // }).catch(function(err) {res.json({status: 400, message: err.message})})
   // refer.getAcademicYearTerms(function(err, result) {
   //   if(err)
   //     res.json({status: 400, message: err.message})
   //   else
   //     res.json(result)
   // })
+  scoreGetter.getClassStudentScore('10152510134', 'C180001201512', function(err, result) {
+    res.json(result)
+  })
 })
 
-
+router.get('/get-class-detail/:id', function(req, res) {
+  scoreGetter.getClassBadScores(req.params.id, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json({status: 200, data: result})
+  })
+})

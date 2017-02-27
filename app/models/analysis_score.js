@@ -18,6 +18,7 @@ module.exports = function (sequelize, DataTypes) {
       classMethods: {
         associate: function (models) {
           // example on how to add relations
+          AnalysisScore.belongsTo(models.User, {foreignKey: 'userId'})
         }
       },
       freezeTableName: true,

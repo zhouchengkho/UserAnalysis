@@ -20,20 +20,13 @@
                           <div class="panel panel-default">
                               <div class="panel-heading">
                                   <h4 class="panel-title">
-                                      <a data-toggle="collapse" data-parent="#accordion"
-                                         href="#{{classInfo.classId}}">
+                                      <a data-toggle="collapse" class="class-detail" data-parent="#accordion" href="#{{classInfo.classId}}">
                                           {{classInfo.classId}}: {{classInfo.Course.courseName}}
                                       </a>
                                   </h4>
                               </div>
                               <div id="{{classInfo.classId}}" class="panel-collapse collapse">
                                   <div class="panel-body">
-                                      {{#if badScoreFilter}}
-                                        <p>Bad Scorers</p>
-                                        {{#each badScoreFilter}}
-                                            <p><a href="/student/overall/{{userId}}">{{userId}} </a>{{userName}} {{score}}</p>
-                                        {{/each}}
-                                      {{/if}}
                                   </div>
                               </div>
                           </div>

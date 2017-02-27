@@ -13,7 +13,7 @@ function Summary() {
   }
 
   this.getClassStudentSummary = function(classId, userId, callback) {
-    callback(null, Math.random() * 10);
+    callback(null, 'this is class student summary');
   }
 
   this.getStudentSummary = function(userId, callback) {

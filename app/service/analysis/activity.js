@@ -3,7 +3,7 @@ var moment  = require('moment');
 var reference = require('./../reference');
 var Promise = require('bluebird');
 var async = require('async');
-var query = require('../query');
+var query = Promise.promisifyAll(require('../query'));
 function Activity() {
   /**
    * getOverallScore
@@ -29,21 +29,22 @@ function Activity() {
     var self = this;
     var data = {};
     data.classScores = [];
-    query.getStudentClasses(userId).then(function(data) {
-      var classId = data[index];
-      async.eachSeries(data, function(classId, done) {
-        self.getClassStudentScore(classId, userId, function(err, score) {
+    query.getStudentClasses(userId).then(function(classIds) {
+      // var classId = data[index];
+      async.eachSeries(classIds, function(classId, done) {
+        self.getClassStudentScoreAsync(classId, userId, function(err, score) {
           if(err)
             throw new Error(err)
-          classScores.push({classId: classId, score: score})
+          data.classScores.push({classId: classId, score: score})
           done()
         })
       }, function done() {
         // compute avg
         var sum = 0;
-        for(var index in classScores)
-          sum += classScores[index].score
-        data.overallScore = sum / classScores.length
+        for(var index in data.classScores)
+          sum += data.classScores[index].score
+        data.overallScore = sum / data.classScores.length
+        console.log('student score: ' + data)
         callback(null, data);
       })
     }).catch(function(err) {callback(err)})
@@ -53,8 +54,114 @@ function Activity() {
     callback(null, Math.random() * 10);
   }
 
+  /**
+   *  count / avg > 1.8  =  10
+   *  < 1.8:  ( (count / avg) / 1.8 ) * 10
+   * @param score
+   * @returns {number}
+   */
+  function getScore(count, avg) {
+    var score = (avg == 0) ? 0.9 : count / avg;
+    if(score >= 1.8)
+      return 10;
+    else {
+      return ( score / 1.8 ) * 10
+    }
+  }
+  /**
+   * class score
+   * initiate discussion - code: 401, 30%
+   * checkout discussion - code: 402, 10%
+   * resource (check out / edit / download / rate) - (502  / 503 / 505 / 507) 20%
+   * ppt download  - code: 301 * 20%
+   * assignment (submit / resubmit / download) -  (201 / 202 / 203) 20%
+   *
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   */
   this.getClassStudentScore = function(classId, userId, callback) {
-    callback(null, Math.random() * 10);
+    var score = {};
+    Promise.all([
+      query.getClassStudentActionCountAsync(classId, userId, ['401']),
+      // query.getClassActionCountAvgAsync(classId, ['401']),
+      query.getClassStudentActionCountAsync(classId, userId, ['402']),
+      // query.getClassActionCountAvgAsync(classId, ['402']),
+      query.getClassStudentActionCountAsync(classId, userId, ['502', '503', '504', '505', '507']),
+      // query.getClassActionCountAvgAsync(classId, ['502', '503', '504', '505', '507']),
+      query.getClassStudentActionCountAsync(classId, userId, ['301']),
+      // query.getClassActionCountAvgAsync(classId, ['301']),
+      query.getClassStudentActionCountAsync(classId, userId, ['201', '202', '203']),
+      // query.getClassActionCountAvgAsync(classId, ['201', '202', '203'])
+    ]).spread(function(initCount, checkoutCount, rscCount, pptCount, assignmentCount) {
+      var initAvg, checkoutAvg, rscAvg, pptAvg, assignmentAvg;
+      query.getClassActionCountAvgAsync(classId, ['401']).then(function(count) {
+        initAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['402'])
+      }).then(function(count) {
+        checkoutAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['502', '503', '504', '505', '507'])
+      }).then(function(count) {
+        rscAvg = count;
+        return  query.getClassActionCountAvgAsync(classId, ['301'])
+      }).then(function(count) {
+        pptAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['201', '202', '203'])
+      }).then(function(count) {
+        assignmentAvg = count;
+        score.initDiscussionScore = getScore(initCount, initAvg);
+        score.checkoutDiscussionScore = getScore(checkoutCount, checkoutAvg);
+        score.resourceScore = getScore(rscCount, rscAvg);
+        score.pptScore = getScore(pptCount, pptAvg);
+        score.assignmentScore = getScore(assignmentCount, assignmentAvg);
+        var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
+        console.log('param: '+initCount + ' '+ initAvg + ' '+ checkoutCount + ' ' + checkoutAvg + ' '+ rscCount + ' ' +rscAvg + ' '+ pptCount + ' '+ pptAvg + ' '+ assignmentCount + ' '+ assignmentAvg)
+        console.log('score: '+JSON.stringify(score))
+        console.log('final ' + classId + ' ' + final)
+        callback(null, final)
+      })
+      // Promise.all([
+      //   query.getClassActionCountAvgAsync(classId, ['401']),
+      //   query.getClassActionCountAvgAsync(classId, ['402']),
+      //   query.getClassActionCountAvgAsync(classId, ['502', '503', '504', '505', '507']),
+      //   query.getClassActionCountAvgAsync(classId, ['301']),
+      //   // query.getClassActionCountAvgAsync(classId, ['201', '202', '203'])
+      // ]).spread(function(initAvg, checkoutAvg, rscAvg, pptAvg, assignmentAvg) {
+      //   // assignmentAvg = 2;
+      //   score.initDiscussionScore = getScore(initCount, initAvg);
+      //   score.checkoutDiscussionScore = getScore(checkoutCount, checkoutAvg);
+      //   score.resourceScore = getScore(rscCount, rscAvg);
+      //   score.pptScore = getScore(pptCount, pptAvg);
+      //   score.assignmentScore = getScore(assignmentCount, assignmentAvg);
+      //   var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
+      //   console.log('param: '+initCount + ' '+ initAvg + ' '+ checkoutCount + ' ' + checkoutAvg + ' '+ rscCount + ' ' +rscAvg + ' '+ pptCount + ' '+ pptAvg + ' '+ assignmentCount + ' '+ assignmentAvg)
+      //   console.log('score: '+JSON.stringify(score))
+      //   console.log('final ' + classId + ' ' + final)
+      //   callback(null, final)
+      // })
+      // query.getClassActionCountAvgAsync(classId, ['201', '202', '203']).then(function(assignmentAvg) {
+      //   // console.log(assignmentAvg)
+      //   score.initDiscussionScore = getScore(initCount, initAvg);
+      //   score.checkoutDiscussionScore = getScore(checkoutCount, checkoutAvg);
+      //   score.resourceScore = getScore(rscCount, rscAvg);
+      //   score.pptScore = getScore(pptCount, pptAvg);
+      //   score.assignmentScore = getScore(assignmentCount, assignmentAvg);
+      //   var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
+      //   console.log('param: '+initCount + ' '+ initAvg + ' '+ checkoutCount + ' ' + checkoutAvg + ' '+ rscCount + ' ' +rscAvg + ' '+ pptCount + ' '+ pptAvg + ' '+ assignmentCount + ' '+ assignmentAvg)
+      //   console.log('score: '+JSON.stringify(score))
+      //   console.log('final ' + classId + ' ' + final)
+      //   callback(null, final)
+      // })
+
+      // console.log(initCount)
+
+      // var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
+      // var final = score.initDiscussionScore * 0.5 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 ;
+      //
+      // console.log(final)
+      // callback(null, final)
+    }).catch(function(err) {callback(err)})
   }
 
   /**

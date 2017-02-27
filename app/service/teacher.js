@@ -4,6 +4,8 @@
 var db = require('../models/index');
 var async = require('async');
 var scoreGetter = require('./scoregetter');
+var query = require('./query')
+
 function Teacher() {
   function getMyClasses(teacherId, callback) {
     db.Class.findAll({where: {userId: teacherId}, include: [db.Course]}).then(function(result) {
@@ -46,36 +48,7 @@ function Teacher() {
     scoreGetter.getClassBadScores(classId, function(err, data) {
       callback(err, data)
     })
-    var filter = [];
-    var badScores = [];
-    // getClassStudents(teacherId, classId, function(err, result) {
-    //   for(var i in result[0]) {
-    //   }
-    // })
-    // getClassStudents(teacherId, classId, function(err, students) {
-    //   console.log('filter')
-    //   async.eachSeries(students, function(student, done) {
-    //     var userId = student.User.userId;
-    //     score.getClassScore(userId, classId, function(err, result) {
-    //       console.log('err');
-    //       console.log(err)
-    //       console.log(result);
-    //       if(err)
-    //         return callback(err)
-    //       filter.push({userId: userId, score: result.overallScore, userName: student.User.userName})
-    //       done()
-    //     })
-    //   }, function done() {
-    //     // if class has more than 20 students, filter bad scorers
-    //     if (filter.length > 20) {
-    //       console.log('filter 3')
-    //       sortScoreFilter(filter)
-    //       callback(null, [filter[0], filter[1], filter[2]])
-    //     } else {
-    //       callback(null, [])
-    //     }
-    //   })
-    // });
+
 
   }
 
@@ -94,9 +67,10 @@ function Teacher() {
             classInfo.classInfo = aClass;
             // students data in this class
             classInfo.data = result;
-            console.log('what the fuck is goin on')
+            // data.push(classInfo)
+            // done();
+
             filterBadScores(aClass.classId, function(err, filter) {
-              console.log('????')
               classInfo.badScoreFilter = filter;
               data.push(classInfo);
               done();
@@ -107,11 +81,17 @@ function Teacher() {
             callback(err)
           })
         }, function done() {
-          console.log('fuck shut up bitch')
-          console.log(JSON.stringify(data));
+          // console.log(JSON.stringify(data));
           callback(null, {classCount: data.length, data: JSON.parse(JSON.stringify(data))})
         })
       }
+    })
+  }
+
+
+  this.getClassDetail = function(classId, callback) {
+    scoreGetter.getClassBadScores(classId, function(err, result) {
+      callback(err, result)
     })
   }
 

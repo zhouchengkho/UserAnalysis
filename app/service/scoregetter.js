@@ -12,12 +12,7 @@ var dorm = require('./analysis/dorm'),
   async = require('async'),
   scoreFiller = require('./scorefiller'),
   Promise = require('bluebird');
-function Score() {
-
-  function fixToTwo(score) {
-    score  = score + '';
-    return score.substring(0, score.indexOf(".") + 3);
-  }
+function ScoreGetter() {
 
   this.getStudentScore = function(userId, callback) {
     var self = this;
@@ -39,6 +34,7 @@ function Score() {
           classCount = classIds.length;
           async.eachSeries(classIds, function(classId, done) {
             self.getClassStudentScore(classId, userId, function(err, result) {
+
               sum.overallScore += result.overallScore;
               sum.dormScore += result.dormScore;
               sum.socialScore += result.socialScore;
@@ -115,51 +111,38 @@ function Score() {
     scoreFiller.fillClassScore(classId,function(err, result) {
       if(err)
         return callback(err)
-      db.AnalysisScore.findAll({where: {classId: classId}, limit: 3, order: 'overallScore asc'}).then(function (result) {
+      db.AnalysisScore.findAll({where: {classId: classId}, limit: 3, order: 'overallScore asc', include:[db.User]}).then(function (result) {
         var data = [];
         for(var index = 0; index < result.length; index++) {
           var temp = {
             userId: result[index].userId,
-            userName: result[index].userName,
+            userName: result[index].User.userName,
             overallScore: result[index].overallScore
           }
           data.push(temp)
         }
+        console.log('amigo '+JSON.stringify(data))
         callback(null, data)
       })
     })
   }
 
 
-  /**
-   *
-   * @param userId
-   * @param callback
-   * result format: Array
-   * ['classId', 'classId' ...]
-   */
-  function getStudentClasses(userId, callback) {
-    db.StudentClass.findAll({where: {userId: userId}}).then(function(result) {
-      var data = [];
-      for(var index in result)
-        data.push(result[index].classId)
-      callback(null, data)
-    }).catch(function(err) {
-      console.log(err)
-      callback(err)
-    })
+
+  this.getTest = function(classId, userId, callback) {
+    var data = {
+      classId: classId,
+      userId: userId,
+      overallScore: 5,
+      dormScore: 6,
+      socialScore: 5,
+      homeworkScore: 6,
+      activityScore: 5,
+      summary: 'you are doing great'
+    };
+
+    callback(null, data)
   }
-
-
-  function getClassStudentIds(classId, callback) {
-    db.StudentClass.findAll({where: {classId: classId}, include: [db.User]}).then(function(result) {
-      var data = [];
-      for(var index in result)
-        data.push(result[index].userId)
-      callback(null, data)
-    })
-  }
-
   /**
    *
    * @param classId
@@ -205,6 +188,7 @@ function Score() {
 
         ep.all([epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
           function(activityScore, dormScore, socialScore, homeworkScore, summary) {
+          console.log('summary is: '+summary)
             var data = {
               userId: userId,
               classId: classId,
@@ -226,6 +210,7 @@ function Score() {
         })
 
         activity.getClassStudentScore(classId, userId, function(err, activityScore) {
+
           if(err)
             return ep.emit(epEmitter.error, err);
           ep.emit(epEmitter.activity, activityScore);
@@ -248,12 +233,48 @@ function Score() {
         summary.getClassStudentSummary(classId, userId, function(err, summary) {
           if(err)
             return ep.emit(epEmitter.error, err);
+          console.log('got summary: '+summary)
           ep.emit(epEmitter.summary, summary)
         })
       }
     })
 
   }
+
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   * result format: Array
+   * ['classId', 'classId' ...]
+   */
+  function getStudentClasses(userId, callback) {
+    db.StudentClass.findAll({where: {userId: userId}}).then(function(result) {
+      var data = [];
+      for(var index in result)
+        data.push(result[index].classId)
+      callback(null, data)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+
+  function getClassStudentIds(classId, callback) {
+    db.StudentClass.findAll({where: {classId: classId}, include: [db.User]}).then(function(result) {
+      var data = [];
+      for(var index in result)
+        data.push(result[index].userId)
+      callback(null, data)
+    })
+  }
+
+  function fixToTwo(score) {
+    score  = score + '';
+    return score.substring(0, score.indexOf(".") + 3);
+  }
+
 }
 
-module.exports = new Score();
+module.exports = new ScoreGetter();

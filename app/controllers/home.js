@@ -28,10 +28,13 @@ router.get('/', function (req, res, next) {
       break;
     case 'teacher':
       teacher.getData(req.session.login.userId, function(err, data) {
+        console.log(data)
         res.render('teacher', getRenderOption(req, {
           data: data,
-          script: '<script type="text/javascript" src="/js/Chart.js"></script>'
-        }));
+          script: '<script type="text/javascript" src="/js/teacher.js"></script>' +
+          '<script type="text/javascript" src="js/handlebars-v4.0.5.js"></script>' +
+          '<script type="text/javascript" src="js/partials/class_detail.js"></script>' +
+          }));
       })
       break;
     default:

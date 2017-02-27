@@ -27,18 +27,6 @@ module.exports = function(app, config) {
   // app.use(favicon(config.root + '/public/img/favicon.ico'));
 
 
-  // Login Authentication
-  // app.all('/*', function(req, res, next) {
-  //   console.log('yo '+req.url);
-  //   if(req.url === '/login') {
-  //     return next()
-  //   }
-  //   if(!req.session.login) {
-  //     return res.redirect('/login');
-  //   }
-  //   next()
-  // })
-
   // use session
   app.use(session({
     secret: 'now-you-see-me',
