@@ -67,16 +67,15 @@ function Teacher() {
             classInfo.classInfo = aClass;
             // students data in this class
             classInfo.data = result;
-            // data.push(classInfo)
-            // done();
+            data.push(classInfo)
+            done();
 
-            filterBadScores(aClass.classId, function(err, filter) {
-              classInfo.badScoreFilter = filter;
-              data.push(classInfo);
-              done();
-            })
+            // filterBadScores(aClass.classId, function(err, filter) {
+            //   classInfo.badScoreFilter = filter;
+            //   data.push(classInfo);
+            //   done();
+            // })
           }).catch(function(err) {
-            console.log('error?')
             console.log(err)
             callback(err)
           })

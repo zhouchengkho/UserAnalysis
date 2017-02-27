@@ -4,6 +4,8 @@
 
 var db = require('../models/index')
 var Promise = require('bluebird')
+
+
 function Query() {
   /**
    * Traverse val to fill where clause
@@ -103,6 +105,9 @@ function Query() {
       callback(null, data)
     }).catch(function(err) {callback(err)})
   }
+
+
+
 }
 
 module.exports = new Query();

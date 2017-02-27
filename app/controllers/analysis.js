@@ -86,16 +86,8 @@ router.get('/activity-html-data', function(req, res) {
 
 router.get('/test', function(req, res) {
 
-      // db.Action.findAll(query).then(function(result) {
-      //   res.json(result)
-      // }).catch(function(err) {res.json({status: 400, message: err.message})})
-  // refer.getAcademicYearTerms(function(err, result) {
-  //   if(err)
-  //     res.json({status: 400, message: err.message})
-  //   else
-  //     res.json(result)
-  // })
-  scoreGetter.getClassStudentScore('10152510134', 'C180001201512', function(err, result) {
+
+  scoreGetter.getHighestInClass('C180001201409', function(err, result) {
     res.json(result)
   })
 })

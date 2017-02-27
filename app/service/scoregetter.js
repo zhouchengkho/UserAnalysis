@@ -258,6 +258,32 @@ function ScoreGetter() {
 
   /**
    *
+   * @param classId
+   * @param callback
+   * result {JSON}
+   * {
+   *  "userId": "",
+   *  "userName": "",
+   *  "classId": "",
+   *  "overallScore": ""
+   * }
+   */
+  this.getHighestInClass = function(classId, callback) {
+   scoreFiller.fillClassScore(classId, function(err, result) {
+     db.AnalysisScore.findAll({where: {classId: classId}, limit: 1, order: 'overallScore desc', include:[db.User]}).then(function(result) {
+       var data = {
+         userId: result[0].userId,
+         userName: result[0].User.userName,
+         classId: classId,
+         overallScore: result[0].overallScore
+       }
+       callback(null, data)
+     }).catch(function(err) {callback(err)})
+   })
+  }
+
+  /**
+   *
    * @param userId
    * @param callback
    * result format: Array
