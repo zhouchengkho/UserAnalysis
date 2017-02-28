@@ -85,6 +85,7 @@ router.get('/noaccess', function(req, res) {
   res.render('noaccess', {});
 })
 router.get('/login', function (req, res) {
+  console.log('login status: ' + req.session.login)
   if(req.session.login)
     res.redirect('/');
   else {
@@ -110,6 +111,39 @@ router.post('/login', function (req, res, next) {
 })
 
 
+router.get('/new_ui', function(req, res) {
+  switch (req.session.login.character) {
+    case 'student':
+      score.getStudentScore(req.session.login.userId, function(err, data) {
+        if(err)
+          res.json(err)
+        else {
+          res.render('new_index', getRenderOption(req, {
+            data: data,
+            script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
+            '<script type="text/javascript" src="/js/home.js"></script>'
+          }));
+        }
+      })
+      break;
+    case 'teacher':
+      teacher.getData(req.session.login.userId, function(err, data) {
+        console.log(data)
+        res.render('teacher', getRenderOption(req, {
+          data: data,
+          script: '<script type="text/javascript" src="/js/teacher.js"></script>' +
+          '<script type="text/javascript" src="js/handlebars-v4.0.5.js"></script>' +
+          '<script type="text/javascript" src="js/partials/class_detail.js"></script>'
+        }));
+      })
+      break;
+    default:
+      res.json({status: 400, message: 'invalid request'})
+      break;
+  }
+
+
+})
 /**
  * add common data to render
  * @param req: get session data

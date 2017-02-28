@@ -57,33 +57,32 @@ function Teacher() {
     // get classes
     getMyClasses(teacherId, function(err, classes) {
       if(err)
-        callback(err)
-      else {
-          // every class, get students
-        async.eachSeries(classes, function(aClass, done) {
-          db.StudentClass.findAll({where: {classId: aClass.classId}, include: [db.User]}).then(function(result) {
-            var classInfo = {};
-            classInfo.studentCount = result.length;
-            classInfo.classInfo = aClass;
-            // students data in this class
-            classInfo.data = result;
-            data.push(classInfo)
-            done();
+        return callback(err)
+      // every class, get students
 
-            // filterBadScores(aClass.classId, function(err, filter) {
-            //   classInfo.badScoreFilter = filter;
-            //   data.push(classInfo);
-            //   done();
-            // })
-          }).catch(function(err) {
-            console.log(err)
-            callback(err)
-          })
-        }, function done() {
-          // console.log(JSON.stringify(data));
-          callback(null, {classCount: data.length, data: JSON.parse(JSON.stringify(data))})
+      async.eachSeries(classes, function(aClass, done) {
+        db.StudentClass.findAll({where: {classId: aClass.classId}, include: [db.User]}).then(function(result) {
+          var classInfo = {};
+          classInfo.studentCount = result.length;
+          classInfo.classInfo = aClass;
+          // students data in this class
+          classInfo.data = result;
+          data.push(classInfo)
+          done();
+
+          // filterBadScores(aClass.classId, function(err, filter) {
+          //   classInfo.badScoreFilter = filter;
+          //   data.push(classInfo);
+          //   done();
+          // })
+        }).catch(function(err) {
+          console.log(err)
+          callback(err)
         })
-      }
+      }, function done() {
+        // console.log(JSON.stringify(data));
+        callback(null, {classCount: data.length, data: JSON.parse(JSON.stringify(data))})
+      })
     })
   }
 

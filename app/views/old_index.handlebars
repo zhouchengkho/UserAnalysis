@@ -1,0 +1,120 @@
+<div class="rate-table">
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-6">
+            <div class="rate-counter-block">
+                <div class="icon rate-icon  "> <img src="/img/activity.svg"  class="icon-svg-1x"></div>
+                <div class="rate-box">
+                    <h1 class="loan-rate">{{ data.activityScore}}</h1>
+                  <a href="#activity">
+                      <small class="rate-title">Activity</small>
+                  </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6">
+            <div class="rate-counter-block">
+                <div class="icon rate-icon  "> <img src="/img/social.svg"  class="icon-svg-1x"></div>
+                <div class="rate-box">
+                    <h1 class="loan-rate">{{ data.socialScore}}</h1>
+                  <a href="#social">
+                      <small class="rate-title">Social</small>
+                  </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6">
+            <div class="rate-counter-block">
+                <div class="icon rate-icon  "> <img src="/img/dorm.svg"  class="icon-svg-1x"></div>
+                <div class="rate-box">
+                    <h1 class="loan-rate">{{ data.dormScore}}</h1>
+                    <a href="#dorm">
+                      <small class="rate-title">Dorm</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-xs-6">
+            <div class="rate-counter-block">
+                <div class="icon rate-icon  "> <img src="/img/homework.svg"  class="icon-svg-1x"></div>
+                <div class="rate-box">
+                    <h1 class="loan-rate">{{ data.homeworkScore}}</h1>
+                    <a href="#dorm">
+                        <small class="rate-title">Homework</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white section-space80" id="summary">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class=" text-center section-title">
+                <!-- section title start-->
+                <h1>Summary</h1>
+              <h2>Your overall score is {{data.overallScore}}</h2>
+                <p>{{ data.summary}}</p>
+            </div>
+            <!-- /.section title start-->
+        </div>
+
+    </div>
+
+</div>
+
+<div class="bg-white section-space80" id="activity">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class=" text-center section-title">
+                <!-- section title start-->
+                <h1>Activity</h1>
+                <canvas id="activity-chart" width="750" height="400"></canvas>
+                <div>
+                </div>
+            </div>
+            <div id="activity-html"></div>
+            <!-- /.section title start-->
+        </div>
+    </div>
+</div>
+<div class="bg-white section-space80" id="social">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class=" text-center section-title">
+                <!-- section title start-->
+                <h1>Social</h1>
+                <canvas id="social-chart" width="750" height="400"></canvas>
+                <div>
+                </div>
+            </div>
+            <!-- /.section title start-->
+        </div>
+    </div>
+</div>
+
+<div class="bg-white section-space80" id="dorm">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class=" text-center section-title">
+                <!-- section title start-->
+                <h1>Dorm</h1>
+            </div>
+            <!-- /.section title start-->
+        </div>
+    </div>
+</div>
+
+
+<div class="bg-white section-space80" id="homework">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8 col-xs-12">
+            <div class=" text-center section-title">
+                <!-- section title start-->
+                <h1>Homework</h1>
+            </div>
+            <div id="homework-html"></div>
+            <!-- /.section title start-->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>{{title }}</title>
+    <!--<link rel="stylesheet" href="/css/bootstrap.min.css">-->
+    <!--<link rel="stylesheet" href="/css/style.css">-->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/css/fontello.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/animsition.min.css">
+    <link rel="stylesheet" href="/css/public.css">
+  {{css}}
+  {{#if ENV_DEVELOPMENT}}
+    <script src="http://localhost:35729/livereload.js"></script>
+  {{/if}}
+</head>
+<body>
+
+<!-- Static navbar -->
+<nav class="navbar navbar-default navbar-static-top navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="">User Analysis</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/"><i class="glyphicon glyphicon-home"></i> 首页</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                  {{#if login}}
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                          <i class="glyphicon glyphicon-user"></i>
+                          <span id="username">{{login.userName}}</span>
+                          <input type='hidden' id="curId" value="{{login.userId}}" />
+                          <input type="hidden" id="curFaceIcon" value="/resource/img/blank.jpg" />
+                          <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu">
+                          <li><a href="/settings/"><i class="glyphicon glyphicon-wrench"></i> 设置</a></li>
+                          <li><a href="/logout"><i class="glyphicon glyphicon-off"></i> 注销</a></li>
+                      </ul>
+                  {{/if}}
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="modal fade" id="change-psd">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">修改密码</h4>
+            </div>
+            <form class="form-horizontal" id="change-psd-form" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="userId" value="10132510237" >
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">原密码</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" name="oldPsd" id="oldPsd" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">新密码</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" name="newPsd" id="newPsd" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">确认新密码</label>
+                        <div class="col-sm-9">
+                            <input type="password" class="form-control" id="newPsdAgain" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="submit" class="btn btn-primary" value="提交" />
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="container main">{{{body}}}</div>
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script type="text/javascript" src="/js/jquery.sticky.js"></script>
+<script type="text/javascript" src="/js/sticky-header.js"></script>
+{{{script}}}
+
+  </body>
+</html>
