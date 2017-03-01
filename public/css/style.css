@@ -897,4 +897,20 @@ input[type="text"] {
 .padding-bottom-5 {
   padding-bottom: 5em;
 }
+
+.padding-bottom-2 {
+  padding-bottom: 2em;
+}
+
+.hidden {
+  display: none;
+}
+
+.show {
+  display: inherit;
+}
+
+.analysis-selector ul li a:hover {
+  cursor: pointer;
+}
 /*# sourceMappingURL=style.css.map */

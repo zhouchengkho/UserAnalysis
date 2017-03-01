@@ -2,64 +2,43 @@
     <div class="container text-center">
         <div class="fh5co-navbar-brand">
             <a class="fh5co-logo" href="/">ECNU USER ANALYSIS</a>
-            <nav id="fh5co-main-nav" role="navigation">
-                <ul>
-                    <li><a href="/new_ui" class="active">Home</a></li>
-                    <li><a href="/settings">Settings</a></li>
-                    <li><a href="/logout">Logout</a></li>
-
-                </ul>
-            </nav>
         </div>
 
         <nav id="fh5co-main-nav" role="navigation">
             <ul>
-                <li><a href="work.html">Activity</a></li>
-                <li><a href="services.html">Social</a></li>
-                <li><a href="about.html">Dorm</a></li>
-                <li><a href="contact.html">Homework</a></li>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/logout">Logout</a></li>
+
             </ul>
         </nav>
     </div>
 </header>
 
-<div class="row">
-    <div class="bg-white section-space80" id="summary">
-        <div class="row">
-            <div class="col-md-offset-2 col-md-8 col-xs-12">
-                <div class=" text-center section-title">
-                    <!-- section title start-->
-                    <h2>Teaching {{data.classCount}} Classes</h2>
-                </div>
-                <!-- /.section title start-->
-            </div>
-        </div>
-
+<div class="col-xs-12">
+    <div class="col-xs-4 text-center">
+        <img src="{{data.teacherInfo.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
+        <h2>Hi {{data.teacherInfo.userName}}</h2>
+        <h2>Teaching {{data.classCount}} Classes</h2>
     </div>
-    <div class="bg-white section-space80">
-        <div class="row">
-            <div class="col-md-offset-1 col-md-10 col-xs-12">
-                <div class="section-title">
-                    <div class="panel-group" id="accordion">
-                      {{#each data.data}}
-                          <div class="panel panel-default">
-                              <div class="panel-heading">
-                                  <h4 class="panel-title">
-                                      <a data-toggle="collapse" class="class-detail" data-parent="#accordion" href="#{{classInfo.classId}}">
-                                          {{classInfo.classId}}: {{classInfo.Course.courseName}}
-                                      </a>
-                                  </h4>
-                              </div>
-                              <div id="{{classInfo.classId}}" class="panel-collapse collapse">
-                                  <div class="panel-body">
-                                  </div>
-                              </div>
-                          </div>
-                      {{/each}}
-                    </div>
-                </div>
-                <!-- /.section title start-->
-            </div>
+
+    <div class="col-xs-8">
+        <div class="panel-group" id="accordion">
+          {{#each data.data}}
+              <div class="panel panel-default">
+                  <div class="panel-heading">
+                      <h4 class="panel-title">
+                          <a data-toggle="collapse" class="class-detail" data-parent="#accordion" href="#{{classInfo.classId}}">
+                            {{classInfo.classId}}: {{classInfo.Course.courseName}}
+                          </a>
+                      </h4>
+                  </div>
+                  <div id="{{classInfo.classId}}" class="panel-collapse collapse">
+                      <div class="panel-body">
+                      </div>
+                  </div>
+              </div>
+          {{/each}}
         </div>
 
     </div>

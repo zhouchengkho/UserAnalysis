@@ -5,7 +5,7 @@
         </div>
         <nav id="fh5co-main-nav" role="navigation">
             <ul>
-                <li><a href="/new_ui">Home</a></li>
+                <li><a href="/">Home</a></li>
                 <li><a href="/settings" class="active">Settings</a></li>
                 <li><a href="/logout">Logout</a></li>
 
@@ -29,14 +29,13 @@
                   </div>
 
                   <p>Current Terms</p>
-                  <div class="btn-group col-sm-12 current-terms" role="group" aria-label="...">
+                  <div class="btn-group col-sm-12 current-terms padding-bottom-2" role="group" aria-label="...">
                       {{#each terms}}
                           <button type="button" class="btn btn-default col-sm-6 setting-terms" id="{{termId}}">{{termName}}</button>
                         {{/each}}
                   </div>
               </div>
                 <div>
-                    <div class="blank-space"></div>
                     <button class="btn btn-primary" id="ok">OK</button>
                     <button class="btn btn-primary" id="cancel">Cancel</button>
 

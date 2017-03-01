@@ -48,4 +48,10 @@ function fetchData() {
   });
 }
 
-fetchData();
+$('.analysis-selector ul li a').on('click', function() {
+  var eleId = $(this).attr('id')+ '-section';
+  $('.analysis-selector ul li a').removeClass('active')
+  $(this).addClass('active')
+  $('#analysis-sections div').addClass('hidden')
+  $('#'+eleId).removeClass('hidden')
+})

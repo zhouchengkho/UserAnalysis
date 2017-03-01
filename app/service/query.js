@@ -107,7 +107,11 @@ function Query() {
   }
 
 
-
+  this.getUserInfo = function(userId, callback) {
+    db.User.findAll({where: {userId: userId}}).then(function(result) {
+      callback(null, result[0])
+    }).catch(function(err) {callback(err)})
+  }
 }
 
 module.exports = new Query();

@@ -28,7 +28,8 @@ var config = {
         timezone: '+8:00',
         logging: false
       }
-    }
+    },
+    prefix: 'https://www.mynereus.com'
   },
 
   test: {

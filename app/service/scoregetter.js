@@ -29,6 +29,7 @@ function ScoreGetter() {
     var classCount;
     db.User.findAll({where: {userId: userId}}).then(function(result) {
       return new Promise(function(resolve, reject) {
+        console.log('test: '+result[0])
         data.userName = result[0].userName;
         getStudentClasses(userId, function(err, classIds) {
           classCount = classIds.length;
