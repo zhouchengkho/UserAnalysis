@@ -107,9 +107,16 @@ function Query() {
    *
    * @param classId
    * @param callback
+   *
+   * {
+   *  "classId": "",
+   *  "courseName": ""
+   * }
    */
   this.getClassDetail = function(classId, callback) {
-
+    db.Class.findAll({where: {classId: classId}, include:[db.Course]}).then(function(result) {
+      callback(null, {classId: result[0].classId, courseName: result[0].Course.courseName})
+    })
   }
 
   /**

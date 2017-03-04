@@ -31,6 +31,16 @@ router.get('/dorm-bar-chart-data', function(req, res) {
   })
 })
 
+router.get('/class-dorm-bar-chart-data/:studentId/:classId', function(req, res) {
+  graph.getClassBarChartDataForDorm(req.params.classId, req.params.studentId, function(err, result) {
+    console.log(JSON.stringify(result))
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json(result)
+  })
+})
+
 
 router.get('/activity-line-chart-data', function(req, res) {
   graph.getActivityLineChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
@@ -39,12 +49,6 @@ router.get('/activity-line-chart-data', function(req, res) {
     else
       res.json(result)
   })
-  // activity.getLineChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
-  //   if(err)
-  //     res.json({status: 400, message: err.message})
-  //   else
-  //     res.json(result)
-  // })
 })
 
 router.get('/social-radar-chart-data', function(req, res) {
@@ -55,16 +59,10 @@ router.get('/social-radar-chart-data', function(req, res) {
     else
       res.json(result)
   })
-  // social.getRadarChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
-  //   if(err)
-  //     res.json({status: 400, message: err.message})
-  //   else
-  //     res.json(result)
-  // })
 })
 
 router.get('/student-class-line-chart-data/:studentId/:classId', function(req, res) {
-  activity.getClassStudentLineChartData(req.params.classId, req.params.studentId, function(err, result) {
+  graph.getClassStudentLineChartData(req.params.classId, req.params.studentId, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else

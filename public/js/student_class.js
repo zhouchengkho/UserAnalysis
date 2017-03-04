@@ -10,8 +10,11 @@ fetchData();
 function fetchData() {
   var activityChart = $('#activity-chart');
   var socialChart = $('#social-chart');
+  var dormChart = $('#dorm-chart');
   var activityChartData = {};
   var socialChartData = {};
+  var dormChartData = {};
+
 
   var url  = location.href;
   // alert(url);
@@ -27,6 +30,16 @@ function fetchData() {
   }).done(function(data){
     activityChartData = data;
     var lineChart = new Chart(activityChart, activityChartData);
+  });
+
+
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json; charset=utf-8',
+    url: '/analysis/class-dorm-bar-chart-data/' + userId + '/' + classId
+  }).done(function(data){
+    dormChartData = data;
+    var barChart = new Chart(dormChart, dormChartData);
   });
 
 

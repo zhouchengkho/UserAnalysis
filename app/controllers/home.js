@@ -68,7 +68,7 @@ router.get('/student/overall/:id', function(req, res) {
 router.get('/student/class/:studentId/:classId', function(req, res) {
   // check if is teacher
   if(req.session.login.character == 'teacher') {
-    score.getClassStudentScore(req.params.classId, req.params.studentId, function(err, data) {
+    student.getClassData(req.params.classId, req.params.studentId, function(err, data) {
       console.log(JSON.stringify(data))
       if(err)
         res.json(err)
@@ -80,6 +80,7 @@ router.get('/student/class/:studentId/:classId', function(req, res) {
         }));
       }
     })
+
   } else {
     res.redirect('/noaccess');
   }

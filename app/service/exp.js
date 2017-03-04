@@ -154,6 +154,36 @@ function Exp() {
 
   }
 
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   * {
+   *  "userId": "",
+   *  "userName": "",
+   *  "exp": ""
+   * }
+   */
+  this.getDetailedClassStudentExp = function(classId, userId, callback) {
+    var data = {};
+    var self = this;
+    query.getUserInfo(userId, function(err, result) {
+      data.userId = result.userId;
+      data.userName = result.userName;
+      self.getClassStudentExp(classId, userId, function(err, result) {
+        if(err) {
+          console.log(err)
+          callback(err)
+        } else {
+          data.exp = result;
+          console.log('yo detailed: '+JSON.stringify(data))
+          callback(null, data)
+        }
+
+      })
+    })
+  }
 
   /**
    *
@@ -245,6 +275,21 @@ function Exp() {
     })
   }
 
+  this.getMyDormOfClassExp = function(userId, callback) {
+    var self = this;
+    var data = [];
+    query.getRoommates(userId, function(err, userIds) {
+      async.eachSeries(userIds, function(roommateId, done) {
+        self.getClassStudentExp(roommateId, function(err, result) {
+          data.push(result)
+          done();
+        })
+      }, function done() {
+        callback(null, data)
+      })
+    })
+  }
+
   /**
    *
    * @param userId
@@ -278,6 +323,39 @@ function Exp() {
     })
   }
 
+  /**
+   *
+   * @param userId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "exp": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "exp": ""
+   *  }
+   * ]
+   */
+  this.getDetailedClassDormExp = function(classId, userId, callback) {
+    var self = this;
+    var data = [];
+    query.getRoommates(userId, function(err, userIds) {
+      console.log('roommates: '+userIds)
+      async.eachSeries(userIds, function(roommateId, done) {
+        self.getDetailedClassStudentExp(classId, roommateId, function(err, result) {
+          data.push(result)
+          done();
+        })
+      }, function done() {
+        callback(null, data)
+      })
+    })
+  }
 }
 
 

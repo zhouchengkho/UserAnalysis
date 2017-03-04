@@ -50,13 +50,7 @@ function Student() {
         data.user.summary = result;
         exp.getStudentExp(userId, function(err, result) {
           data.user.exp = result;
-          exp.getMyDormExp(userId, function(err, result) {
-            data.dorm = [];
-            for(var i in result)
-              data.dorm.push({ exp: result[i]})
-            callback(null, data)
-
-          })
+          callback(null, data)
         })
 
       })
@@ -66,6 +60,43 @@ function Student() {
   }
 
 
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   * {
+   *  "user":
+   *    {
+   *    "userId": "10132510237",
+   *    "userName": "",
+   *    "courseName": "",
+   *    "faceIcon": "",
+   *    "exp": "",
+   *    "summary": ""
+   *    }
+   * }
+   */
+  this.getClassData = function(classId, userId, callback) {
+    var data = {};
+    query.getClassDetail(classId, function(err, result) {
+      data.courseName = result.courseName;
+      query.getUserInfo(userId, function(err, result) {
+        data.user = result;
+        data.user.faceIcon = prefix + data.user.faceIcon;
+        summary.getStudentSummary(userId, function(err, result) {
+          data.user.summary = result;
+          exp.getClassStudentExp(classId, userId, function(err, result) {
+            data.user.exp = result;
+            callback(null, data)
+          })
+
+        })
+
+      })
+
+    })
+  }
 }
 
 
