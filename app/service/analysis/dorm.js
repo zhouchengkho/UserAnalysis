@@ -60,12 +60,9 @@ function Dorm() {
     callback(null, Math.random() * 10);
   }
 
-  this.getRoommates = function(userId, callback) {
-    query.getRoommates(userId, function(err, result) {
-      console.log(JSON.stringify(result))
-      callback(err, result)
-    })
-  }
+
+
+
 }
 
 module.exports = new Dorm();

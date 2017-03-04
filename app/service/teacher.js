@@ -7,51 +7,43 @@ var scoreGetter = require('./scoregetter');
 var query = require('./query')
 var prefix = require('../../config/config').prefix;
 function Teacher() {
-  function getMyClasses(teacherId, callback) {
-    db.Class.findAll({where: {userId: teacherId}, include: [db.Course]}).then(function(result) {
-      callback(null, result)
-    }).catch(function(err) {
-      callback(err)
-    })
-  }
 
-  function getClassStudents(teacherId, classId, callback) {
-    db.sequelize.transaction(function(t) {
-      return db.Class.findAll({where: {userId: teacherId, classId: classId}, include: [db.Course]})
-    }).then(function(result) {
-      console.log('???')
-      // console.log(JSON.stringify(result))
-      return db.StudentClass.findAll({where: {classId: result[0].classId}, include: [db.User]})
-    }).then(function(result) {
-      // console.log(JSON.stringify(result))
-      callback(null, result)
-    }).catch(function(err) {
-      callback(err)
-    })
-  }
-
-
-
-  function sortScoreFilter(filter) {
-    for (var i = 0; i < filter.length; i++) {
-      for(var j = i + 1; j < filter.length; j++) {
-        if(filter[j].overflow < filter[i].overallScore) {
-          var temp = filter[i];
-          filter[i] = filter[j];
-          filter[j] = temp;
-        }
-      }
-    }
-  }
-
-  function filterBadScores(classId, callback) {
-    scoreGetter.getClassBadScores(classId, function(err, data) {
-      callback(err, data)
-    })
-
-
-  }
-
+  /**
+   *
+   * @param teacherId
+   * @param callback
+   *
+   * {
+   *  "classCount": "7",
+   *  "teacherInfo":
+   *    {
+   *      "userName": "wang li ping",
+   *      "faceIcon": ""
+   *    },
+   *    "data":
+   *      [
+   *        {
+   *          "studentCount": 50,
+   *          "classInfo":
+   *            {
+   *             "classId": "",
+   *             "courseId": "",
+   *             "userId": "",
+   *             "termId": "",
+   *             "classStatus": "",
+   *             "Course":
+   *                {
+   *                  "courseId": "",
+   *                  "courseName": "",
+   *                  "courseCredit": "",
+   *                  "courseWeekTime": "",
+   *                  "courseStatus": ""
+   *                }
+   *             }
+   *         }
+   *       ]
+   * }
+   */
   this.getData = function(teacherId, callback) {
     var teacherInfo = {};
     var data = [];
@@ -61,7 +53,7 @@ function Teacher() {
       teacherInfo.userName = result.userName;
       teacherInfo.faceIcon = prefix + result.faceIcon;
       // get classes
-      getMyClasses(teacherId, function(err, classes) {
+      query.getTeacherClasses(teacherId, function(err, classes) {
         if(err)
           return callback(err)
         // every class, get students
@@ -76,11 +68,7 @@ function Teacher() {
             data.push(classInfo)
             done();
 
-            // filterBadScores(aClass.classId, function(err, filter) {
-            //   classInfo.badScoreFilter = filter;
-            //   data.push(classInfo);
-            //   done();
-            // })
+
           }).catch(function(err) {
             console.log(err)
             callback(err)
@@ -94,12 +82,6 @@ function Teacher() {
     })
   }
 
-
-  this.getClassDetail = function(classId, callback) {
-    scoreGetter.getClassBadScores(classId, function(err, result) {
-      callback(err, result)
-    })
-  }
 
 
 }

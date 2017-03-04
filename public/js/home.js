@@ -7,8 +7,11 @@ fetchData();
 function fetchData() {
   var activityChart = $('#activity-chart');
   var socialChart = $('#social-chart');
+  var dormChart = $('#dorm-chart');
   var activityChartData = {};
   var socialChartData = {};
+  var dormChartData = {};
+
   $.ajax({
     type: 'GET',
     contentType: 'application/json; charset=utf-8',
@@ -25,6 +28,16 @@ function fetchData() {
   }).done(function(data){
     $('#activity-html').html(data.html);
   });
+
+  $.ajax({
+    type: 'GET',
+    contentType: 'application/json; charset=utf-8',
+    url: '/analysis/dorm-bar-chart-data'
+  }).done(function(data){
+    dormChartData = data;
+    var barChart = new Chart(dormChart, dormChartData);
+  });
+
 
   $.ajax({
     type: 'GET',

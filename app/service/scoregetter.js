@@ -100,16 +100,18 @@ function ScoreGetter() {
           classCount = classIds.length;
           async.eachSeries(classIds, function(classId, done) {
             self.getClassStudentScore(classId, userId, function(err, result) {
-
-              sum.overallScore += result.overallScore;
-              sum.dormScore += result.dormScore;
-              sum.socialScore += result.socialScore;
-              sum.homeworkScore += result.homeworkScore;
-              sum.activityScore += result.activityScore;
+              console.log('doing math: '+ JSON.stringify(result))
+              sum.overallScore += 0 + result.overallScore;
+              sum.dormScore += 0 + result.dormScore;
+              sum.socialScore += 0 + result.socialScore;
+              sum.homeworkScore += 0 + result.homeworkScore;
+              sum.activityScore += 0 + result.activityScore;
               done();
             })
           }, function done() {
             // calculate avg
+            console.log('final tracking: '+ JSON.stringify(sum))
+            console.log(classCount)
             data.overallScore = fixToTwo(sum.overallScore / classCount);
             data.dormScore = fixToTwo(sum.dormScore / classCount);
             data.socialScore = fixToTwo(sum.socialScore / classCount);
@@ -125,6 +127,7 @@ function ScoreGetter() {
         data.summary = result;
         if(err)
           return callback(err)
+        console.log('getting final scores here: '+JSON.stringify(data))
         callback(null, data)
       })
     }).catch(function(err){
@@ -208,6 +211,7 @@ function ScoreGetter() {
     var self = this;
     var data = [];
     query.getRoommates(userId, function(err, userIds) {
+      console.log('roommates: '+userIds)
       var myId = userId;
       async.eachSeries(userIds, function(userId, done) {
         self.getStudentScore(userId, function(err, result) {
@@ -224,6 +228,7 @@ function ScoreGetter() {
           done()
         })
       }, function done() {
+        console.log('final data: '+JSON.stringify(data))
         callback(null, data)
       })
     })
@@ -294,7 +299,7 @@ function ScoreGetter() {
 
         ep.all([epEmitter.name, epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
           function(className, activityScore, dormScore, socialScore, homeworkScore, summary) {
-          console.log('summary is: '+summary)
+          console.log('whats going on: '+className + ' '+activityScore + ' '+dormScore + ' '+socialScore + ' '+homeworkScore + ' '+summary)
             var data = {
               userId: userId,
               classId: classId,
@@ -306,6 +311,7 @@ function ScoreGetter() {
               activityScore: fixToTwo(activityScore),
               summary: summary
             }
+            console.log('class score data: '+JSON.stringify(data))
             callback(null, data)
           })
 
@@ -409,7 +415,7 @@ function ScoreGetter() {
 
   function fixToTwo(score) {
     score  = score + '';
-    return score.substring(0, score.indexOf(".") + 3);
+    return Number(score.substring(0, score.indexOf(".") + 3));
   }
 
 }

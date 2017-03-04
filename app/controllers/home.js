@@ -2,7 +2,8 @@ var express = require('express'),
   router = express.Router(),
   login = require('../service/login'),
   score = require('../service/scoregetter'),
-  teacher = require('../service/teacher')
+  teacher = require('../service/teacher'),
+  student  = require('../service/student');
 module.exports = function (app) {
   app.use('/', router);
 };
@@ -14,7 +15,7 @@ module.exports = function (app) {
 router.get('/', function (req, res, next) {
   switch (req.session.login.character) {
     case 'student':
-      score.getStudentData(req.session.login.userId, function(err, data) {
+      student.getData(req.session.login.userId, function(err, data) {
         if(err)
           res.json(err)
         else {

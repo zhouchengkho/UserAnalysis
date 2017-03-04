@@ -27,9 +27,10 @@
     <div class="col-xs-4 text-center">
         <!-- section title start-->
         <!--<h1>Summary</h1>-->
-        <h2>Hey {{data.score.userName}}</h2>
-        <h2>Your overall score is {{data.score.overallScore}}</h2>
-        <p>{{ data.score.summary}}</p>
+        <img src="{{data.user.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
+        <h3>Hey {{data.user.userName}}</h3>
+        <h3>Your exp is {{data.user.exp}}</h3>
+        <p>{{ data.user.summary}}</p>
     </div>
     <div class="col-xs-8" id="analysis-sections">
         <div id="activity-section" class="text-center analysis-section">
@@ -39,22 +40,20 @@
         </div>
         <div id="social-section" class="text-center analysis-section hidden">
             <!-- section title start-->
-            <h1>Social</h1>
+            <h3>Social</h3>
             <canvas id="social-chart" width="750" height="400"></canvas>
         </div>
         <div id="dorm-section" class="text-center analysis-section hidden">
             <!-- section title start-->
-            <h1>Dorm</h1>
+            <h3>Dorm</h3>
           <h3>Roommates scores</h3>
-          {{#each data.dorm}}
-          <div class="col-xs-6 text-left ">
-              <p class="lesser-margins">overallScore: {{overallScore}}</p>
-              <p class="lesser-margins">socialScore: {{socialScore}}</p>
-            <p class="lesser-margins">activityScore: {{activityScore}}</p>
-            <p class="lesser-margins">dormScore: {{dormScore}}</p>
-            <p class="lesser-margins">homeworkScore: {{homeworkScore}}</p>
-          </div>
-          {{/each}}
+            <canvas id="dorm-chart" width="750" height="400"></canvas>
+
+          <!--{{#each data.dorm}}-->
+          <!--<div class="col-xs-6 text-left ">-->
+              <!--<p class="lesser-margins">exp: {{exp}}</p>-->
+          <!--</div>-->
+          <!--{{/each}}-->
 
         </div>
         <div id="homework-section" class="text-center analysis-section hidden">

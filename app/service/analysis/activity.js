@@ -55,12 +55,14 @@ function Activity() {
   }
 
   /**
+   *
    *  count / avg > 1.8  =  10
    *  < 1.8:  ( (count / avg) / 1.8 ) * 10
    * @param score
    * @returns {number}
    */
   function getScore(count, avg) {
+    // TODO: this should be considered with a serious model instead of simple math
     var score = (avg == 0) ? 0.9 : count / avg;
     if(score >= 1.8)
       return 10;
@@ -137,6 +139,9 @@ function Activity() {
    * @param classId
    * @param userId
    * @param callback
+   *
+   *
+   * 5.21  {Number}
    */
   this.getClassStudentExp = function(classId, userId, callback) {
     var score = {};
@@ -175,45 +180,8 @@ function Activity() {
       })
     }).catch(function(err) {callback(err)})
   }
-  /**
-   *
-   * @param classId
-   * @param userId
-   * @param callback
-   */
-  this.getClassStudentActivityCount = function(classId, userId, callback) {
-    db.sequelize.transaction(function(t) {
-      return db.Action.count({where: {classId: classId, userId: userId}})
-    }).then(function(result) {
-      callback(null, {count: result})
-    }).catch(function(err) {callback(err)})
-  }
 
-  /**
-   *
-   * @param userId
-   * @param timePeriod
-   * @param callback
-   */
-  this.getStudentActivityCount = function(userId, timePeriod, callback) {
 
-  }
-  /**
-   * return user's action count
-   * @param userId
-   * @param callback
-   */
-  this.getActionCount = function(userId, callback) {
-    db.Action.count({
-      where: {
-        userId: userId
-      }
-    }).then(function(count) {
-      callback(null, {
-        count: count
-      })
-    });
-  }
   /**
    * get data from according to semester
    * fall: 8 - 1

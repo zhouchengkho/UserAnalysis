@@ -150,8 +150,11 @@ function Query() {
     }).then(function(result) {
       console.log(JSON.stringify(result))
       var data = [];
-      for(var i in result)
-        data.push(result[i].userId)
+      for(var i in result) {
+        if(result[i].userId != userId)
+          data.push(result[i].userId)
+      }
+
       callback(null, data)
     }).catch(function(err) {
       callback(err)
@@ -160,7 +163,32 @@ function Query() {
 
   /**
    *
+   * @param teacherId
+   * @param callback
+   *
+   * {
+   *  "classId": "",
+   *  "courseId": "",
+   *  "userId": "",
+   *  "termId": "",
+   *  "classStatus": "",
+   *  "Course":
+   *    {
+   *      "courseId": "",
+   *      "courseName": "",
+   *      "courseCredit": "",
+   *      "courseWeekTime": "",
+   *      "courseStatus": ""
+   *    }
+   * }
    */
+  this.getTeacherClasses = function(teacherId, callback) {
+    db.Class.findAll({where: {userId: teacherId}, include: [db.Course]}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
 
 }
 

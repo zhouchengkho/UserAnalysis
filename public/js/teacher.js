@@ -7,32 +7,11 @@
 $(document).on('click', '.class-detail', function()
 {
   var self = $(this);
-
-  // var data = {
-  //   badScoreFilter: [
-  //     {
-  //       userId: '1011111',
-  //       userName: 'zhou',
-  //       score: 1.22
-  //     },
-  //     {
-  //       userId: '312312312',
-  //       userName: 'hou',
-  //       score: 111.1
-  //     },
-  //     {
-  //       userId: '11111',
-  //       userName: 'ye',
-  //       score: 3.44
-  //     }
-  //   ]
-
-
-
   var href = self.attr('href');
   var id = href.substr(1, href.length - 1)
   // not collapsed
-  if (!$('#'+id).hasClass('in')) {
+  var selector = '#'+id;
+  if ($(selector).attr('aria-expanded') === "true") {
     $.ajax({
       type: 'GET',
       contentType: 'application/json; charset=utf-8',

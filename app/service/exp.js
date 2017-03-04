@@ -200,6 +200,84 @@ function Exp() {
       callback(err)})
   }
 
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   * {
+   *  "userId": "",
+   *  "userName": "",
+   *  "exp": ""
+   * }
+   */
+  this.getDetailedStudentExp = function(userId, callback) {
+    var data = {};
+    var self = this;
+    query.getUserInfo(userId, function(err, result) {
+      data = result;
+      self.getStudentExp(userId, function(err, result) {
+        data.exp = result;
+        callback(null, data)
+      })
+    })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   *
+   * [1.22, 4.66, 7.66...]
+   */
+  this.getMyDormExp = function(userId, callback) {
+    var self = this;
+    var data = [];
+    query.getRoommates(userId, function(err, userIds) {
+      async.eachSeries(userIds, function(roommateId, done) {
+        self.getStudentExp(roommateId, function(err, result) {
+          data.push(result)
+          done();
+        })
+      }, function done() {
+        callback(null, data)
+      })
+    })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "exp": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "exp": ""
+   *  }
+   * ]
+   */
+  this.getDetailedDormExp = function(userId, callback) {
+    var self = this;
+    var data = [];
+    query.getRoommates(userId, function(err, userIds) {
+      async.eachSeries(userIds, function(roommateId, done) {
+        self.getDetailedStudentExp(roommateId, function(err, result) {
+          data.push(result)
+          done();
+        })
+      }, function done() {
+        callback(null, data)
+      })
+    })
+  }
+
 }
 
 

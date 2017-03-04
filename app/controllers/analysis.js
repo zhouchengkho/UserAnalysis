@@ -10,9 +10,10 @@ var express = require('express'),
   dorm = require('../service/analysis/dorm'),
   teacher = require('../service/teacher'),
   scoreFiller = require('../service/scorefiller'),
-  scoreGetter = require('../service/scoregetter')
+  scoreGetter = require('../service/scoregetter'),
   db = require('../models/index'),
-    exp = require('../service/exp');
+  exp = require('../service/exp'),
+  graph = require('../service/graph');
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -20,8 +21,9 @@ module.exports = function (app) {
 
 
 
-router.get('/action-count', function(req, res) {
-  activity.getActionCount(req.session.login.userId, function(err, result) {
+router.get('/dorm-bar-chart-data', function(req, res) {
+  graph.getBarChartDataForDorm(req.session.login.userId, function(err, result) {
+    console.log(JSON.stringify(result))
     if(err)
       res.json({status: 400, message: err.message})
     else
