@@ -31,19 +31,24 @@ function Login() {
     }).then(function(users) {
       if(users) {
         // console.log(JSON.stringify(users));
+        console.log('what is happening')
         refer.getAcademicYearTerms(function(err, terms) {
           if(err)
             return callback(err)
+          console.log(JSON.stringify(terms))
+          console.log(JSON.stringify(users[0]))
           req.session.login = {
             userId: users[0].userId,
             userName: users[0].userName,
             character: (users[0].isTeacher == '0' ? 'student' : 'teacher'),
             settings: {
               // time: refer.getTimePeriod('academic-year'),
-              timePeriod: 'academic-year',
+              timePeriod: 'academic-year'
               // terms: terms
             }
           };
+          console.log('?')
+          console.log(req.session)
           req.session.save();
           callback(null, true)
         })

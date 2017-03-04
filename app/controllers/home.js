@@ -14,7 +14,7 @@ module.exports = function (app) {
 router.get('/', function (req, res, next) {
   switch (req.session.login.character) {
     case 'student':
-      score.getStudentScore(req.session.login.userId, function(err, data) {
+      score.getStudentData(req.session.login.userId, function(err, data) {
         if(err)
           res.json(err)
         else {

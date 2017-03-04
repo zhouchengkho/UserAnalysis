@@ -11,10 +11,73 @@ var dorm = require('./analysis/dorm'),
   db = require('../models/index'),
   async = require('async'),
   scoreFiller = require('./scorefiller'),
-  Promise = require('bluebird');
+  Promise = require('bluebird'),
+  query = require('./query');
 function ScoreGetter() {
 
+  /**
+   *
+   * @param userId
+   * @param callback
+   * {
+   *  "score":
+   *    {
+   *    "userId": "10132510237",
+   *    "overallScore": 3.44,
+   *    "dormScore": 5.66,
+   *    "socialScore": 5.31
+   *    "homeworkScore": 5.67,
+   *    "activityScore": 7.88
+   *    },
+   *    "dorm":
+   *    [
+   *      {
+   *        "overallScore": 3.44,
+   *        "dormScore": 5.66,
+   *        "socialScore": 5.31
+   *        "homeworkScore": 5.67,
+   *        "activityScore": 7.88
+   *      },
+   *      {
+   *        "overallScore": 3.44,
+   *        "dormScore": 5.66,
+   *        "socialScore": 5.31
+   *        "homeworkScore": 5.67,
+   *        "activityScore": 7.88
+   *      }
+   *    ]
+   * }
+   */
+  this.getStudentData = function(userId, callback) {
+    var self = this;
+    var data = {};
+    self.getStudentScore(userId, function(err, result) {
+      if(err)
+        return callback(err)
+      data.score = result;
+      self.getCompareScore(userId, function(err, result) {
+        if(err)
+          return callback(err)
+        data.dorm = result;
+        callback(null, data)
+      })
+    })
+  }
+  /**
+   *
+   * @param userId
+   * @param callback
+   * {
+   *  "userId": "10132510237",
+   *  "overallScore": 3.44,
+   *  "dormScore": 5.66,
+   *  "socialScore": 5.31,
+   *  "homeworkScore": 5.67,
+   *  "activityScore": 7.88
+   * }
+   */
   this.getStudentScore = function(userId, callback) {
+    console.log('getting score for: '+ userId);
     var self = this;
     var data = {
       userId: userId
@@ -29,7 +92,9 @@ function ScoreGetter() {
     var classCount;
     db.User.findAll({where: {userId: userId}}).then(function(result) {
       return new Promise(function(resolve, reject) {
-        console.log('test: '+result[0])
+        if(result.length == 0)
+          throw new Error('user does not exist')
+        console.log('test: '+JSON.stringify(result[0]))
         data.userName = result[0].userName;
         getStudentClasses(userId, function(err, classIds) {
           classCount = classIds.length;
@@ -59,10 +124,12 @@ function ScoreGetter() {
       summary.getStudentSummary(userId, function(err, result) {
         data.summary = result;
         if(err)
-          callback(err)
+          return callback(err)
         callback(null, data)
       })
-    })
+    }).catch(function(err){
+      console.log('err here')
+      callback(err)})
   }
 
 
@@ -132,6 +199,35 @@ function ScoreGetter() {
   }
 
 
+  /**
+   *
+   * @param userId
+   * @param callback
+   */
+  this.getCompareScore = function(userId, callback) {
+    var self = this;
+    var data = [];
+    query.getRoommates(userId, function(err, userIds) {
+      var myId = userId;
+      async.eachSeries(userIds, function(userId, done) {
+        self.getStudentScore(userId, function(err, result) {
+          if(!err) {
+            var temp = {
+              overallScore: result.overallScore,
+              dormScore: result.dormScore,
+              socialScore: result.socialScore,
+              homeworkScore: result.homeworkScore,
+              activityScore: result.activityScore
+            }
+            data.push(temp)
+          }
+          done()
+        })
+      }, function done() {
+        callback(null, data)
+      })
+    })
+  }
 
   this.getTest = function(classId, userId, callback) {
     var data = {

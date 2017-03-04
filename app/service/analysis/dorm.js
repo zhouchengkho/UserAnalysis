@@ -1,6 +1,8 @@
 /**
  * Created by zhoucheng on 1/20/17.
  */
+
+var query = require('../query');
 function Dorm() {
   /**
    * getOverallScore
@@ -51,6 +53,18 @@ function Dorm() {
   }
   this.getClassStudentScore = function(classId, userId, callback) {
     callback(null, Math.random() * 10);
+  }
+
+
+  this.getClassStudentExp = function(classId, userId, callback) {
+    callback(null, Math.random() * 10);
+  }
+
+  this.getRoommates = function(userId, callback) {
+    query.getRoommates(userId, function(err, result) {
+      console.log(JSON.stringify(result))
+      callback(err, result)
+    })
   }
 }
 

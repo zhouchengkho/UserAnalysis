@@ -124,6 +124,57 @@ function Activity() {
     }).catch(function(err) {callback(err)})
   }
 
+
+  /**
+   * class exp
+   * initiate discussion - code: 401, 30%
+   * checkout discussion - code: 402, 10%
+   * resource (check out / edit / download / rate) - (502  / 503 / 505 / 507) 20%
+   * ppt download  - code: 301 * 20%
+   * assignment (submit / resubmit / download) -  (201 / 202 / 203) 20%
+   *
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   */
+  this.getClassStudentExp = function(classId, userId, callback) {
+    var score = {};
+    Promise.all([
+      query.getClassStudentActionCountAsync(classId, userId, ['401']),
+      query.getClassStudentActionCountAsync(classId, userId, ['402']),
+      query.getClassStudentActionCountAsync(classId, userId, ['502', '503', '504', '505', '507']),
+      query.getClassStudentActionCountAsync(classId, userId, ['301']),
+      query.getClassStudentActionCountAsync(classId, userId, ['201', '202', '203'])
+    ]).spread(function(initCount, checkoutCount, rscCount, pptCount, assignmentCount) {
+      var initAvg, checkoutAvg, rscAvg, pptAvg, assignmentAvg;
+      query.getClassActionCountAvgAsync(classId, ['401']).then(function(count) {
+        initAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['402'])
+      }).then(function(count) {
+        checkoutAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['502', '503', '504', '505', '507'])
+      }).then(function(count) {
+        rscAvg = count;
+        return  query.getClassActionCountAvgAsync(classId, ['301'])
+      }).then(function(count) {
+        pptAvg = count;
+        return query.getClassActionCountAvgAsync(classId, ['201', '202', '203'])
+      }).then(function(count) {
+        assignmentAvg = count;
+        score.initDiscussionScore = getScore(initCount, initAvg);
+        score.checkoutDiscussionScore = getScore(checkoutCount, checkoutAvg);
+        score.resourceScore = getScore(rscCount, rscAvg);
+        score.pptScore = getScore(pptCount, pptAvg);
+        score.assignmentScore = getScore(assignmentCount, assignmentAvg);
+        var final = score.initDiscussionScore * 0.3 + score.checkoutDiscussionScore * 0.1 + score.resourceScore * 0.2 + score.pptScore * 0.2 + score.assignmentScore * 0.2;
+        console.log('param: '+initCount + ' '+ initAvg + ' '+ checkoutCount + ' ' + checkoutAvg + ' '+ rscCount + ' ' +rscAvg + ' '+ pptCount + ' '+ pptAvg + ' '+ assignmentCount + ' '+ assignmentAvg)
+        console.log('score: '+JSON.stringify(score))
+        console.log('final ' + classId + ' ' + final)
+        callback(null, final)
+      })
+    }).catch(function(err) {callback(err)})
+  }
   /**
    *
    * @param classId

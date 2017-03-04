@@ -27,26 +27,37 @@
     <div class="col-xs-4 text-center">
         <!-- section title start-->
         <!--<h1>Summary</h1>-->
-        <h2>Hey {{data.userName}}</h2>
-        <h2>Your overall score is {{data.overallScore}}</h2>
-        <p>{{ data.summary}}</p>
+        <h2>Hey {{data.score.userName}}</h2>
+        <h2>Your overall score is {{data.score.overallScore}}</h2>
+        <p>{{ data.score.summary}}</p>
     </div>
     <div class="col-xs-8" id="analysis-sections">
-        <div id="activity-section" class="text-center">
+        <div id="activity-section" class="text-center analysis-section">
             <!-- section title start-->
             <h3>Activity</h3>
             <canvas id="activity-chart" width="750" height="400"></canvas>
         </div>
-        <div id="social-section" class="text-center hidden">
+        <div id="social-section" class="text-center analysis-section hidden">
             <!-- section title start-->
             <h1>Social</h1>
             <canvas id="social-chart" width="750" height="400"></canvas>
         </div>
-        <div id="dorm-section" class="text-center hidden">
+        <div id="dorm-section" class="text-center analysis-section hidden">
             <!-- section title start-->
             <h1>Dorm</h1>
+          <h3>Roommates scores</h3>
+          {{#each data.dorm}}
+          <div class="col-xs-6 text-left ">
+              <p class="lesser-margins">overallScore: {{overallScore}}</p>
+              <p class="lesser-margins">socialScore: {{socialScore}}</p>
+            <p class="lesser-margins">activityScore: {{activityScore}}</p>
+            <p class="lesser-margins">dormScore: {{dormScore}}</p>
+            <p class="lesser-margins">homeworkScore: {{homeworkScore}}</p>
+          </div>
+          {{/each}}
+
         </div>
-        <div id="homework-section" class="text-center hidden">
+        <div id="homework-section" class="text-center analysis-section hidden">
             <!-- section title start-->
             <h1>Homework</h1>
             <div id="homework-html"></div>

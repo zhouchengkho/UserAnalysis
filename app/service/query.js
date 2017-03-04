@@ -39,6 +39,27 @@ function Query() {
   }
 
   /**
+   *
+   * @param classId
+   * @param callback
+   * [
+   *  {
+   *    "userId": "1231231",
+   *    "classId": "CA4131",
+   *    "exp": number | null
+   *  },
+   *  {
+   *    ...
+   *  }
+   * ]
+   */
+  this.getStudentsByClass = function(classId, callback) {
+    db.StudentClass.findAll({where: {classId: classId}}).then(function(result) {
+      callback(null, result)
+    })
+  }
+
+  /**
    * @param classId
    * @param userId
    * @param actionCode
@@ -112,6 +133,35 @@ function Query() {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
   }
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   *
+   * ['userId', 'userId', 'userId', 'userId']
+   */
+  this.getRoommates = function(userId, callback) {
+    db.sequelize.transaction(function() {
+      return db.Dorm.findAll({where: {userId: userId}})
+    }).then(function(result) {
+      console.log(JSON.stringify(result))
+      return db.Dorm.findAll({where: {dormId: result[0].dormId}})
+    }).then(function(result) {
+      console.log(JSON.stringify(result))
+      var data = [];
+      for(var i in result)
+        data.push(result[i].userId)
+      callback(null, data)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+  /**
+   *
+   */
+
 }
 
 module.exports = new Query();

@@ -5,7 +5,8 @@ module.exports = function (sequelize, DataTypes) {
 
   var StudentClass = sequelize.define('StudentClass', {
       userId: { type: DataTypes.STRING(12), primaryKey: true, notNull: true },
-      classId: { type: DataTypes.STRING(20), primaryKey: true, notNull: true }
+      classId: { type: DataTypes.STRING(20), primaryKey: true, notNull: true },
+      exp: { type: DataTypes.FLOAT, defaultValue: null }
     },
     {
       classMethods: {

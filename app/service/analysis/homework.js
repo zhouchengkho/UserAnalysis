@@ -60,6 +60,10 @@ function HomeWork() {
     callback(null, Math.random() * 10);
   }
 
+  this.getClassStudentExp = function(classId, userId, callback) {
+    callback(null, Math.random() * 10);
+  }
+
   /**
    *
    * @param userId

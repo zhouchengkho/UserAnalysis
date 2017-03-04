@@ -913,4 +913,8 @@ input[type="text"] {
 .analysis-selector ul li a:hover {
   cursor: pointer;
 }
+
+.lesser-margins {
+  margin: 2px;
+}
 /*# sourceMappingURL=style.css.map */

@@ -7,10 +7,12 @@ var express = require('express'),
   social = require('../service/analysis/social'),
   homework = require('../service/analysis/homework'),
   refer = require('../service/reference'),
+  dorm = require('../service/analysis/dorm'),
   teacher = require('../service/teacher'),
   scoreFiller = require('../service/scorefiller'),
   scoreGetter = require('../service/scoregetter')
-  db = require('../models/index');
+  db = require('../models/index'),
+    exp = require('../service/exp');
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -85,10 +87,15 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
+  // scoreGetter.getStudentData(req.session.login.userId, function(err, result) {
+  //   res.json(result)
+  // })
 
-
-  scoreGetter.getHighestInClass('C180001201409', function(err, result) {
-    res.json(result)
+  exp.fillAllExp(function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json({status: 200, data: result})
   })
 })
 

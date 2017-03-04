@@ -65,6 +65,10 @@ function Social() {
   this.getClassStudentScore = function(classId, userId, callback) {
     callback(null, Math.random() * 10);
   }
+
+  this.getClassStudentExp = function(classId, userId, callback) {
+    callback(null, Math.random() * 10);
+  }
   /**
    * getRadarData
    * get data for the radar chart
