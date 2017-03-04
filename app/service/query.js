@@ -145,10 +145,8 @@ function Query() {
     db.sequelize.transaction(function() {
       return db.Dorm.findAll({where: {userId: userId}})
     }).then(function(result) {
-      console.log(JSON.stringify(result))
       return db.Dorm.findAll({where: {dormId: result[0].dormId}})
     }).then(function(result) {
-      console.log(JSON.stringify(result))
       var data = [];
       for(var i in result) {
         if(result[i].userId != userId)
@@ -190,6 +188,161 @@ function Query() {
     })
   }
 
+
+  /**
+   *
+   * @param callback
+   *
+   * 388 {Number}
+   */
+  this.getTotalUserCount = function(callback) {
+    db.User.count({}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param userId
+   * @param gte
+   * @param lte
+   * @param callback
+   *
+   * {Number}
+   */
+  this.getStudentActionCountInTime = function(userId, gte, lte, callback) {
+    db.Action.count({where: {time: {gte: gte, lte: lte}, userId: userId}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param userId
+   * @param gte
+   * @param lte
+   * @param callback
+   *
+   * {Number}
+   */
+  this.getStudentActionCountInTimeAvg = function(userId, gte, lte, callback) {
+    this.getTotalUserCount(function(err, userCount) {
+      db.Action.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
+
+
+        callback(null, count/userCount)
+      }).catch(function(err) {callback(err)})
+    })
+  }
+
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   *
+   * {Number}
+   */
+  this.getStudentFriendsCount = function(userId, callback) {
+    db.Friend.count({where: {userId: userId}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param callback
+   *
+   * {Number}
+   */
+  this.getStudentFriendsCountAvg = function(callback) {
+    this.getTotalUserCount(function(err, userCount) {
+      db.Friend.count({}).then(function(count) {
+        callback(null, count/userCount)
+      }).catch(function(err) {callback(err)})
+    })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param gte
+   * @param lte
+   * @param callback
+   */
+  this.getStudentStatusCountInTime = function(userId, gte, lte, callback) {
+    db.Status.count({where: {userId: userId, time: {gte: gte, lte: lte}}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param gte
+   * @param lte
+   * @param callback
+   */
+  this.getStudentStatusCountInTimeAvg = function(gte, lte, callback) {
+    this.getTotalUserCount(function(err, userCount) {
+      db.Status.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
+        callback(null, count/userCount)
+      })
+    })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param gte
+   * @param lte
+   * @param callback
+   */
+  this.getStudentTopicReplyCountInTime = function(userId, gte, lte, callback) {
+    db.TopicReply.count({where: {fromId: userId, time: {gte: gte, lte: lte}}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param gte
+   * @param lte
+   * @param callback
+   */
+  this.getStudentTopicReplyCountInTimeAvg = function(gte, lte, callback) {
+    this.getTotalUserCount(function(err, userCount) {
+      db.TopicReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
+        callback(null, count/userCount)
+      }).catch(function(err) {callback(err)})
+    })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param gte
+   * @param lte
+   * @param callback
+   */
+  this.getStudentSourceReplyCountInTime = function(userId, gte, lte, callback) {
+    db.SourceReply.count({where: {fromId: userId, time: {gte: gte, lte: lte}}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param gte
+   * @param lte
+   * @param callback
+   */
+  this.getStudentSourceReplyCountInTimeAvg = function(gte, lte, callback) {
+    this.getTotalUserCount(function(err, userCount) {
+      db.SourceReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
+        callback(null, count/userCount)
+      }).catch(function(err) {callback(err)})
+    })
+  }
 }
 
 module.exports = new Query();
