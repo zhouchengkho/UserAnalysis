@@ -106,6 +106,37 @@ function Query() {
   /**
    *
    * @param classId
+   * @param actionCode
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "count": 5
+   *  },
+   *  {
+   *    "userId": "",
+   *    "count" 3
+   *  }
+   * ]
+   */
+  this.getClassActionCountGroup = function(classId, actionCode, callback) {
+    if (typeof actionCode == 'string') {
+      var temp = actionCode;
+      actionCode = [];
+      actionCode.push(temp)
+    }
+    db.Action.findAll({
+      attributes: ['userId', [db.sequelize.fn('COUNT', 'actionCode'), 'count']],
+      where: {classId: classId, actionCode: {$in: actionCode}},
+      group: ['userId'],
+      order: [['userId', 'desc']]}).then(function(result) {
+        callback(null, result)
+    }).catch(function(err) {callback(err)})
+  }
+  /**
+   *
+   * @param classId
    * @param callback
    *
    * {

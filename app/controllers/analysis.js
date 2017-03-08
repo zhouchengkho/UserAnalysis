@@ -13,7 +13,8 @@ var express = require('express'),
   scoreGetter = require('../service/scoregetter'),
   db = require('../models/index'),
   exp = require('../service/exp'),
-  graph = require('../service/graph');
+  graph = require('../service/graph'),
+  query = require('../service/query');
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -101,14 +102,8 @@ router.get('/activity-html-data', function(req, res) {
 
 router.get('/test', function(req, res) {
   // scoreGetter.getStudentData(req.session.login.userId, function(err, result) {
-  //   res.json(result)
-  // })
-
-  exp.fillAllExp(function(err, result) {
-    if(err)
-      res.json({status: 400, message: err.message})
-    else
-      res.json({status: 200, data: result})
+  activity.getClassStudentExp('C180001201512', '10112510101', function(err, result) {
+    res.json({exp: result})
   })
 })
 
