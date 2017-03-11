@@ -21,6 +21,12 @@ function Query() {
     return result;
   }
 
+  this.getClassTermName = function(classId, callback) {
+    db.Class.findAll({where: {classId: classId}, include: [db.Term]}).then(function(result) {
+      var termName = result[0].Term.termName
+      callback(null, termName)
+    }).catch(function(err) {callback(err)})
+  }
   /**
    *
    * @param userId
@@ -348,9 +354,9 @@ function Query() {
         order: 'userId desc'
       }).then(function(result) {
         callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      }).catch(function(err) {
+        callback(err)
       })
-    }).catch(function(err) {
-      callback(err)
     })
   }
 
@@ -363,9 +369,9 @@ function Query() {
         order: 'userId desc'
       }).then(function(result) {
         callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      }).catch(function(err) {
+        callback(err)
       })
-    }).catch(function(err) {
-      callback(err)
     })
   }
 
@@ -378,9 +384,9 @@ function Query() {
         order: 'fromId desc'
       }).then(function(result) {
         callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      }).catch(function(err) {
+        callback(err)
       })
-    }).catch(function(err) {
-      callback(err)
     })
   }
 
@@ -393,9 +399,9 @@ function Query() {
         order: 'fromId desc'
       }).then(function(result) {
         callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      }).catch(function(err) {
+        callback(err)
       })
-    }).catch(function(err) {
-      callback(err)
     })
   }
 
@@ -408,9 +414,9 @@ function Query() {
         order: 'fromId desc'
       }).then(function(result) {
         callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      }).catch(function(err) {
+        callback(err)
       })
-    }).catch(function(err) {
-      callback(err)
     })
   }
 

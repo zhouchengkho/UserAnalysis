@@ -100,10 +100,16 @@ router.get('/activity-html-data', function(req, res) {
 
 router.get('/test', function(req, res) {
   // scoreGetter.getStudentData(req.session.login.userId, function(err, result) {
-  activity.getClassStudentExp('C180001201512', '10112510101', function(err, result) {
-    res.json({exp: result})
+  // activity.getClassStudentExp('C180001201512', '10112510101', function(err, result) {
+  //   res.json({exp: result})
+  // })
+  // query.getClassFriendsCountGroup('C180001201512', function(err, result) {
+  //   res.json(result)
+  // })
+  social.getClassStudentExpTest('C180001201512', '10112510101', function(err, result) {
+    res.json(result)
   })
-})
+});
 
 router.get('/get-class-detail/:id', function(req, res) {
   exp.getClassBadExpers(req.params.id, function(err, result) {

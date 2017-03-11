@@ -1,8 +1,9 @@
 var db = require('../../models/index');
 var reference = require('./../reference');
-var query = require('./../query');
 var Promise = require('bluebird');
+var query = Promise.promisifyAll(require('../query'));
 var score = require('./score');
+var helper = require('../helper');
 function Social() {
 
   /**
@@ -59,34 +60,28 @@ function Social() {
 
   /**
    *
+   * Friends, Status, Status Reply, Topic Reply, Source Reply
    * @param classId
    * @param userId
-   * @param callback
+   * @param callback {Function} 3.56
    */
   this.getClassStudentExp = function(classId, userId, callback) {
-    callback(null, Math.random() * 10);
-  }
+    reference.getTimeForClass(classId, function(err, time) {
+      var gte = time.gte;
+      var lte = time.lte;
 
-  /**
-   *
-   * Friends, Status, Status Reply, Topic Reply, Source Reply
-   * @param timePeriod
-   * @param callback
-   */
-  this.getClassStudentExpTest = function(classId, userId, timePeriod, callback) {
-    var time = reference.getTimePeriod(timePeriod, userId);
-    var gte = time.gte;
-    var lte = time.lte;
-    Promise.all([
-      query.getStudentFriendsCountAsync(userId),
-      query.getStudentStatusReplyCountInTimeAsync(userId, gte, lte),
-      query.getStudentStatusCountInTimeAsync(userId, gte, lte),
-      query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte),
-      query.getStudentSourceReplyCountInTimeAsync(userId, gte, lte)
+      Promise.all([
+        query.getClassFriendsCountGroupAsync(classId),
+        query.getClassStatusCountGroupInTimeAsync(classId, gte, lte),
+        query.getClassStatusReplyCountGroupInTimeAsync(classId, gte, lte),
+        query.getClassTopicReplyCountGroupInTimeAsync(classId, gte, lte),
+        query.getClassSourceReplyCountGroupInTimeAsync(classId, gte, lte)
+      ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
+        var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
+        callback(null, score.entropy.getScoreOf(statistic, userId))
+      })
+    });
 
-    ]).spread(function() {
-
-    })
   }
 }
 

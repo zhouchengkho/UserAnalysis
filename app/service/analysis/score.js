@@ -226,37 +226,6 @@ function Entropy() {
    *    "data": [9, 2, 30, 7, 5, 9]
    *  }
    * ]
-   *
-   * @returns
-   *
-   * [
-   *  {
-   *    "userId": "10132510237",
-   *    "score": 1.0272226069300192
-   *  },
-   *  {
-   *    "userId": "10132510238",
-   *    "score": 5.32290665674021
-   *  }
-   * ]
-   */
-  this.getScoresTest = function(data) {
-
-  }
-
-  /**
-   *
-   * @param data
-   * [
-   *  {
-   *    "userId": "10132510237",
-   *    "data": [5, 1.4, 6, 3, 5, 7]
-   *  },
-   *  {
-   *    "userId": "10132510238",
-   *    "data": [9, 2, 30, 7, 5, 9]
-   *  }
-   * ]
    * @param userId
    * @returns
    *

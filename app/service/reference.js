@@ -3,7 +3,7 @@
  */
 var moment = require('moment');
 var db = require('../models/index');
-
+var query = require('./query');
 function Reference() {
 
 
@@ -37,14 +37,14 @@ function Reference() {
   function getSemester(year, term) {
     if(term == 'spring') {
       return {
-        gte: moment().format(year + '-02-01 00:00:00'),
-        lte: moment().format(year + '-07-31 24:00:00')
+        gte: year + '-02-01 00:00:00',
+        lte: year + '-07-31 24:00:00'
       }
     }
     else {
       return {
-        gte: moment().format(year + '-08-01 00:00:00'),
-        lte: moment().format(((Number(year) + 1).toString()) + '-01-31 24:00:00')
+        gte: year + '-08-01 00:00:00',
+        lte: ((Number(year) + 1).toString() + '-01-31 24:00:00')
       }
     }
   }
@@ -413,6 +413,20 @@ function Reference() {
     db.Term.findAll({where: {termName: {$in: terms}}}).then(function(result) {
       callback(null, result)
     }).catch(function(err) {callback(err)} )
+  }
+
+  this.getTimeForClass = function(classId, callback) {
+    query.getClassTermName(classId, function(err, term) {
+      var startYear = term.substring(0, 4)
+      var termNumber = term.substring(12, 13);
+
+      var time;
+      if(termNumber === '一')
+        time = getSemester(startYear, 'fall')
+      else
+        time = getSemester((Number(startYear) + 1).toString(), 'spring')
+      callback(null, time)
+    })
   }
 }
 
