@@ -27,7 +27,6 @@ module.exports = function (sequelize, DataTypes) {
         // example on how to add relations
         User.hasMany(models.Friend, {foreignKey: 'userId'});
         User.hasMany(models.StudentClass, {foreignKey: 'userId'});
-        User.hasMany(models.AnalysisScore, {foreignKey: 'userId'})
         User.belongsTo(models.Dorm, {foreignKey: 'userId'})
       }
     },

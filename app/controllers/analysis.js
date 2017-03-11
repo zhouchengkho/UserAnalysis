@@ -9,8 +9,6 @@ var express = require('express'),
   refer = require('../service/reference'),
   dorm = require('../service/analysis/dorm'),
   teacher = require('../service/teacher'),
-  scoreFiller = require('../service/scorefiller'),
-  scoreGetter = require('../service/scoregetter'),
   db = require('../models/index'),
   exp = require('../service/exp'),
   graph = require('../service/graph'),
@@ -108,7 +106,7 @@ router.get('/test', function(req, res) {
 })
 
 router.get('/get-class-detail/:id', function(req, res) {
-  scoreGetter.getClassBadScores(req.params.id, function(err, result) {
+  exp.getClassBadExpers(req.params.id, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else
@@ -117,11 +115,3 @@ router.get('/get-class-detail/:id', function(req, res) {
 })
 
 
-router.get('/fill-all', function(req, res) {
-  scoreFiller.fillAllScore(function(err, result) {
-    if(err)
-      res.json({status: 400, message: err.message})
-    else
-      res.json({status: 200, data: result})
-  })
-})

@@ -1,9 +1,9 @@
 var express = require('express'),
   router = express.Router(),
   login = require('../service/login'),
-  score = require('../service/scoregetter'),
   teacher = require('../service/teacher'),
-  student  = require('../service/student');
+  student  = require('../service/student'),
+  exp = require('../service/exp');
 module.exports = function (app) {
   app.use('/', router);
 };
@@ -49,7 +49,7 @@ router.get('/student/overall/:id', function(req, res) {
   console.log(req.url)
   if(req.session.login.character == 'teacher') {
     console.log('id: '+req.params.id)
-    score.getStudentScore(req.params.id, function(err, data) {
+    exp.getStudentExp(req.params.id, function(err, data) {
       if(err)
         res.json(err)
       else {

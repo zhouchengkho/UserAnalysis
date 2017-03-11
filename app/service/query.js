@@ -381,6 +381,12 @@ function Query() {
       }).catch(function(err) {callback(err)})
     })
   }
+
+  this.getClassBadExpers = function(classId, callback) {
+    db.StudentClass.findAll({where: {classId: classId}, limit: 3, order: 'exp asc'}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) {callback(err)})
+  }
 }
 
 module.exports = new Query();

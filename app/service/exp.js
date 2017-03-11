@@ -356,6 +356,48 @@ function Exp() {
       })
     })
   }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   * result format
+   * [
+   *  {
+   *    "userId": "",
+   *    "classId": "",
+   *    "userName": "",
+   *    "overallScore": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "classId": "",
+   *    "userName": "",
+   *    "overallScore": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "classId": "",
+   *    "userName": "",
+   *    "overallScore": ""
+   *  }
+   * ]
+   */
+  this.getClassBadExpers = function(classId, callback) {
+    this.fillClassExp(classId, function(err, result) {
+      if(err)
+        callback(err)
+      else {
+        query.getClassBadExpers(classId, function(err, result) {
+          if(err)
+            callback(err)
+          else
+            callback(null, result)
+        })
+      }
+    })
+
+  }
 }
 
 

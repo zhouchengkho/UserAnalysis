@@ -3,7 +3,6 @@
  */
 var db = require('../models/index');
 var async = require('async');
-var scoreGetter = require('./scoregetter');
 var query = require('./query')
 var prefix = require('../../config/config').prefix;
 function Teacher() {
