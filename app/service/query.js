@@ -4,7 +4,7 @@
 
 var db = require('../models/index')
 var Promise = require('bluebird')
-
+var helper = require('./helper');
 
 function Query() {
   /**
@@ -56,6 +56,23 @@ function Query() {
   this.getStudentsByClass = function(classId, callback) {
     db.StudentClass.findAll({where: {classId: classId}}).then(function(result) {
       callback(null, result)
+    })
+  }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.getClassStudentIdsDesc = function(classId, callback) {
+    var studentIds = [];
+    db.StudentClass.findAll({where: {classId: classId}, order: 'userId desc'}).then(function(result) {
+      for(var i in result) {
+        studentIds.push(result[i].userId)
+      }
+      callback(null, studentIds)
+    }).catch(function(err) {
+      callback(err)
     })
   }
 
@@ -121,18 +138,23 @@ function Query() {
    * ]
    */
   this.getClassActionCountGroup = function(classId, actionCode, callback) {
+    var self = this;
     if (typeof actionCode == 'string') {
       var temp = actionCode;
       actionCode = [];
       actionCode.push(temp)
     }
-    db.Action.findAll({
-      attributes: ['userId', [db.sequelize.fn('COUNT', 'actionCode'), 'count']],
-      where: {classId: classId, actionCode: {$in: actionCode}},
-      group: ['userId'],
-      order: [['userId', 'desc']]}).then(function(result) {
-        callback(null, result)
-    }).catch(function(err) {callback(err)})
+    self.getClassStudentIdsDesc(classId, function(err, userIds) {
+      db.Action.findAll({
+        attributes: ['userId', [db.sequelize.fn('COUNT', 'actionCode'), 'count']],
+        where: {classId: classId, actionCode: {$in: actionCode}},
+        group: ['userId'],
+        order: [['userId', 'desc']]}).then(function(result) {
+
+        callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      }).catch(function(err) {callback(err)})
+    })
+
   }
   /**
    *
@@ -302,6 +324,99 @@ function Query() {
   }
 
   /**
+   * Callback userId s are in desc order
+   * @param classId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "10132510237",
+   *    "count": 20
+   *  },
+   *  {
+   *    "userId": "10142510222",
+   *    "count": 13
+   *  }
+   * ]
+   */
+  this.getClassFriendsCountGroup = function(classId, callback) {
+    this.getClassStudentIdsDesc(classId, function(err, userIds) {
+      db.Friend.findAll({
+        attributes: ['userId', [db.sequelize.fn('COUNT', 'userId'), 'count']],
+        where: {userId: {$in: userIds}},
+        group: ['userId'],
+        order: 'userId desc'
+      }).then(function(result) {
+        callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      })
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+  this.getClassStatusCountGroupInTime = function(classId, gte, lte, callback) {
+    this.getClassStudentIdsDesc(classId, function(err, userIds) {
+      db.Status.findAll({
+        attributes: ['userId', [db.sequelize.fn('COUNT', 'userId'), 'count']],
+        where: {userId: {$in: userIds}, time: {gte: gte, lte: lte}},
+        group: ['userId'],
+        order: 'userId desc'
+      }).then(function(result) {
+        callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      })
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+  this.getClassStatusReplyCountGroupInTime = function(classId, gte, lte, callback) {
+    this.getClassStudentIdsDesc(classId, function(err, userIds) {
+      db.StatusReply.findAll({
+        attributes: [['fromId', 'userId'], [db.sequelize.fn('COUNT', 'fromId'), 'count']],
+        where: {fromId: {$in: userIds}, time: {gte: gte, lte: lte}},
+        group: ['fromId'],
+        order: 'fromId desc'
+      }).then(function(result) {
+        callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      })
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+  this.getClassSourceReplyCountGroupInTime = function(classId, gte, lte, callback) {
+    this.getClassStudentIdsDesc(classId, function(err, userIds) {
+      db.SourceReply.findAll({
+        attributes: [['fromId', 'userId'], [db.sequelize.fn('COUNT', 'fromId'), 'count']],
+        where: {fromId: {$in: userIds}, time: {gte: gte, lte: lte}},
+        group: ['fromId'],
+        order: 'fromId desc'
+      }).then(function(result) {
+        callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      })
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+  this.getClassTopicReplyCountGroupInTime = function(classId, gte, lte, callback) {
+    this.getClassStudentIdsDesc(classId, function(err, userIds) {
+      db.TopicReply.findAll({
+        attributes: [['fromId', 'userId'], [db.sequelize.fn('COUNT', 'fromId'), 'count']],
+        where: {fromId: {$in: userIds}, time: {gte: gte, lte: lte}},
+        group: ['fromId'],
+        order: 'fromId desc'
+      }).then(function(result) {
+        callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
+      })
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+
+
+  /**
    *
    * @param userId
    * @param gte
@@ -326,6 +441,12 @@ function Query() {
         callback(null, count/userCount)
       })
     })
+  }
+
+  this.getStudentStatusReplyCountInTime = function(userId, gte, lte, callback) {
+    db.StatusReply.count({where: {fromId: userId, time: {gte: gte, lte: lte}}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {callback(err)})
   }
 
   /**

@@ -14,6 +14,7 @@ module.exports = function (sequelize, DataTypes) {
       classMethods: {
         associate: function (models) {
           // example on how to add relations
+          Status.hasMany(models.StatusReply, {foreignKey: 'statusId', sourceKey: 'statusId'})
         }
       },
       freezeTableName: true,

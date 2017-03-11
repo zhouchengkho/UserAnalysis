@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var async = require('async');
 var query = Promise.promisifyAll(require('../query'));
 var score = require('./score');
+var helper = require('../helper');
 function Activity() {
 
 
@@ -34,15 +35,9 @@ function Activity() {
       query.getClassActionCountGroupAsync(classId, ['301']),
       query.getClassActionCountGroupAsync(classId, ['201', '202', '203'])
     ]).spread(function(initGroup, checkoutGroup, rscGroup, pptGroup, assignmentGroup) {
-      var statistic = reverseMatrix([
-        organize(initGroup, userId),
-        organize(checkoutGroup, userId),
-        organize(rscGroup, userId),
-        organize(pptGroup, userId),
-        organize(assignmentGroup, userId)
-      ])
-
-      callback(null, score.entropy.getScoreOf(statistic, 0))
+      var statistic = helper.organizeData([initGroup, checkoutGroup, rscGroup, pptGroup, assignmentGroup]);
+      console.log(statistic)
+      callback(null, score.entropy.getScoreOf(statistic, userId))
     })
   }
 

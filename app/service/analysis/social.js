@@ -1,6 +1,8 @@
 var db = require('../../models/index');
 var reference = require('./../reference');
 var query = require('./../query');
+var Promise = require('bluebird');
+var score = require('./score');
 function Social() {
 
   /**
@@ -55,10 +57,37 @@ function Social() {
     callback(null, Math.random() * 10);
   }
 
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   */
   this.getClassStudentExp = function(classId, userId, callback) {
     callback(null, Math.random() * 10);
   }
 
+  /**
+   *
+   * Friends, Status, Status Reply, Topic Reply, Source Reply
+   * @param timePeriod
+   * @param callback
+   */
+  this.getClassStudentExpTest = function(classId, userId, timePeriod, callback) {
+    var time = reference.getTimePeriod(timePeriod, userId);
+    var gte = time.gte;
+    var lte = time.lte;
+    Promise.all([
+      query.getStudentFriendsCountAsync(userId),
+      query.getStudentStatusReplyCountInTimeAsync(userId, gte, lte),
+      query.getStudentStatusCountInTimeAsync(userId, gte, lte),
+      query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte),
+      query.getStudentSourceReplyCountInTimeAsync(userId, gte, lte)
+
+    ]).spread(function() {
+
+    })
+  }
 }
 
 

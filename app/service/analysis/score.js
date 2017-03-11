@@ -2,6 +2,7 @@
  * Created by zhoucheng on 3/8/17.
  */
 
+var helper = require('../helper');
 function deepCopy(obj) {
   var out = [],i = 0,len = obj.length;
   for (; i < len; i++) {
@@ -210,19 +211,72 @@ function Entropy() {
     return scores;
   }
 
-  this.getScoreOf = function(datasets, index) {
-    var weights = this.getWeights(datasets);
-    var scaled = minMaxStandardize(datasets);
-    var scores = [];
-    for(var i in scaled) {
-      var score = 0;
-      for(var j in weights) {
-        score += weights[j] * scaled[i][j]
-        // console.log(score)
-      }
-      scores.push(score * 10)
-    }
-    return scores[index];
+
+
+  /**
+   *
+   * @param data
+   * [
+   *  {
+   *    "userId": "10132510237",
+   *    "data": [5, 1.4, 6, 3, 5, 7]
+   *  },
+   *  {
+   *    "userId": "10132510238",
+   *    "data": [9, 2, 30, 7, 5, 9]
+   *  }
+   * ]
+   *
+   * @returns
+   *
+   * [
+   *  {
+   *    "userId": "10132510237",
+   *    "score": 1.0272226069300192
+   *  },
+   *  {
+   *    "userId": "10132510238",
+   *    "score": 5.32290665674021
+   *  }
+   * ]
+   */
+  this.getScoresTest = function(data) {
+
+  }
+
+  /**
+   *
+   * @param data
+   * [
+   *  {
+   *    "userId": "10132510237",
+   *    "data": [5, 1.4, 6, 3, 5, 7]
+   *  },
+   *  {
+   *    "userId": "10132510238",
+   *    "data": [9, 2, 30, 7, 5, 9]
+   *  }
+   * ]
+   * @param userId
+   * @returns
+   *
+   * [
+   *  {
+   *    "userId": "10132510237",
+   *    "score": 1.0272226069300192
+   *  },
+   *  {
+   *    "userId": "10132510238",
+   *    "score": 5.32290665674021
+   *  }
+   * ]
+   */
+  this.getScoreOf = function(data, userId) {
+    var split = helper.splitDatasetsAndUserIds(data);
+    var datasets = split.datasets;
+    var userIds = split.userIds;
+    var scores = this.getScores(datasets)
+    return scores[helper.getIndex(userIds, userId)]
   }
 }
 
