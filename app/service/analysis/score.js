@@ -2,7 +2,6 @@
  * Created by zhoucheng on 3/8/17.
  */
 
-var helper = require('../helper');
 function deepCopy(obj) {
   var out = [],i = 0,len = obj.length;
   for (; i < len; i++) {
@@ -82,6 +81,10 @@ function zScorestandardize(datasets) {
 }
 
 
+/**
+ * scaled to 0-1
+ * @param datasets
+ */
 function minMaxStandardize(datasets) {
   var scaled = deepCopy(datasets);
   for(var i in datasets) {
@@ -94,6 +97,26 @@ function minMaxStandardize(datasets) {
 
 
 function Entropy() {
+
+ function getIndex(userIds, userId){
+    for(var i in userIds) {
+      if(userId === userIds[i])
+        return i
+    }
+  }
+
+  function splitDatasetsAndUserIds(data) {
+    var datasets = [];
+    var userIds = [];
+    for(var i in data) {
+      datasets.push(data[i].data);
+      userIds.push(data[i].userId);
+    }
+    return {
+      datasets: datasets,
+      userIds: userIds
+    }
+  }
 
   this.scale = function(datasets) {
     var scaled = deepCopy(datasets);
@@ -241,11 +264,11 @@ function Entropy() {
    * ]
    */
   this.getScoreOf = function(data, userId) {
-    var split = helper.splitDatasetsAndUserIds(data);
+    var split = splitDatasetsAndUserIds(data);
     var datasets = split.datasets;
     var userIds = split.userIds;
     var scores = this.getScores(datasets)
-    return scores[helper.getIndex(userIds, userId)]
+    return scores[getIndex(userIds, userId)]
   }
 }
 

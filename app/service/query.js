@@ -514,6 +514,68 @@ function Query() {
       callback(null, result)
     }).catch(function(err) {callback(err)})
   }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   * [1, 2, 3, 4, 6]
+   */
+  this.getClassAssignments = function(classId, callback) {
+    db.Assignment.findAll({where: {classId: classId}, order: 'assignmentId desc'}).then(function(result) {
+      var data = [];
+      for(var i in result) {
+        data.push(result[i].assignmentId)
+      }
+      callback(null, data)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   * @param userId
+   * @param assignmentIds
+   * @param callback
+   *
+   * [
+   *  {
+   *    "assignmentId": 127,
+   *    "submitted": false
+   *  },
+   *  {
+   *    "assignmentId": 126,
+   *    "submitted": true,
+   *    "startTime": "2015-07-21T10:36:33.000Z",
+   *    "endTime": "2015-07-22T16:00:00.000Z",
+   *    "submitTime": "2015-07-22T15:36:16.000Z"
+   *  },
+   *  {
+   *    ...
+   *  }
+   * ]
+   */
+  this.getStudentAssignmentTimes = function(userId, assignmentIds, callback) {
+    db.Assignment.findAll({
+      attributes: ['assignmentId', ['startDate', 'startTime'], ['endDate', 'endTime']],
+      where: {assignmentId: {$in: assignmentIds}},
+      include: [{model: db.StudentAssignment, attributes: [['time', 'submitTime'], ['count', 'submitCount']], where: {userId: userId}}],
+      order: 'assignmentId desc'
+    }).then(function(result) {
+      var data = [];
+      result = JSON.parse(JSON.stringify(result))
+      for(var i in result) {
+        var temp = {};
+        temp.assignmentId = result[i].assignmentId;
+        temp.startTime = result[i].startTime;
+        temp.endTime = result[i].endTime;
+        temp.submitTime = result[i].StudentAssignments[0].submitTime;
+        temp.submitCount = result[i].StudentAssignments[0].submitCount;
+        temp.submitted = true;
+        data.push(temp)
+      }
+      // callback(null, data)
+      callback(null, helper.fillVoid('assignmentId', ['submitted'], assignmentIds, data, [false]))
+    }).catch(function(err) {callback(err)})
+  }
 }
 
 module.exports = new Query();

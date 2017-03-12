@@ -428,6 +428,12 @@ function Reference() {
       callback(null, time)
     })
   }
+
+  this.getTimeInterval = function(startTime, endTime) {
+    var startMoment = moment(startTime);
+    var endMoment = moment(endTime);
+    return endMoment.diff(startMoment, 'hours')
+  }
 }
 
 

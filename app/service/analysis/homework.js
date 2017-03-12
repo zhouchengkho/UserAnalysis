@@ -1,67 +1,60 @@
 var db = require('../../models/index');
 var query = require('./../query');
 var reference = require('./../reference');
+var helper = require('../helper');
 /**
- * 1. Attended Class
- * 2. Finished Assignment
- * 3. Source Score
+ * 1. Finished Assignment
  * @constructor
  */
 function HomeWork() {
+
   /**
-   * getOverallScore
-   * @param userId
-   * @param callback
-   * @returns {JSON}
-   * {
-   *  "overallScore": 8.33
-   *  "classScores":
-   *    [
-   *      {
-   *        "classId": "C12312312",
-   *        "score": 7.33
-   *      },
-   *      {
-   *      "classId": "C12312312",
-   *        "score": "9.33"
-   *      }
-   *    ]
-   * }
+   * on a scale from 0-10, based on submitted time
+   * y = 10 * e^ ((1/totalInterval) * In(1/2) * interval)
+   * meaning submit on startTime, score = 10
+   *         submit on endTime, score = 5
+   *         lower after
+   *         not submitted score is 0
+   *
+   * @param startTime
+   * @param endTime
+   * @param submitTime
    */
-  this.getStudentScore = function(userId, callback) {
-    var self = this;
-    var data = {};
-    data.classScores = [];
-    query.getStudentClasses(userId).then(function(data) {
-      var classId = data[index];
-      async.eachSeries(data, function(classId, done) {
-        self.getClassStudentScore(classId, userId, function(err, score) {
-          if(err)
-            throw new Error(err)
-          classScores.push({classId: classId, score: score})
-          done()
-        })
-      }, function done() {
-        // compute avg
-        var sum = 0;
-        for(var index in classScores)
-          sum += classScores[index].score
-        data.overallScore = sum / classScores.length
-        callback(null, data);
-      })
-    }).catch(function(err) {callback(err)})
+  function getNewtonCoolingScore(startTime, endTime, submitTime) {
+    var totalInterval = reference.getTimeInterval(startTime, endTime);
+    var interval = reference.getTimeInterval(startTime, submitTime);
+    console.log(totalInterval + ' '+interval);
+    return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(1/2) * interval))
   }
 
-  this.getClassScore = function(userId, classId, callback) {
-    callback(null, Math.random() * 10);
-  }
 
-  this.getClassStudentScore = function(classId, userId, callback) {
-    callback(null, Math.random() * 10);
-  }
-
+  /**
+   * get all assignments of this class, estimate score of 0-10 according to hand in time
+   * @param classId
+   * @param userId
+   * @param callback {function} (err, exp)
+   */
   this.getClassStudentExp = function(classId, userId, callback) {
-    callback(null, Math.random() * 10);
+    query.getClassAssignments(classId, function(err, assignmentIds) {
+      if(err)
+        return callback(err)
+      else {
+          query.getStudentAssignmentTimes(userId, assignmentIds, function(err, result) {
+            if(err)
+              return callback(err)
+            else {
+                var scores = [];
+                for(var i in result) {
+                  if(result[i].submitted === false)
+                    scores.push(0)
+                  else
+                    scores.push(getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
+                }
+                callback(null, helper.avg(scores))
+            }
+          })
+      }
+    })
   }
 
   /**
@@ -133,12 +126,12 @@ function HomeWork() {
     this.getHomeWorkData(userId, timePeriod, function(err, homeworkData) {
       if(err)
         callback(err)
-      var html = '<div style="float: left">' +
+      var html = '<div class="col-xs-6">' +
         '<p>Finished ' + homeworkData.assignmentCount + ' Assignment(s)</p>' +
         '<p>Took ' + homeworkData.classCount + ' Course(s)</p>' +
         '<p>Finished ' + homeworkData.sourceCount + ' Source, Averaging Score ' + homeworkData.sourceScoreAvg + '</p>' +
         '</div>' +
-        '<div style="float: right">' +
+        '<div class="col-xs-6">' +
         '<p>Average ' + homeworkData.assignmentAverage + ' Assignment(s)</p>' +
         '<p>Average ' + homeworkData.classAverage + ' Course(s)</p>' +
         '</div>';

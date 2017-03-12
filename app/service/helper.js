@@ -102,24 +102,35 @@ function Helper() {
     return result;
   }
 
-  this.getIndex = function(userIds, userId){
-    for(var i in userIds) {
-      if(userId === userIds[i])
-        return i
+  this.fillVoid = function(id, columns, ids, data, fills) {
+    if(typeof  columns === 'string') {
+      var arr = [];
+      arr.push(columns)
+      columns = arr;
     }
+    if(typeof fills === 'string') {
+      var arr = [];
+      arr.push(fills)
+      fills = arr;
+    }
+    for(var i in ids) {
+      if(!data[i] || data[i][id] != ids[i]) {
+        var temp = {};
+        temp[id] = ids[i];
+        for(var j in columns) {
+          temp[columns[j]] = fills[j]
+        }
+        data.splice(i, 0, temp);
+      }
+    }
+    return data;
   }
 
-  this.splitDatasetsAndUserIds = function(data) {
-    var datasets = [];
-    var userIds = [];
-    for(var i in data) {
-      datasets.push(data[i].data);
-      userIds.push(data[i].userId);
-    }
-    return {
-      datasets: datasets,
-      userIds: userIds
-    }
+  this.avg = function(arr) {
+    var sum = 0;
+    for(var i in arr)
+      sum+=arr[i]
+    return sum/arr.length;
   }
 }
 

@@ -11,7 +11,7 @@ function Activity() {
 
 
   /**
-   * class exp
+   * class student exp
    * initiate discussion - code: 401
    * checkout discussion - code: 402
    * resource (check out / edit / download / rate) - (502  / 503 / 505 / 507)
@@ -19,12 +19,12 @@ function Activity() {
    * assignment (submit / resubmit / download) -  (201 / 202 / 203)
    *
    *
-   * @param classId
-   * @param userId
-   * @param callback
+   * @param classId {string}
+   * @param userId {string}
+   * @param callback {function} (err, exp)
    *
    *
-   * 5.21  {Number}
+   * 5.21  {Number} 0-10
    */
   this.getClassStudentExp = function(classId, userId, callback) {
 
@@ -41,36 +41,6 @@ function Activity() {
     })
   }
 
-
-  function reverseMatrix(datasets) {
-    var data = [];
-    for(var j in datasets[0]) {
-      var column = [];
-      for(var i in datasets) {
-        column.push(datasets[i][j])
-      }
-      data.push(column)
-    }
-    return data;
-  }
-  /**
-   *
-   * @param data
-   * @param firstId
-   * returns
-   * [3, 5, 7, 10]
-   */
-  function organize(data, firstId) {
-    var result = [0];
-    data = JSON.parse(JSON.stringify(data))
-    for(var i in data) {
-      if(data[i].userId == firstId)
-        result[0] = data[i].count;
-      else
-        result.push(data[i].count);
-    }
-    return result
-  }
 
 
   /**

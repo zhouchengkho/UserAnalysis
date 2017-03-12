@@ -99,15 +99,11 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  // scoreGetter.getStudentData(req.session.login.userId, function(err, result) {
-  // activity.getClassStudentExp('C180001201512', '10112510101', function(err, result) {
-  //   res.json({exp: result})
-  // })
-  // query.getClassFriendsCountGroup('C180001201512', function(err, result) {
-  //   res.json(result)
-  // })
-  social.getClassStudentExpTest('C180001201512', '10112510101', function(err, result) {
-    res.json(result)
+  homework.getClassStudentExp('C180001201511', '10112110108', function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json(result)
   })
 });
 
