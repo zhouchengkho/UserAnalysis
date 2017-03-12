@@ -96,6 +96,7 @@ function Helper() {
     for(var j in data[0]) {
       result.push({userId: data[0][j].userId, data: []})
       for(var i in data) {
+
         result[j].data.push(data[i][j].count)
       }
     }

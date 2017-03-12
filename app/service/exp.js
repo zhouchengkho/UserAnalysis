@@ -2,14 +2,14 @@
  * Created by zhoucheng on 3/3/17.
  */
 var db = require('./../models/index')
-var social = require('./analysis/social');
-var dorm = require('./analysis/dorm');
-var activity = require('./analysis/activity');
-var homework = require('./analysis/homework');
 var Promise = require('bluebird');
+var social = Promise.promisifyAll(require('./analysis/social'));
+var dorm = require('./analysis/dorm');
+var activity = Promise.promisifyAll(require('./analysis/activity'));
+var homework = Promise.promisifyAll(require('./analysis/homework'));
 var EventProxy = require('eventproxy');
-var summary = require('./analysis/summary');
-var query = require('./query');
+var summary = Promise.promisifyAll(require('./analysis/summary'));
+var query = Promise.promisifyAll(require('./query'));
 var async = require('async');
 function Exp() {
   /**
@@ -81,73 +81,17 @@ function Exp() {
         var data = result[0].exp
         callback(null, data)
       } else {
-        var epEmitter = {
-          name: 'name',
-          dorm: 'dorm',
-          social: 'social',
-          summary: 'summary',
-          homework: 'homework',
-          activity: 'activity',
-          error: 'error'
-        }
-        var ep = new EventProxy();
+        Promise.all([
+          activity.getClassStudentExpAsync(classId, userId),
+          social.getClassStudentExpAsync(classId, userId),
+          homework.getClassStudentExpAsync(classId, userId),
+          summary.getClassStudentSummaryAsync(classId, userId)
+        ]).spread(function (activityExp, socialExp, homeworkExp, summary) {
+          console.log('result: ' + activityExp + ' ' + ' ' + socialExp + ' ' + homeworkExp);
+          console.log('summary is: ' + summary)
 
-        ep.all([epEmitter.name, epEmitter.activity, epEmitter.dorm, epEmitter.social, epEmitter.homework, epEmitter.summary],
-          function(className, activityExp, dormExp, socialExp, homeworkExp, summary) {
-          console.log('result: '+activityExp + ' '+ dormExp + ' '+ socialExp + ' '+homeworkExp);
-            console.log('summary is: '+summary)
-            var data = {
-              userId: userId,
-              classId: classId,
-              className: className,
-              overallExp: fixToTwo((activityExp + dormExp + socialExp +homeworkExp ) /4),
-              dormExp: fixToTwo(dormExp),
-              socialExp: fixToTwo(socialExp),
-              homeworkExp: fixToTwo(homeworkExp),
-              activityExp: fixToTwo(activityExp),
-              summary: summary
-            }
-            console.log(JSON.stringify(data))
-            callback(null, data.overallExp)
-          })
-
-        ep.bind(epEmitter.error, function(err) {
-          // 卸载掉所有handler
-          ep.unbind();
-          // 异常回调
-          callback(err);
-        })
-
-        db.Class.findAll({where: {classId: classId}, include:[db.Course]}).then(function(result) {
-          ep.emit(epEmitter.name, result[0].Course.courseName);
-
-        }).catch(function(err){ep.emit(epEmitter.error, err);})
-        activity.getClassStudentExp(classId, userId, function(err, activityExp) {
-
-          if(err)
-            return ep.emit(epEmitter.error, err);
-          ep.emit(epEmitter.activity, activityExp);
-        })
-        dorm.getClassStudentExp(classId, userId, function(err, dormExp) {
-          if(err)
-            return ep.emit(epEmitter.error, err);
-          ep.emit(epEmitter.dorm, dormExp);
-        })
-        social.getClassStudentExp(classId, userId, function(err, socialExp) {
-          if(err)
-            return ep.emit(epEmitter.error, err);
-          ep.emit(epEmitter.social, socialExp)
-        })
-        homework.getClassStudentExp(classId, userId, function(err, homeworkExp) {
-          if(err)
-            return ep.emit(epEmitter.error, err);
-          ep.emit(epEmitter.homework, homeworkExp)
-        })
-        summary.getClassStudentSummary(classId, userId, function(err, summary) {
-          if(err)
-            return ep.emit(epEmitter.error, err);
-          console.log('got summary: '+summary)
-          ep.emit(epEmitter.summary, summary)
+          var overallExp = fixToTwo((activityExp + socialExp + homeworkExp ) / 3)
+          callback(null, overallExp)
         })
       }
     })
@@ -208,10 +152,10 @@ function Exp() {
         data.userName = result[0].userName;
         query.getStudentClasses(userId).then(function(classIds) {
           classCount = classIds.length;
-          console.log('classIds: '+classIds)
+          console.log('my classes: '+classIds)
           async.eachSeries(classIds, function(classId, done) {
             self.getClassStudentExp(classId, userId, function(err, result) {
-              exp +=result;
+              exp += Number(result);
               done();
             })
           }, function done() {
@@ -246,8 +190,10 @@ function Exp() {
     var self = this;
     query.getUserInfo(userId, function(err, result) {
       data = result;
-      self.getStudentExp(userId, function(err, result) {
-        data.exp = result;
+      self.getStudentExp(userId, function(err, exp) {
+        console.log('huh?')
+        console.log(data)
+        data.exp = exp;
         callback(null, data)
       })
     })

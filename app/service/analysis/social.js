@@ -26,7 +26,10 @@ function Social() {
         query.getClassSourceReplyCountGroupInTimeAsync(classId, gte, lte)
       ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
         var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
-        callback(null, score.entropy.getScoreOf(statistic, userId))
+        console.log('social')
+        var exp = score.entropy.getScoreOf(statistic, userId)
+        console.log(exp)
+        callback(null, exp)
       })
     });
 

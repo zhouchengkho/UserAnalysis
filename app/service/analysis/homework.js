@@ -23,7 +23,6 @@ function HomeWork() {
   function getNewtonCoolingScore(startTime, endTime, submitTime) {
     var totalInterval = reference.getTimeInterval(startTime, endTime);
     var interval = reference.getTimeInterval(startTime, submitTime);
-    console.log(totalInterval + ' '+interval);
     return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(1/2) * interval))
   }
 
@@ -35,24 +34,22 @@ function HomeWork() {
    * @param callback {function} (err, exp)
    */
   this.getClassStudentExp = function(classId, userId, callback) {
-    query.getClassAssignments(classId, function(err, assignmentIds) {
+    query.getClassStudentAssignmentTimes(classId, userId, function(err, result) {
       if(err)
         return callback(err)
       else {
-          query.getStudentAssignmentTimes(userId, assignmentIds, function(err, result) {
-            if(err)
-              return callback(err)
-            else {
-                var scores = [];
-                for(var i in result) {
-                  if(result[i].submitted === false)
-                    scores.push(0)
-                  else
-                    scores.push(getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
-                }
-                callback(null, helper.avg(scores))
-            }
-          })
+
+        var scores = [];
+        for(var i in result) {
+          if(result[i].submitted === false)
+            scores.push(0)
+          else
+            scores.push(getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
+        }
+        if(scores.length === 0)
+          callback(null, 0)
+        else
+          callback(null, helper.avg(scores))
       }
     })
   }

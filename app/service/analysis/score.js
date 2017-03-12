@@ -71,7 +71,6 @@ function getStandardDeviation(datasets) {
 function zScorestandardize(datasets) {
   var scaled = deepCopy(datasets);
   var standardDeviation = getStandardDeviation(datasets);
-  console.log(standardDeviation);
   for(var i in datasets) {
     for(var j in datasets[i]) {
       scaled[i][j] = (datasets[i][j] - avg(column(datasets, j))) / standardDeviation[j]
@@ -89,7 +88,10 @@ function minMaxStandardize(datasets) {
   var scaled = deepCopy(datasets);
   for(var i in datasets) {
     for(var j in datasets[i]) {
-      scaled[i][j] = (datasets[i][j] - min(column(datasets, j))) / ((max(column(datasets, j))) - min(column(datasets, j)))
+      if((max(column(datasets, j)))  === min(column(datasets, j)))
+        scaled[i][j] = 0;
+      else
+        scaled[i][j] = (datasets[i][j] - min(column(datasets, j))) / ((max(column(datasets, j))) - min(column(datasets, j)))
     }
   }
   return scaled;
@@ -171,31 +173,8 @@ function Entropy() {
   this.getWeights  = function(datasets) {
     var scaled = this.scale(datasets);
     var weighted = getWeightedMeasure(scaled);
-    var entropy = getInfoEntropy(weighted);function getStandardDeviation(datasets) {
-      var standardDeviation = [];
-      for(var j in datasets[0]) {
-        var sum = 0;
-        var average = avg(column(datasets, j));
-        for(var i in datasets) {
-          sum += ((datasets[i][j] - average) * (datasets[i][j] - average))
-        }
+    var entropy = getInfoEntropy(weighted);
 
-        sum = Math.sqrt(sum / (datasets.length - 1))
-        standardDeviation.push(sum)
-      }
-      return standardDeviation
-    }
-
-    function standardize(datasets) {
-      var scaled = deepCopy(datasets);
-      var standardDeviation = getStandardDeviation(datasets);
-      for(var i in datasets) {
-        for(var j in datasets[i]) {
-          scaled[i][j] = (datasets[i][j] - avg(column(datasets, j))) / standardDeviation[j]
-        }
-      }
-      return scaled;
-    }
     var redundancy = getEntropyRedundancy(entropy);
     var weights = [];
     for(var i in redundancy) {
@@ -227,7 +206,6 @@ function Entropy() {
       var score = 0;
       for(var j in weights) {
         score += weights[j] * scaled[i][j]
-        // console.log(score)
       }
       scores.push(score * 10)
     }

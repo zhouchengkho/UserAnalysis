@@ -99,13 +99,25 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  homework.getClassStudentExp('C180001201511', '10112110108', function(err, result) {
-    if(err)
-      res.json({status: 400, message: err.message})
-    else
-      res.json(result)
+  // exp.getClassStudentExp('C1800012014023', '10102510122', function(err, result) {
+  //   res.json({exp: result})
+  // })
+  // activity.getClassStudentExp('C180001201403', '10112510101', function(err, result){
+  //   console.log(err)
+  //   console.log(result)
+  //   res.json(result)
+  // })
+
+  exp.getStudentExp('10152510238', function(err, result) {
+    res.json(result)
   })
 });
+
+router.get('/fill-all', function(req, res) {
+  exp.fillAllExp(function(err, result) {
+    res.json({message: 'success'})
+  })
+})
 
 router.get('/get-class-detail/:id', function(req, res) {
   exp.getClassBadExpers(req.params.id, function(err, result) {

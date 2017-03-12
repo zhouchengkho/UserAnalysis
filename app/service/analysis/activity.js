@@ -36,8 +36,8 @@ function Activity() {
       query.getClassActionCountGroupAsync(classId, ['201', '202', '203'])
     ]).spread(function(initGroup, checkoutGroup, rscGroup, pptGroup, assignmentGroup) {
       var statistic = helper.organizeData([initGroup, checkoutGroup, rscGroup, pptGroup, assignmentGroup]);
-      console.log(statistic)
-      callback(null, score.entropy.getScoreOf(statistic, userId))
+      var exp = score.entropy.getScoreOf(statistic, userId);
+      callback(null, exp)
     })
   }
 

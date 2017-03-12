@@ -26,7 +26,7 @@ var config = {
           timestamps: false // education db doesn't use timestamps
         },
         timezone: '+8:00',
-        logging: true
+        logging: false
       }
     },
     prefix: 'https://www.mynereus.com'

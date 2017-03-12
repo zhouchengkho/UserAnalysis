@@ -220,7 +220,7 @@ function Graph() {
       radarChartData.data.datasets[0].data.push(friendsCount)
       radarChartData.data.datasets[0].data.push(statusCount)
       radarChartData.data.datasets[0].data.push(sourceReplyCount)
-      radarChartData.data.datasets[0].data.push(topicReplyAvg)
+      radarChartData.data.datasets[0].data.push(topicReplyCount)
       radarChartData.data.datasets[1].data.push(friendsAvg)
       radarChartData.data.datasets[1].data.push(statusAvg)
       radarChartData.data.datasets[1].data.push(sourceReplyAvg)
