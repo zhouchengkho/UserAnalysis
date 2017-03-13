@@ -67,7 +67,7 @@ router.get('/student/overall/:id', function(req, res) {
 
 router.get('/student/class/:studentId/:classId', function(req, res) {
   // check if is teacher
-  if(req.session.login.character == 'teacher') {
+  if(req.session.login.character == 'teacher' || req.session.login.userId == req.params.studentId) {
     student.getClassData(req.params.classId, req.params.studentId, function(err, data) {
       console.log(JSON.stringify(data))
       if(err)

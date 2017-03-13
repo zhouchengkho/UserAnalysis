@@ -7,19 +7,6 @@ var Promise = require('bluebird')
 var helper = require('./helper');
 
 function Query() {
-  /**
-   * Traverse val to fill where clause
-   * main purpose is to remove null key
-   * @param val JSON
-   */
-  this.genWhereQuery = function(val) {
-    var result = {where: {}};
-    for(var key in val) {
-      if(val[key])
-        result.where[key] = val[key]
-    }
-    return result;
-  }
 
   this.getClassTermName = function(classId, callback) {
     db.Class.findAll({where: {classId: classId}, include: [db.Term]}).then(function(result) {
@@ -33,15 +20,13 @@ function Query() {
    * result format: Array
    * ['classId', 'classId' ...]
    */
-  this.getStudentClasses = function(userId) {
-    return new Promise(function(resolve, reject){
-      db.StudentClass.findAll({where: {userId: userId}}).then(function(result) {
-        var data = [];
-        for(var index in result)
-          data.push(result[index].classId)
-        resolve(data)
-      }).catch(function(err) {reject(err)})
-    })
+  this.getStudentClasses = function(userId, callback) {
+    db.StudentClass.findAll({where: {userId: userId}}).then(function(result) {
+      var data = [];
+      for(var index in result)
+        data.push(result[index].classId)
+      callback(null, data)
+    }).catch(function(err) {callback(err)})
   }
 
   /**
@@ -63,6 +48,34 @@ function Query() {
     db.StudentClass.findAll({where: {classId: classId}}).then(function(result) {
       callback(null, result)
     })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   * [
+   *  {
+   *    "classId": "C180001201403",
+   *    "className": "数据结构"
+   *    "exp":2.86
+   *  },
+   *  {
+   *    ...
+   *  }
+   * ]
+   */
+  this.getStudentClassesDetail = function(userId, callback) {
+    db.StudentClass.findAll({where: {userId: userId}, include: [{model: db.Class, include: [db.Course]}]}).then(function(result) {
+      var data = [];
+      for(var i in result) {
+        var temp = {};
+        temp.classId = result[i].classId;
+        temp.className = result[i].Class.Course.courseName;
+        temp.exp = result[i].exp;
+      }
+      callback(null, result)
+    }).catch(function(err) {callback(err)})
   }
 
   /**
@@ -167,12 +180,12 @@ function Query() {
    *
    * {
    *  "classId": "",
-   *  "courseName": ""
+   *  "className": ""
    * }
    */
   this.getClassDetail = function(classId, callback) {
     db.Class.findAll({where: {classId: classId}, include:[db.Course]}).then(function(result) {
-      callback(null, {classId: result[0].classId, courseName: result[0].Course.courseName})
+      callback(null, {classId: result[0].classId, className: result[0].Course.courseName})
     })
   }
 
@@ -213,12 +226,16 @@ function Query() {
     }).then(function(result) {
       return db.Dorm.findAll({where: {dormId: result[0].dormId, enrollYear: result[0].enrollYear}})
     }).then(function(result) {
-      var data = [];
+      var userIds = [];
       for(var i in result) {
         if(result[i].userId != userId)
-          data.push(result[i].userId)
+          userIds.push(result[i].userId)
       }
-
+      return db.User.findAll({attributes: ['userId'], where: {userId: {$in: userIds}}})
+    }).then(function(userIds) {
+      var data = [];
+      for(var i in userIds)
+        data.push(userIds[i].userId)
       callback(null, data)
     }).catch(function(err) {
       callback(err)
@@ -599,7 +616,7 @@ function Query() {
     db.Assignment.findAll({
       attributes: ['assignmentId', [db.sequelize.fn('date_format', db.sequelize.col('startDate'), '%Y-%m-%d'), 'startTime'], [db.sequelize.fn('date_format', db.sequelize.col('endDate'), '%Y-%m-%d'), 'endTime'], 'title'],
       where: {classId: classId},
-      include: [{model: db.StudentAssignment, attributes: [['time', 'submitTime'], ['count', 'submitCount']], where: {userId: userId}, required: false}],
+      include: [{model: db.StudentAssignment, attributes: [[db.sequelize.fn('date_format', db.sequelize.col('time'), '%Y-%m-%d %h:%i:%s'), 'submitTime'], ['count', 'submitCount']], where: {userId: userId}, required: false}],
       order: 'assignmentId desc'
     }).then(function(result){
       var data = [];

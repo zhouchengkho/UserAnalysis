@@ -76,7 +76,6 @@ function Exp() {
    */
   this.getClassStudentExp = function(classId, userId, callback) {
     db.StudentClass.findAll({where: {classId: classId, userId: userId}}).then(function(result) {
-      console.log('to: '+classId+ ' '+userId)
       if(result.length === 0)
         return callback(new Error('user not in this class or not exist'))
       if(result[0].exp) {
@@ -108,25 +107,78 @@ function Exp() {
    * {
    *  "userId": "",
    *  "userName": "",
-   *  "exp": ""
+   *  "classId": "",
+   *  "className": ""
+   *  "exp": 2.46
    * }
    */
   this.getDetailedClassStudentExp = function(classId, userId, callback) {
     var data = {};
     var self = this;
+
     query.getUserInfo(userId, function(err, result) {
+      if(err)
+        return callback(err)
       data.userId = result.userId;
       data.userName = result.userName;
-      self.getClassStudentExp(classId, userId, function(err, result) {
-        if(err) {
-          console.log(err)
-          callback(err)
-        } else {
-          data.exp = result;
-          console.log('yo detailed: '+JSON.stringify(data))
-          callback(null, data)
-        }
+      query.getClassDetail(classId, function(err, result) {
+        if(err)
+          return callback(err)
+        data.classId = result.classId;
+        data.className = result.className;
+        self.getClassStudentExp(classId, userId, function(err, result) {
+          if(err)
+            return callback(err)
 
+          data.exp = result;
+          callback(null, data)
+        })
+      })
+    })
+  }
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   * {
+   *  "exp": 3,
+   *  "classes":
+   *  [
+   *    {
+   *      "userId": "",
+   *      "userName": "",
+   *      "className": ""
+   *      "exp": 2.46
+   *    },
+   *    {
+   *      "userId": "",
+   *      "userName": "",
+   *      "className": ""
+   *      "exp": 2.46
+   *    }
+   *  ]
+   * }
+   *
+   */
+  this.getDetailedStudentClassesExp = function(userId, callback) {
+    var self = this;
+    var data = [];
+    var exp = 0;
+    console.log('getting detailed for userId: '+userId)
+    query.getStudentClasses(userId, function(err, classIds) {
+      async.eachSeries(classIds, function(classId, done) {
+        self.getDetailedClassStudentExp(classId, userId, function(err, result) {
+          data.push(result)
+          exp += result.exp;
+          done()
+        })
+      }, function done() {
+        if(data.length === 0)
+          exp = 0;
+        else
+          exp = fixToTwo(exp/data.length)
+        callback(null, {exp: exp, classes: data})
       })
     })
   }
@@ -139,7 +191,6 @@ function Exp() {
    * 6.84 {Number}
    */
   this.getStudentExp = function(userId, callback) {
-    console.log('getting exp for: '+ userId);
     var self = this;
     var data = {
       userId: userId
@@ -150,11 +201,9 @@ function Exp() {
       return new Promise(function(resolve, reject) {
         if(result.length == 0)
           throw new Error('user does not exist')
-        console.log('user: '+JSON.stringify(result[0]))
         data.userName = result[0].userName;
-        query.getStudentClasses(userId).then(function(classIds) {
+        query.getStudentClasses(userId, function(err, classIds) {
           classCount = classIds.length;
-          console.log('my classes: '+classIds)
           async.eachSeries(classIds, function(classId, done) {
             self.getClassStudentExp(classId, userId, function(err, result) {
               exp += Number(result);
@@ -191,10 +240,10 @@ function Exp() {
     var data = {};
     var self = this;
     query.getUserInfo(userId, function(err, result) {
+      console.log('yo')
       data = result;
+      console.log(data)
       self.getStudentExp(userId, function(err, exp) {
-        console.log('huh?')
-        console.log(data)
         data.exp = exp;
         callback(null, data)
       })
@@ -260,6 +309,7 @@ function Exp() {
     var self = this;
     var data = [];
     query.getRoommates(userId, function(err, userIds) {
+      console.log('roommates: '+userIds)
       async.eachSeries(userIds, function(roommateId, done) {
         self.getDetailedStudentExp(roommateId, function(err, result) {
           data.push(result)
@@ -293,7 +343,6 @@ function Exp() {
     var self = this;
     var data = [];
     query.getRoommates(userId, function(err, userIds) {
-      console.log('roommates: '+userIds)
       async.eachSeries(userIds, function(roommateId, done) {
         self.getDetailedClassStudentExp(classId, roommateId, function(err, result) {
           if(!err)

@@ -23,21 +23,21 @@ function Student() {
    * {
    *  "user":
    *    {
-   *    "userId": "10132510237",
-   *    "userName": "",
-   *    "faceIcon": "",
-   *    "exp": "",
-   *    "summary": ""
-   *    },
-   *    "dorm":
-   *    [
-   *      {
-   *        "exp": 4.56
-   *      },
-   *      {
-   *        "exp": 6.36
-   *      }
-   *    ]
+   *      "userId": "10132510237",
+   *      "userName": "",
+   *      "faceIcon": "",
+   *      "exp": 3,
+   *      "summary": [
+   *        {
+   *          "className": "",
+   *          "exp": 2
+   *        },
+   *        {
+   *          "className": "",
+   *          "exp": 4
+   *        }
+   *      ]
+   *    }
    * }
    */
   this.getData = function(userId, callback) {
@@ -45,13 +45,11 @@ function Student() {
     query.getUserInfo(userId, function(err, result) {
       data.user = result;
       data.user.faceIcon = prefix + data.user.faceIcon;
-      summary.getStudentSummary(userId, function(err, result) {
-        data.user.summary = result;
-        exp.getStudentExp(userId, function(err, result) {
-          data.user.exp = result;
-          callback(null, data)
-        })
-
+      exp.getDetailedStudentClassesExp(userId, function(err, result) {
+        console.log(result)
+        data.user.summary = result.classes;
+        data.user.exp = result.exp;
+        callback(null, data)
       })
 
     })
@@ -64,29 +62,26 @@ function Student() {
    * @param classId
    * @param userId
    * @param callback
-   * {
-   *  "user":
-   *    {
+   *   {
    *    "userId": "10132510237",
    *    "userName": "",
-   *    "courseName": "",
+   *    "className": "",
    *    "faceIcon": "",
    *    "exp": "",
    *    "summary": ""
-   *    }
-   * }
+   *   }
    */
   this.getClassData = function(classId, userId, callback) {
     var data = {};
     query.getClassDetail(classId, function(err, result) {
-      data.courseName = result.courseName;
+      data.className = result.className;
       query.getUserInfo(userId, function(err, result) {
-        data.user = result;
-        data.user.faceIcon = prefix + data.user.faceIcon;
-        summary.getStudentSummary(userId, function(err, result) {
-          data.user.summary = result;
+        data.faceIcon = prefix + result.faceIcon;
+        data.userName = result.userName;
+        summary.getClassStudentSummary(classId, userId, function(err, result) {
+          data.summary = result;
           exp.getClassStudentExp(classId, userId, function(err, result) {
-            data.user.exp = result;
+            data.exp = result;
             callback(null, data)
           })
 

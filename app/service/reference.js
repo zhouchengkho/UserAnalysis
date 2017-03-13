@@ -415,6 +415,16 @@ function Reference() {
     }).catch(function(err) {callback(err)} )
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * {
+   *  "gte": "",
+   *  "lte": ""
+   * }
+   */
   this.getTimeForClass = function(classId, callback) {
     query.getClassTermName(classId, function(err, term) {
       var startYear = term.substring(0, 4)

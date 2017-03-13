@@ -45,10 +45,12 @@ function fetchData() {
   $.ajax({
     type: 'GET',
     contentType: 'application/json; charset=utf-8',
-    url: '/analysis/social-radar-chart-data/' + userId
+    url: '/analysis/student-class-social-graph/'+ userId + '/' + classId
   }).done(function(data){
-    socialChartData = data;
-    var radarChart = new Chart(socialChart, socialChartData);
+    if(data.status === 200) {
+      socialChartData = data.data;
+      var radarChart = new Chart(socialChart, socialChartData);
+    }
   });
 
   $.ajax({

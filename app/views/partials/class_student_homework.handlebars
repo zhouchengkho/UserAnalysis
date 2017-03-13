@@ -1,5 +1,5 @@
 <table class="table">
-    <caption>Need to Submit: {{total}}, submitted: {{submitCount}}</caption>
+    <caption>需要提交: {{total}}, 已提交: {{submitCount}}</caption>
     <thead>
     <tr>
         <th>题目</th>
@@ -14,7 +14,7 @@
             <td>{{title}}</td>
             <td>{{startTime}}</td>
             <td>{{endTime}}</td>
-            <td>{{#if submiited}}{{submitTime}}{{else}}Overdue{{/if}}</td>
+            <td>{{#if submitted}}{{submitTime}}{{else}}Overdue{{/if}}</td>
         </tr>
       {{/each}}
     </tbody>

@@ -12,7 +12,8 @@ var express = require('express'),
   db = require('../models/index'),
   exp = require('../service/exp'),
   graph = require('../service/graph'),
-  query = require('../service/query');
+  query = require('../service/query'),
+  student = require('../service/student');
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -98,7 +99,6 @@ router.get('/homework-html-data', function(req, res) {
 
 
 router.get('/student-class-homework/:studentId/:classId', function(req, res) {
-  console.log('yo what up')
   homework.getClassStduentHomeworkData(req.params.classId, req.params.studentId, function(err, result) {
     console.log(result)
     if(err)
@@ -108,6 +108,14 @@ router.get('/student-class-homework/:studentId/:classId', function(req, res) {
   })
 })
 
+router.get('/student-class-social-graph/:studentId/:classId', function(req, res) {
+  graph.getClassStudentSocialGraph(req.params.classId, req.params.studentId, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json({status: 200, data: result})
+  })
+})
 router.get('/activity-html-data', function(req, res) {
   activity.getHtmlData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
     if(err)
@@ -120,11 +128,8 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  graph.getSocialRadarChartData('10142510111', req.session.login.settings.timePeriod, function(err, result) {
-    if(err)
-      res.json({status: 400, message: err.message})
-    else
-      res.json(result)
+  student.getData('10152510238', function(err, result){
+    res.json(result)
   })
 });
 

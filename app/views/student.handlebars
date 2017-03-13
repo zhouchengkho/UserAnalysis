@@ -28,9 +28,13 @@
         <!-- section title start-->
         <!--<h1>Summary</h1>-->
         <img src="{{data.user.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
-        <h3>Hey {{data.user.userName}}</h3>
-        <h3>Your exp is {{data.user.exp}}</h3>
-        <p>{{ data.user.summary}}</p>
+        <h4>Hey {{data.user.userName}}</h4>
+        <h4>Your exp is {{data.user.exp}}</h4>
+      <div class="text-left">
+        {{#each data.user.summary}}
+            <h5>{{className}} {{exp}} <a href="/student/class/{{userId}}/{{classId}}" target="_blank">view</a></h5>
+        {{/each}}
+      </div>
     </div>
     <div class="col-xs-8" id="analysis-sections">
         <div id="activity-section" class="text-center analysis-section">

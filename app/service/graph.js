@@ -242,7 +242,6 @@ function Graph() {
    */
   this.getClassStudentLineChartData = function(classId, userId, callback) {
 
-    var userCount = 0;
     var lineChartData = {
       type: 'line',
       option: {
@@ -313,6 +312,64 @@ function Graph() {
 
     })
 
+
+
+  }
+
+  this.getClassStudentSocialGraph = function(classId, userId, callback) {
+    reference.getTimeForClass(classId, function(err, time) {
+      var gte = time.gte;
+      var lte = time.lte;
+      var radarChartData = {
+        type: 'radar',
+        data: {
+          labels: ['Friends', 'Status', 'Source Reply', 'Topic Reply'],
+          datasets: [
+            {
+              label: 'Mine',
+              backgroundColor : 'rgba(207,220,229,0.5)',
+              borderColor : 'rgba(160,185,204,1)',
+              pointBackgroundColor: 'rgba(160,185,204,1)',
+              pointBorderColor : 'rgba(255,255,255,1)',
+              data: []
+            },
+            {
+              label: 'Average',
+              backgroundColor : 'rgba(247,223,229,0.5)',
+              borderColor : 'rgba(226,97,128,1)',
+              pointBackgroundColor: 'rgba(226,97,128,1)',
+              pointBorderColor : 'rgba(255,255,255,1)',
+              data: []
+            }
+          ]
+        }
+      };
+
+
+      console.log('getting chart social for: '+userId)
+
+      Promise.all([
+        query.getStudentFriendsCountAsync(userId),
+        query.getStudentFriendsCountAvgAsync(),
+        query.getStudentStatusCountInTimeAsync(userId, gte, lte),
+        query.getStudentStatusCountInTimeAvgAsync(gte, lte),
+        query.getStudentSourceReplyCountInTimeAsync(userId, gte, lte),
+        query.getStudentSourceReplyCountInTimeAvgAsync(gte, lte),
+        query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte),
+        query.getStudentTopicReplyCountInTimeAvgAsync(gte, lte)
+      ]).spread(function(friendsCount, friendsAvg, statusCount, statusAvg, sourceReplyCount, sourceReplyAvg, topicReplyCount, topicReplyAvg) {
+        console.log('friends count: '+friendsCount)
+        radarChartData.data.datasets[0].data.push(friendsCount)
+        radarChartData.data.datasets[0].data.push(statusCount)
+        radarChartData.data.datasets[0].data.push(sourceReplyCount)
+        radarChartData.data.datasets[0].data.push(topicReplyCount)
+        radarChartData.data.datasets[1].data.push(friendsAvg)
+        radarChartData.data.datasets[1].data.push(statusAvg)
+        radarChartData.data.datasets[1].data.push(sourceReplyAvg)
+        radarChartData.data.datasets[1].data.push(topicReplyAvg)
+        callback(null, radarChartData)
+      }).catch(function(err) {callback(err)})
+    })
 
 
   }

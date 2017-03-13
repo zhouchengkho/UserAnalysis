@@ -922,4 +922,17 @@ input[type="text"] {
 #homework-html h5 {
   margin-bottom: 10px;
 }
+
+#homework-html caption {
+  color: black;
+}
+
+#homework-html tbody tr td {
+  font-size: 15px;
+}
+
+
+.col-xs-8 {
+  border-left: grey solid 1px;
+}
 /*# sourceMappingURL=style.css.map */
