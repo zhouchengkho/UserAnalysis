@@ -60,6 +60,15 @@ router.get('/social-radar-chart-data', function(req, res) {
   })
 })
 
+router.get('/social-radar-chart-data/:studentId/', function(req, res) {
+  graph.getSocialRadarChartData(req.params.studentId, req.session.login.settings.timePeriod, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json(result)
+  })
+})
+
 router.get('/student-class-line-chart-data/:studentId/:classId', function(req, res) {
   graph.getClassStudentLineChartData(req.params.classId, req.params.studentId, function(err, result) {
     if(err)
@@ -87,6 +96,18 @@ router.get('/homework-html-data', function(req, res) {
   })
 })
 
+
+router.get('/student-class-homework/:studentId/:classId', function(req, res) {
+  console.log('yo what up')
+  homework.getClassStduentHomeworkData(req.params.classId, req.params.studentId, function(err, result) {
+    console.log(result)
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json({status: 200, data: result})
+  })
+})
+
 router.get('/activity-html-data', function(req, res) {
   activity.getHtmlData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
     if(err)
@@ -99,17 +120,11 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  // exp.getClassStudentExp('C1800012014023', '10102510122', function(err, result) {
-  //   res.json({exp: result})
-  // })
-  // activity.getClassStudentExp('C180001201403', '10112510101', function(err, result){
-  //   console.log(err)
-  //   console.log(result)
-  //   res.json(result)
-  // })
-
-  exp.getStudentExp('10152510238', function(err, result) {
-    res.json(result)
+  graph.getSocialRadarChartData('10142510111', req.session.login.settings.timePeriod, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json(result)
   })
 });
 
@@ -125,6 +140,13 @@ router.get('/get-class-detail/:id', function(req, res) {
       res.json({status: 400, message: err.message})
     else
       res.json({status: 200, data: result})
+  })
+})
+
+
+router.get('/get-diagnose/:studentId/:classId', function(req, res) {
+  exp.getClassStudentExp(req.params.classId, req.params.studentId, function(err, result) {
+    res.json({exp: result})
   })
 })
 

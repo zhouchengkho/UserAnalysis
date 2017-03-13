@@ -136,6 +136,13 @@ function HomeWork() {
       callback(null, {html: html})
     })
   }
+
+  this.getClassStduentHomeworkData = function(classId, userId, callback) {
+    console.log('homework page: '+classId+' '+userId)
+    query.getDetailedClassStudentAssignments(classId, userId, function(err, result) {
+      callback(err, result)
+    })
+  }
 }
 
 

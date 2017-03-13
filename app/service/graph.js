@@ -206,6 +206,7 @@ function Graph() {
 
     var gte = reference.getTimePeriod(timePeriod, userId).gte;
     var lte = reference.getTimePeriod(timePeriod, userId).lte;
+    console.log('getting chart social for: '+userId)
 
     Promise.all([
       query.getStudentFriendsCountAsync(userId),
@@ -217,6 +218,7 @@ function Graph() {
       query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte),
       query.getStudentTopicReplyCountInTimeAvgAsync(gte, lte)
     ]).spread(function(friendsCount, friendsAvg, statusCount, statusAvg, sourceReplyCount, sourceReplyAvg, topicReplyCount, topicReplyAvg) {
+      console.log('friends count: '+friendsCount)
       radarChartData.data.datasets[0].data.push(friendsCount)
       radarChartData.data.datasets[0].data.push(statusCount)
       radarChartData.data.datasets[0].data.push(sourceReplyCount)
@@ -229,6 +231,8 @@ function Graph() {
     }).catch(function(err) {callback(err)})
 
   }
+
+
 
   /**
    *

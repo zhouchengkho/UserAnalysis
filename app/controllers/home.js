@@ -33,8 +33,8 @@ router.get('/', function (req, res, next) {
         res.render('teacher', getRenderOption(req, {
           data: data,
           script: '<script type="text/javascript" src="/js/teacher.js"></script>' +
-          '<script type="text/javascript" src="js/handlebars-v4.0.5.js"></script>' +
-          '<script type="text/javascript" src="js/partials/class_detail.js"></script>'
+          '<script type="text/javascript" src="/js/handlebars-v4.0.5.js"></script>' +
+          '<script type="text/javascript" src="/js/partials/class_detail.js"></script>'
           }));
       })
       break;
@@ -76,6 +76,8 @@ router.get('/student/class/:studentId/:classId', function(req, res) {
         res.render('student_class', getRenderOption(req, {
           data: data,
           script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
+          '<script type="text/javascript" src="/js/handlebars-v4.0.5.js"></script>' +
+          '<script type="text/javascript" src="/js/partials/class_student_homework.js"></script>'+
           '<script type="text/javascript" src="/js/student_class.js"></script>'
         }));
       }

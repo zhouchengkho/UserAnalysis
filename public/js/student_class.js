@@ -21,8 +21,7 @@ function fetchData() {
   var pieces = url.split('/')
   var classId = pieces[pieces.length - 1]
   var userId = pieces[pieces.length - 2]
-  // alert(classId + ' '+userId)
-  // alert(pieces)
+
   $.ajax({
     type: 'GET',
     contentType: 'application/json; charset=utf-8',
@@ -46,7 +45,7 @@ function fetchData() {
   $.ajax({
     type: 'GET',
     contentType: 'application/json; charset=utf-8',
-    url: '/analysis/social-radar-chart-data'
+    url: '/analysis/social-radar-chart-data/' + userId
   }).done(function(data){
     socialChartData = data;
     var radarChart = new Chart(socialChart, socialChartData);
@@ -55,9 +54,12 @@ function fetchData() {
   $.ajax({
     type: 'GET',
     contentType: 'application/json; charset=utf-8',
-    url: '/analysis/homework-html-data'
-  }).done(function(data){
-    $('#homework-html').html(data.html);
+    url: '/analysis/student-class-homework/' + userId + '/' + classId
+  }).done(function(res){
+    if(res.status === 200) {
+      var html = Handlebars.templates["class_student_homework"](res.data);
+      $('#homework-html').html(html)
+    }
   });
 }
 
@@ -67,4 +69,6 @@ $('.analysis-selector ul li a').on('click', function() {
   $(this).addClass('active')
   $('#analysis-sections div').addClass('hidden')
   $('#'+eleId).removeClass('hidden')
+  $('#'+eleId+ ' div').removeClass('hidden')
+
 })

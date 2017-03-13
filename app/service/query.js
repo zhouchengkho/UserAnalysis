@@ -211,7 +211,7 @@ function Query() {
     db.sequelize.transaction(function() {
       return db.Dorm.findAll({where: {userId: userId}})
     }).then(function(result) {
-      return db.Dorm.findAll({where: {dormId: result[0].dormId}})
+      return db.Dorm.findAll({where: {dormId: result[0].dormId, enrollYear: result[0].enrollYear}})
     }).then(function(result) {
       var data = [];
       for(var i in result) {
@@ -383,18 +383,7 @@ function Query() {
       console.log(err)
       callback(err)}
       )
-    // this.getClassStudentIdsDesc(classId, function(err, userIds) {
-    //   db.StatusReply.findAll({
-    //     attributes: [['fromId', 'userId'], [db.sequelize.fn('COUNT', 'fromId'), 'count']],
-    //     where: {fromId: {$in: userIds}, time: {gte: gte, lte: lte}},
-    //     group: ['fromId'],
-    //     order: 'fromId desc'
-    //   }).then(function(result) {
-    //     callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
-    //   }).catch(function(err) {
-    //     callback(err)
-    //   })
-    // })
+
   }
 
   this.getClassSourceReplyCountGroupInTime = function(classId, gte, lte, callback) {
@@ -402,18 +391,7 @@ function Query() {
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
-    // this.getClassStudentIdsDesc(classId, function(err, userIds) {
-    //   db.SourceReply.findAll({
-    //     attributes: [['fromId', 'userId'], [db.sequelize.fn('COUNT', 'fromId'), 'count']],
-    //     where: {fromId: {$in: userIds}, time: {gte: gte, lte: lte}},
-    //     group: ['fromId'],
-    //     order: 'fromId desc'
-    //   }).then(function(result) {
-    //     callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
-    //   }).catch(function(err) {
-    //     callback(err)
-    //   })
-    // })
+
   }
 
   this.getClassTopicReplyCountGroupInTime = function(classId, gte, lte, callback) {
@@ -421,18 +399,7 @@ function Query() {
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
-    // this.getClassStudentIdsDesc(classId, function(err, userIds) {
-    //   db.TopicReply.findAll({
-    //     attributes: [['fromId', 'userId'], [db.sequelize.fn('COUNT', 'fromId'), 'count']],
-    //     where: {fromId: {$in: userIds}, time: {gte: gte, lte: lte}},
-    //     group: ['fromId'],
-    //     order: 'fromId desc'
-    //   }).then(function(result) {
-    //     callback(null, helper.fillZeroCountStudents(JSON.parse(JSON.stringify(result)), userIds))
-    //   }).catch(function(err) {
-    //     callback(err)
-    //   })
-    // })
+
   }
 
 
@@ -597,6 +564,70 @@ function Query() {
         data.push(temp)
       }
       callback(null, data)
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "assignmentId": 127,
+   *    "title": "第二周作业",
+   *    "startTime": "2015-07-21T10:36:33.000Z",
+   *    "endTime": "2015-07-22T16:00:00.000Z",
+   *    "submitted": false
+   *  },
+   *  {
+   *    "assignmentId": 126,
+   *    "title": "第三周作业",
+   *    "startTime": "2015-07-21T10:36:33.000Z",
+   *    "endTime": "2015-07-22T16:00:00.000Z",
+   *    "submitted": true,
+   *    "submitTime": "2015-07-22T15:36:16.000Z"
+   *  },
+   *  {
+   *    ...
+   *  }
+   * ]
+   */
+  this.getDetailedClassStudentAssignments = function(classId, userId, callback) {
+    console.log('getting detailed assignments for '+classId +' '+userId)
+    db.Assignment.findAll({
+      attributes: ['assignmentId', [db.sequelize.fn('date_format', db.sequelize.col('startDate'), '%Y-%m-%d'), 'startTime'], [db.sequelize.fn('date_format', db.sequelize.col('endDate'), '%Y-%m-%d'), 'endTime'], 'title'],
+      where: {classId: classId},
+      include: [{model: db.StudentAssignment, attributes: [['time', 'submitTime'], ['count', 'submitCount']], where: {userId: userId}, required: false}],
+      order: 'assignmentId desc'
+    }).then(function(result){
+      var data = [];
+      result = JSON.parse(JSON.stringify(result))
+      var submitCount = 0;
+      for(var i in result) {
+        var temp = {};
+        temp.assignmentId = result[i].assignmentId;
+        temp.title = result[i].title;
+        temp.startTime = result[i].startTime;
+        temp.endTime = result[i].endTime;
+        if(result[i].StudentAssignments.length === 0)
+          temp.submitted = false;
+        else {
+          temp.submitTime = result[i].StudentAssignments[0].submitTime;
+          temp.submitCount = result[i].StudentAssignments[0].submitCount;
+          temp.submitted = true;
+          submitCount++;
+        }
+
+        data.push(temp)
+      }
+      var final = {
+        total: data.length,
+        submitCount: submitCount,
+        data: data
+      }
+      callback(null, final)
     }).catch(function(err) {callback(err)})
   }
 }

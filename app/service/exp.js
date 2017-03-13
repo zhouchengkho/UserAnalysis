@@ -75,8 +75,10 @@ function Exp() {
    * 3.45   {Number}
    */
   this.getClassStudentExp = function(classId, userId, callback) {
-    console.log('getting class student exp: '+classId + ' '+userId);
     db.StudentClass.findAll({where: {classId: classId, userId: userId}}).then(function(result) {
+      console.log('to: '+classId+ ' '+userId)
+      if(result.length === 0)
+        return callback(new Error('user not in this class or not exist'))
       if(result[0].exp) {
         var data = result[0].exp
         callback(null, data)
@@ -294,7 +296,8 @@ function Exp() {
       console.log('roommates: '+userIds)
       async.eachSeries(userIds, function(roommateId, done) {
         self.getDetailedClassStudentExp(classId, roommateId, function(err, result) {
-          data.push(result)
+          if(!err)
+            data.push(result)
           done();
         })
       }, function done() {

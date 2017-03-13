@@ -1,0 +1,21 @@
+<table class="table">
+    <caption>Need to Submit: {{total}}, submitted: {{submitCount}}</caption>
+    <thead>
+    <tr>
+        <th>题目</th>
+        <th>开始时间</th>
+        <th>截止时间</th>
+        <th>提交时间</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each data}}
+        <tr>
+            <td>{{title}}</td>
+            <td>{{startTime}}</td>
+            <td>{{endTime}}</td>
+            <td>{{#if submiited}}{{submitTime}}{{else}}Overdue{{/if}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+</table>
