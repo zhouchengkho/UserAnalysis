@@ -175,13 +175,24 @@ function Entropy() {
     var weighted = getWeightedMeasure(scaled);
     var entropy = getInfoEntropy(weighted);
 
-    var redundancy = getEntropyRedundancy(entropy);
+    // var redundancy = getEntropyRedundancy(entropy);
+    var redundancy = entropy;
+    console.log('redundancy: '+redundancy)
     var weights = [];
-    for(var i in redundancy) {
-      var weight = redundancy[i] / sum(redundancy);
-      weights.push(weight);
+    if(sum(redundancy) === 0) {
+      for(var i in redundancy) {
+        weights.push(1/redundancy.length)
+      }
+    }
+    else {
+      for(var i in redundancy) {
+        var weight = redundancy[i] / sum(redundancy);
+        weights.push(weight);
+      }
     }
 
+
+    console.log('weights: '+weights)
     return weights;
   }
 

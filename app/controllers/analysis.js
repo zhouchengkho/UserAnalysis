@@ -137,11 +137,8 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  query.getStudentClassesAssignments('10152510238', function(err, result) {
-    if(err)
-      res.json({status: 400, message: err.message})
-    else
-      res.json(result)
+  activity.test('C180001201601', '10152510238', function(err, result) {
+    res.json(result)
   })
 });
 

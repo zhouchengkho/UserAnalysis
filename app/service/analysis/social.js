@@ -25,8 +25,12 @@ function Social() {
         query.getClassTopicReplyCountGroupInTimeAsync(classId, gte, lte),
         query.getClassSourceReplyCountGroupInTimeAsync(classId, gte, lte)
       ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
+
+        for(var i in friendsCount) {
+          friendsCount[i].count = friendsCount[i].count * 0.5;
+        }
+
         var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
-        console.log('social')
         var exp = score.entropy.getScoreOf(statistic, userId)
         console.log(exp)
         callback(null, exp)

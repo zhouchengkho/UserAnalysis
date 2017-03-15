@@ -34,14 +34,31 @@ function Activity() {
       query.getClassActionCountGroupAsync(classId, ['401', '402', '403', '404', '405']),
       query.getClassActionCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507']),
       query.getClassActionCountGroupAsync(classId, ['201', '202', '203'])
-    ]).spread(function(initGroup, checkoutGroup, rscGroup, pptGroup) {
-      var statistic = helper.organizeData([initGroup, checkoutGroup, rscGroup, pptGroup]);
+    ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
+      var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
       var exp = score.entropy.getScoreOf(statistic, userId);
       callback(null, exp)
     })
   }
 
 
+  this.test = function(classId, userId, callback) {
+    Promise.all([
+      query.getClassActionCountGroupAsync(classId, ['201', '202', '203']),
+      query.getClassActionCountGroupAsync(classId, ['301']),
+      query.getClassActionCountGroupAsync(classId, ['401', '402', '403', '404', '405']),
+      query.getClassActionCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507']),
+      query.getClassActionCountGroupAsync(classId, ['201', '202', '203'])
+    ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
+      // var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
+      // callback(null, statistic)
+
+      var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
+      console.log(statistic)
+      var exp = score.entropy.getScoreOf(statistic, userId);
+      callback(null, exp)
+    })
+  }
 
   /**
    *

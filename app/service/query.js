@@ -377,6 +377,22 @@ function Query() {
   //   })
   // }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "count": 5
+   *  },
+   *  {
+   *    "userId": "",
+   *    "count": 6
+   *  }
+   * ]
+   */
   this.getClassFriendsCountGroup = function(classId, callback) {
     var rawQuery = "select user.userId, ifnull(t.friendCount, 0) count from user left outer join (select userId, count(userId) friendCount from friend group by userId) t on user.userId = t.userId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
