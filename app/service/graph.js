@@ -79,6 +79,8 @@ function Graph() {
 
 
     exp.getDetailedClassStudentExp(classId, userId, function(err, result) {
+      console.log('in dorm')
+      console.log(result)
       barChartData.data.labels.push(result.userName)
       barChartData.data.datasets[0].data.push(result.exp)
       exp.getDetailedClassDormExp(classId, userId, function(err, result) {
@@ -182,7 +184,7 @@ function Graph() {
     var radarChartData = {
       type: 'radar',
       data: {
-        labels: ['Friends', 'Status', 'Source Reply', 'Topic Reply'],
+        labels: ['好友', '签到', '资源回复', '话题回复'],
         datasets: [
           {
             label: 'Mine',
@@ -243,7 +245,7 @@ function Graph() {
   this.getClassStudentLineChartData = function(classId, userId, callback) {
 
     var lineChartData = {
-      type: 'line',
+      type: 'bar',
       option: {
         title: {
           text: 'Visit Frequency',
@@ -252,7 +254,7 @@ function Graph() {
         responsive: false
       },
       data: {
-        labels : ['发起讨论', '查看讨论', '下载资源', '下载ppt', '下载资源'],
+        labels : ['作业', '课件', '讨论', '资源'],
         datasets : [
           {
             label: 'Mine',
@@ -275,44 +277,28 @@ function Graph() {
     }
 
     Promise.all([
-      query.getClassStudentActionCountAsync(classId, userId, ['401']),
-      query.getClassStudentActionCountAsync(classId, userId, ['402']),
-      query.getClassStudentActionCountAsync(classId, userId, ['505']),
+      query.getClassStudentActionCountAsync(classId, userId, ['201', '202', '203']),
       query.getClassStudentActionCountAsync(classId, userId, ['301']),
-      query.getClassStudentActionCountAsync(classId, userId, ['203'])
-    ]).spread(function(initScore, checkoutScore, rscScore, pptScore, assignmentScore) {
-      var initAvg, checkoutAvg, rscAvg, pptAvg, assignmentAvg;
-      query.getClassActionCountAvgAsync(classId, ['401']).then(function(count) {
-        initAvg = count;
-        return query.getClassActionCountAvgAsync(classId, ['402'])
-      }).then(function(count) {
-        checkoutAvg = count;
-        return query.getClassActionCountAvgAsync(classId, ['505'])
-      }).then(function(count) {
-        rscAvg = count;
-        return  query.getClassActionCountAvgAsync(classId, ['301'])
-      }).then(function(count) {
-        pptAvg = count;
-        return query.getClassActionCountAvgAsync(classId, ['203'])
-      }).then(function(count) {
-        assignmentAvg = count;
-        lineChartData.data.datasets[0].data.push(initScore)
-        lineChartData.data.datasets[0].data.push(checkoutScore)
-        lineChartData.data.datasets[0].data.push(rscScore)
-        lineChartData.data.datasets[0].data.push(pptScore)
+      query.getClassStudentActionCountAsync(classId, userId, ['401', '402', '403', '404', '405']),
+      query.getClassStudentActionCountAsync(classId, userId, ['501', '502', '503', '504', '505', '506', '507']),
+      query.getClassActionCountAvgAsync(classId, ['201', '202', '203']),
+      query.getClassActionCountAvgAsync(classId, ['301']),
+      query.getClassActionCountAvgAsync(classId, ['401', '402', '403', '404', '405']),
+      query.getClassActionCountAvgAsync(classId, ['501', '502', '503', '504', '505', '506', '507'])
+    ]).spread(function(assignmentScore, pptScore, discussionScore, rscScore, assignmentAvg, pptAvg, discussionAvg, rscAvg) {
+
         lineChartData.data.datasets[0].data.push(assignmentScore)
-        lineChartData.data.datasets[1].data.push(initAvg)
-        lineChartData.data.datasets[1].data.push(checkoutAvg)
-        lineChartData.data.datasets[1].data.push(rscAvg)
-        lineChartData.data.datasets[1].data.push(pptAvg)
+        lineChartData.data.datasets[0].data.push(pptScore)
+        lineChartData.data.datasets[0].data.push(discussionScore)
+        lineChartData.data.datasets[0].data.push(rscScore)
         lineChartData.data.datasets[1].data.push(assignmentAvg)
+        lineChartData.data.datasets[1].data.push(pptAvg)
+        lineChartData.data.datasets[1].data.push(discussionAvg)
+        lineChartData.data.datasets[1].data.push(rscAvg)
 
         callback(null, lineChartData)
-      })
 
     })
-
-
 
   }
 
@@ -323,7 +309,7 @@ function Graph() {
       var radarChartData = {
         type: 'radar',
         data: {
-          labels: ['Friends', 'Status', 'Source Reply', 'Topic Reply'],
+          labels: ['好友', '签到', ' 资源回复', '话题回复'],
           datasets: [
             {
               label: 'Mine',
@@ -375,6 +361,7 @@ function Graph() {
   }
 
 }
+
 
 
 

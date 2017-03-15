@@ -133,6 +133,12 @@ function Helper() {
       sum+=arr[i]
     return sum/arr.length;
   }
+
+  this.fixToTwo = function(num){
+    num  = num + '';
+    return Number(num.substring(0, num.indexOf(".") + 3));
+
+  }
 }
 
 module.exports = new Helper();

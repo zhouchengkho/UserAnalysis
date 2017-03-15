@@ -1,0 +1,21 @@
+{{#with data}}
+    <table class="table text-left">
+        <caption>各门课程作业提交情况</caption>
+        <thead>
+        <tr>
+            <th>课程名称</th>
+            <th>作业数</th>
+            <th>提交数</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each this}}
+            <tr>
+                <td>{{className}}</td>
+                <td>{{total}}</td>
+                <td>{{submitted}}</td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+{{/with}}

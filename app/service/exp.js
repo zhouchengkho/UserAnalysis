@@ -8,7 +8,6 @@ var dorm = require('./analysis/dorm');
 var activity = Promise.promisifyAll(require('./analysis/activity'));
 var homework = Promise.promisifyAll(require('./analysis/homework'));
 var EventProxy = require('eventproxy');
-var summary = Promise.promisifyAll(require('./analysis/summary'));
 var query = Promise.promisifyAll(require('./query'));
 var async = require('async');
 function Exp() {
@@ -58,12 +57,43 @@ function Exp() {
 
   this.fillClassStudentExp = function(classId, userId, callback) {
     this.getClassStudentExp(classId, userId, function(err, exp) {
-      db.StudentClass.update({exp: exp}, {where: {classId: classId, userId: userId}}).then(function(result) {
+      db.StudentClass.update({exp: exp.exp}, {where: {classId: classId, userId: userId}}).then(function(result) {
         callback(null, 'success')
       }).catch(function(err) {callback(err)})
     })
   }
 
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   *
+   * {
+   *  "exp": 3.55,
+   *  "socialExp": "",
+   *  "homeworkExp": "",
+   *  "activityExp": ""
+   * }
+   */
+  function computeClassStudentExp(classId, userId, callback) {
+    Promise.all([
+      activity.getClassStudentExpAsync(classId, userId),
+      social.getClassStudentExpAsync(classId, userId),
+      homework.getClassStudentExpAsync(classId, userId)
+    ]).spread(function (activityExp, socialExp, homeworkExp) {
+      console.log('result: ' + activityExp + ' ' + ' ' + socialExp + ' ' + homeworkExp);
+
+      var overallExp = fixToTwo((activityExp + socialExp + homeworkExp ) / 3)
+      var data = {
+        exp: overallExp,
+        activityExp: fixToTwo(activityExp),
+        socialExp: fixToTwo(socialExp),
+        homeworkExp: fixToTwo(homeworkExp)
+      }
+      callback(null, data)
+    }).catch(function(err) {callback(err)})
+  }
 
 
   /**
@@ -72,7 +102,12 @@ function Exp() {
    * @param userId
    * @param callback
    *
-   * 3.45   {Number}
+   * {
+   *  "exp": 3.55,
+   *  "socialExp": "",
+   *  "homeworkExp": "",
+   *  "activityExp": ""
+   * }
    */
   this.getClassStudentExp = function(classId, userId, callback) {
     db.StudentClass.findAll({where: {classId: classId, userId: userId}}).then(function(result) {
@@ -80,19 +115,10 @@ function Exp() {
         return callback(new Error('user not in this class or not exist'))
       if(result[0].exp) {
         var data = result[0].exp
-        callback(null, data)
+        callback(null, {exp: data})
       } else {
-        Promise.all([
-          activity.getClassStudentExpAsync(classId, userId),
-          social.getClassStudentExpAsync(classId, userId),
-          homework.getClassStudentExpAsync(classId, userId),
-          summary.getClassStudentSummaryAsync(classId, userId)
-        ]).spread(function (activityExp, socialExp, homeworkExp, summary) {
-          console.log('result: ' + activityExp + ' ' + ' ' + socialExp + ' ' + homeworkExp);
-          console.log('summary is: ' + summary)
-
-          var overallExp = fixToTwo((activityExp + socialExp + homeworkExp ) / 3)
-          callback(null, overallExp)
+        computeClassStudentExp(classId, userId, function(err, result) {
+          callback(err, result)
         })
       }
     })
@@ -109,7 +135,7 @@ function Exp() {
    *  "userName": "",
    *  "classId": "",
    *  "className": ""
-   *  "exp": 2.46
+   *  "exp": 3.44
    * }
    */
   this.getDetailedClassStudentExp = function(classId, userId, callback) {
@@ -130,7 +156,52 @@ function Exp() {
           if(err)
             return callback(err)
 
-          data.exp = result;
+          data.exp = result.exp;
+          data.socialExp = result.socialExp;
+          data.homeworkExp = result.homeworkExp;
+          data.activityExp = result.activityExp;
+          callback(null, data)
+        })
+      })
+    })
+  }
+
+
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   * {
+   *  "userId": "",
+   *  "userName": "",
+   *  "classId": "",
+   *  "className": ""
+   *  "exp": 3.44
+   * }
+   */
+  this.getComputedClassStudentExp = function(classId, userId, callback) {
+    var data = {};
+    var self = this;
+
+    query.getUserInfo(userId, function(err, result) {
+      if(err)
+        return callback(err)
+      data.userId = result.userId;
+      data.userName = result.userName;
+      query.getClassDetail(classId, function(err, result) {
+        if(err)
+          return callback(err)
+        data.classId = result.classId;
+        data.className = result.className;
+        computeClassStudentExp(classId, userId, function(err, result) {
+          if(err)
+            return callback(err)
+
+          data.exp = result.exp;
+          data.socialExp = result.socialExp;
+          data.homeworkExp = result.homeworkExp;
+          data.activityExp = result.activityExp;
           callback(null, data)
         })
       })
@@ -188,12 +259,26 @@ function Exp() {
    * @param userId
    * @param callback
    *
-   * 6.84 {Number}
+   *
+   * {
+   *  "exp": 6.84,
+   *  "userName": "cheng",
+   *  "userId": "some_userId",
+   *  "classes": [
+   *    {
+   *      "classId": "",
+   *      "userId": "",
+   *      "exp": ""
+   *    }
+   *  ]
+   * }
+   *
    */
   this.getStudentExp = function(userId, callback) {
     var self = this;
     var data = {
-      userId: userId
+      userId: userId,
+      classes: []
     };
     var exp = 0;
     var classCount;
@@ -206,7 +291,13 @@ function Exp() {
           classCount = classIds.length;
           async.eachSeries(classIds, function(classId, done) {
             self.getClassStudentExp(classId, userId, function(err, result) {
-              exp += Number(result);
+              var temp = {
+                classId: classId,
+                userId: userId,
+                exp: result.exp
+              }
+              data.classes.push(temp)
+              exp += Number(result.exp);
               done();
             })
           }, function done() {
@@ -217,9 +308,8 @@ function Exp() {
         })
       })
     }).then(function() {
-      // now get summary
-      callback(null, exp)
-
+      data.exp = exp;
+      callback(null, data)
     }).catch(function(err){
       console.log('err here')
       callback(err)})
@@ -243,8 +333,8 @@ function Exp() {
       console.log('yo')
       data = result;
       console.log(data)
-      self.getStudentExp(userId, function(err, exp) {
-        data.exp = exp;
+      self.getStudentExp(userId, function(err, d) {
+        data.exp = d.exp;
         callback(null, data)
       })
     })
@@ -263,7 +353,7 @@ function Exp() {
     query.getRoommates(userId, function(err, userIds) {
       async.eachSeries(userIds, function(roommateId, done) {
         self.getStudentExp(roommateId, function(err, result) {
-          data.push(result)
+          data.push(result.exp)
           done();
         })
       }, function done() {
@@ -278,7 +368,7 @@ function Exp() {
     query.getRoommates(userId, function(err, userIds) {
       async.eachSeries(userIds, function(roommateId, done) {
         self.getClassStudentExp(roommateId, function(err, result) {
-          data.push(result)
+          data.push(result.exp)
           done();
         })
       }, function done() {
@@ -355,32 +445,7 @@ function Exp() {
     })
   }
 
-  /**
-   *
-   * @param classId
-   * @param callback
-   * result format
-   * [
-   *  {
-   *    "userId": "",
-   *    "classId": "",
-   *    "userName": "",
-   *    "overallScore": ""
-   *  },
-   *  {
-   *    "userId": "",
-   *    "classId": "",
-   *    "userName": "",
-   *    "overallScore": ""
-   *  },
-   *  {
-   *    "userId": "",
-   *    "classId": "",
-   *    "userName": "",
-   *    "overallScore": ""
-   *  }
-   * ]
-   */
+
   this.getClassBadExpers = function(classId, callback) {
     this.fillClassExp(classId, function(err, result) {
       if(err)
@@ -396,12 +461,59 @@ function Exp() {
     })
 
   }
+
+  this.getClassGoodExpers = function(classId, callback) {
+    this.fillClassExp(classId, function(err, result) {
+      if(err)
+        callback(err)
+      else {
+        query.getClassGoodExpers(classId, function(err, result) {
+          if(err)
+            callback(err)
+          else
+            callback(null, result)
+        })
+      }
+    })
+  }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * {
+   *  "goodExpers": [],
+   *  "badExpers": []
+   * }
+   */
+  this.getClassPolariziedExpers = function(classId, callback) {
+    var self = this;
+    var data = {};
+    self.getClassGoodExpers(classId, function(err, result) {
+      if(err)
+        return callback(err)
+      else {
+        data.goodExpers = result;
+        self.getClassBadExpers(classId, function(err, result) {
+          if(err)
+            return callback(err)
+          else {
+            data.badExpers = result;
+            console.log(data)
+            callback(null, data)
+          }
+        })
+      }
+    })
+  }
+
 }
 
 
 function fixToTwo(exp) {
   exp  = exp + '';
-  return exp.substring(0, exp.indexOf(".") + 3);
+  return Number(exp.substring(0, exp.indexOf(".") + 3));
 }
 
 

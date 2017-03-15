@@ -58,10 +58,7 @@ function fetchData() {
     contentType: 'application/json; charset=utf-8',
     url: '/analysis/student-class-homework/' + userId + '/' + classId
   }).done(function(res){
-    if(res.status === 200) {
-      var html = Handlebars.templates["class_student_homework"](res.data);
-      $('#homework-html').html(html)
-    }
+    $('#homework-html').html(res)
   });
 }
 

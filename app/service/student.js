@@ -5,7 +5,7 @@
 var dorm = require('./analysis/dorm'),
   activity = require('./analysis/activity'),
   social = require('./analysis/social'),
-  summary = require('./analysis/summary'),
+  summary = require('./summary'),
   homework = require('./analysis/homework'),
   EventProxy = require('eventproxy'),
   db = require('../models/index'),
@@ -81,7 +81,11 @@ function Student() {
         summary.getClassStudentSummary(classId, userId, function(err, result) {
           data.summary = result;
           exp.getClassStudentExp(classId, userId, function(err, result) {
-            data.exp = result;
+            console.log(result)
+            data.exp = result.exp;
+            data.socialExp = result.socialExp;
+            data.homeworkExp = result.homeworkExp;
+            data.activityExp = result.activityExp;
             callback(null, data)
           })
 

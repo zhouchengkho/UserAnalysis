@@ -508,12 +508,45 @@ function Query() {
     })
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * {
+   *  "userId": "",
+   *  "classId": "",
+   *  "exp": 0,
+   *  "User": {
+   *    "userName": ""
+   *  }
+   * }
+   */
   this.getClassBadExpers = function(classId, callback) {
-    db.StudentClass.findAll({where: {classId: classId}, limit: 3, order: 'exp asc'}).then(function(result) {
-      callback(null, result)
+    db.StudentClass.findAll({where: {classId: classId}, limit: 3, include: [db.User], order: 'exp asc'}).then(function(result) {
+      callback(null, JSON.parse(JSON.stringify(result)))
     }).catch(function(err) {callback(err)})
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * {
+   *  "userId": "",
+   *  "classId": "",
+   *  "exp": 0,
+   *  "User": {
+   *    "userName": ""
+   *  }
+   * }
+   */
+  this.getClassGoodExpers = function(classId, callback) {
+    db.StudentClass.findAll({where: {classId: classId}, limit: 3, include: [db.User], order: 'exp desc'}).then(function(result) {
+      callback(null, JSON.parse(JSON.stringify(result)))
+    }).catch(function(err) {callback(err)})
+  }
   /**
    *
    * @param classId
@@ -646,6 +679,55 @@ function Query() {
       }
       callback(null, final)
     }).catch(function(err) {callback(err)})
+  }
+
+
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   *
+   * {
+   *  "userId": "",
+   *  "rank": 1
+   * }
+   */
+  this.getClassStudentRanking = function(classId, userId, callback) {
+    var rawQuery = "select userId, rank from (SELECT userId, @curRank := @curRank + 1 AS rank FROM student_class s, (SELECT @curRank := 0) r where classId = '"+classId+"' ORDER BY  exp desc) t where userId = '"+userId+"';";
+    db.sequelize.query(rawQuery).then(function(result) {
+      callback(null, result[0][0])
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param userId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "classId": "",
+   *    "className": "",
+   *    "submitted": 5,
+   *    "total": 7,
+   *  },
+   *  {
+   *    ...
+   *  }
+   * ]
+   */
+  this.getStudentClassesAssignments = function(userId, callback) {
+    var rawQuery = " select t1.classId, course.courseName className, t1.submitCount submitted, t2.count total from " +
+      "(select count(t.classId) submitCount, t.classId from " +
+      "(select student_assignment.userId, assignment.classId, student_assignment.assignmentId from student_assignment left outer join assignment on student_assignment.assignmentId = assignment.assignmentId " +
+      "where student_assignment.userId = '" + userId + "' ) t group by t.classId) t1 " +
+      "left outer join (select count(classId) count, classId from assignment group by classId) t2 on t1.classId = t2.classId " +
+      "left outer join class on t1.classId = class.classId left outer join course on class.courseId = course.courseId;";
+    db.sequelize.query(rawQuery).then(function(result) {
+      callback(null, result[0])
+    }).catch(function(err) {callback(err)})
+
   }
 }
 

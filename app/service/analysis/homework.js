@@ -10,9 +10,9 @@ function HomeWork() {
 
   /**
    * on a scale from 0-10, based on submitted time
-   * y = 10 * e^ ((1/totalInterval) * In(1/2) * interval)
+   * y = 10 * e^ ((1/totalInterval) * In(3/5) * interval)
    * meaning submit on startTime, score = 10
-   *         submit on endTime, score = 5
+   *         submit on endTime, score = 6
    *         lower after
    *         not submitted score is 0
    *
@@ -23,7 +23,7 @@ function HomeWork() {
   function getNewtonCoolingScore(startTime, endTime, submitTime) {
     var totalInterval = reference.getTimeInterval(startTime, endTime);
     var interval = reference.getTimeInterval(startTime, submitTime);
-    return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(1/2) * interval))
+    return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(3/5) * interval))
   }
 
 
@@ -110,39 +110,29 @@ function HomeWork() {
   /**
    *
    * @param userId
-   * @param timePeriod [optional]
    * @param callback
+   *
    */
-  this.getHtmlData = function(userId, timePeriod, callback) {
-    if((typeof timePeriod) == 'function') {
-      callback = timePeriod;
-      timePeriod = reference.getTimePeriod('academic-year')
-    }
-
-
-    this.getHomeWorkData(userId, timePeriod, function(err, homeworkData) {
-      if(err)
-        callback(err)
-      var html = '<div class="col-xs-6">' +
-        '<p>Finished ' + homeworkData.assignmentCount + ' Assignment(s)</p>' +
-        '<p>Took ' + homeworkData.classCount + ' Course(s)</p>' +
-        '<p>Finished ' + homeworkData.sourceCount + ' Source, Averaging Score ' + homeworkData.sourceScoreAvg + '</p>' +
-        '</div>' +
-        '<div class="col-xs-6">' +
-        '<p>Average ' + homeworkData.assignmentAverage + ' Assignment(s)</p>' +
-        '<p>Average ' + homeworkData.classAverage + ' Course(s)</p>' +
-        '</div>';
-
-      callback(null, {html: html})
+  this.getHtmlData = function(userId, callback) {
+    query.getStudentClassesAssignments(userId, function(err, result) {
+      callback(err, result)
     })
+
   }
 
-  this.getClassStduentHomeworkData = function(classId, userId, callback) {
-    console.log('homework page: '+classId+' '+userId)
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param callback
+   */
+  this.getClassStudentHomeworkData = function(classId, userId, callback) {
     query.getDetailedClassStudentAssignments(classId, userId, function(err, result) {
       callback(err, result)
     })
   }
+
+
 }
 
 

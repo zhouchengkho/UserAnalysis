@@ -53,7 +53,7 @@ function fetchData() {
     contentType: 'application/json; charset=utf-8',
     url: '/analysis/homework-html-data'
   }).done(function(data){
-    $('#homework-html').html(data.html);
+    $('#homework-html').html(data);
   });
 }
 

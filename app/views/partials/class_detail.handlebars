@@ -1,8 +1,50 @@
-{{#if this}}
-<p>Low Exp</p>
-{{#each this}}
-    <p><a href="/student/class/{{userId}}/{{classId}}">{{userId}} </a>{{userName}} {{exp}}
-        <a href="/student/class/{{userId}}/{{classId}}">View Class</a>/
-        <a href="/student/overall/{{userId}}">View full</a></p>
-{{/each}}
+{{#with data}}
+{{#if goodExpers}}
+    <table class="table">
+        <caption>高经验值</caption>
+        <thead>
+        <tr>
+            <th>姓名</th>
+            <th>学号</th>
+            <th>exp</th>
+            <th>查看</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each goodExpers}}
+            <tr>
+                <td>{{User.userName}}</td>
+                <td>{{userId}}</td>
+                <td>{{exp}}</td>
+                <td><a href="/student/class/{{userId}}/{{classId}}" target="_blank"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
 {{/if}}
+
+
+{{#if badExpers}}
+<table class="table">
+    <caption>低经验值</caption>
+    <thead>
+    <tr>
+        <th>姓名</th>
+        <th>学号</th>
+        <th>exp</th>
+        <th>查看</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each badExpers}}
+        <tr>
+            <td>{{User.userName}}</td>
+            <td>{{userId}}</td>
+            <td>{{exp}}</td>
+            <td><a href="/student/class/{{userId}}/{{classId}}" target="_blank"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{/if}}
+{{/with}}

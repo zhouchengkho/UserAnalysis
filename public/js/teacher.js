@@ -12,16 +12,13 @@ $(document).on('click', '.class-detail', function()
   // not collapsed
   var selector = '#'+id;
   if ($(selector).attr('aria-expanded') === "true") {
+    console.log('huh?')
     $.ajax({
       type: 'GET',
       contentType: 'application/json; charset=utf-8',
-      url: '/analysis/get-class-detail/'+id,
-      dataType: 'json'
+      url: '/analysis/get-class-detail/'+id
     }).done(function(res){
-      if(res.status === 200) {
-        var html = Handlebars.templates["class_detail"](res.data);
-        $('#'+id+' .panel-body').html(html)
-      }
+      $('#'+id+' .panel-body').html(res)
     });
   }
   // var html = Handlebars.templates["class_detail"](data);

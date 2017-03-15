@@ -43,7 +43,7 @@ router.get('/class-dorm-bar-chart-data/:studentId/:classId', function(req, res) 
 
 
 router.get('/activity-line-chart-data', function(req, res) {
-  graph.getActivityLineChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
+  graph.getActivityLineChartData(req.session.login.userId, 'college-career', function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else
@@ -52,7 +52,7 @@ router.get('/activity-line-chart-data', function(req, res) {
 })
 
 router.get('/social-radar-chart-data', function(req, res) {
-  graph.getSocialRadarChartData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
+  graph.getSocialRadarChartData(req.session.login.userId, 'college-career', function(err, result) {
     console.log(res.result)
     if(err)
       res.json({status: 400, message: err.message})
@@ -89,22 +89,31 @@ router.get('/homework-data', function(req, res) {
 })
 
 router.get('/homework-html-data', function(req, res) {
-  homework.getHtmlData(req.session.login.userId, req.session.login.settings.timePeriod, function(err, result) {
+  homework.getHtmlData(req.session.login.userId, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
-    else
-      res.json(result)
+    else {
+      res.render('partials/student_homework', {
+        data: result,
+        layout: false
+      })
+    }
   })
 })
 
 
 router.get('/student-class-homework/:studentId/:classId', function(req, res) {
-  homework.getClassStduentHomeworkData(req.params.classId, req.params.studentId, function(err, result) {
+  homework.getClassStudentHomeworkData(req.params.classId, req.params.studentId, function(err, result) {
     console.log(result)
     if(err)
       res.json({status: 400, message: err.message})
-    else
-      res.json({status: 200, data: result})
+    else {
+        // result.layout = false;
+        res.render('partials/class_student_homework', {
+          data: result,
+          layout: false
+        })
+    }
   })
 })
 
@@ -128,8 +137,11 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  student.getData('10152510238', function(err, result){
-    res.json(result)
+  query.getStudentClassesAssignments('10152510238', function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else
+      res.json(result)
   })
 });
 
@@ -140,18 +152,22 @@ router.get('/fill-all', function(req, res) {
 })
 
 router.get('/get-class-detail/:id', function(req, res) {
-  exp.getClassBadExpers(req.params.id, function(err, result) {
+  exp.getClassPolariziedExpers(req.params.id, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
-    else
-      res.json({status: 200, data: result})
+    else {
+        res.render('partials/class_detail', {
+          layout: false,
+          data: result
+        })
+    }
   })
 })
 
 
 router.get('/get-diagnose/:studentId/:classId', function(req, res) {
   exp.getClassStudentExp(req.params.classId, req.params.studentId, function(err, result) {
-    res.json({exp: result})
+    res.json({exp: result.exp})
   })
 })
 

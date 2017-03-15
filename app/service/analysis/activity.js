@@ -29,13 +29,13 @@ function Activity() {
   this.getClassStudentExp = function(classId, userId, callback) {
 
     Promise.all([
-      query.getClassActionCountGroupAsync(classId, ['401']),
-      query.getClassActionCountGroupAsync(classId, ['402']),
-      query.getClassActionCountGroupAsync(classId, ['502', '503', '504', '505', '507']),
+      query.getClassActionCountGroupAsync(classId, ['201', '202', '203']),
       query.getClassActionCountGroupAsync(classId, ['301']),
+      query.getClassActionCountGroupAsync(classId, ['401', '402', '403', '404', '405']),
+      query.getClassActionCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507']),
       query.getClassActionCountGroupAsync(classId, ['201', '202', '203'])
-    ]).spread(function(initGroup, checkoutGroup, rscGroup, pptGroup, assignmentGroup) {
-      var statistic = helper.organizeData([initGroup, checkoutGroup, rscGroup, pptGroup, assignmentGroup]);
+    ]).spread(function(initGroup, checkoutGroup, rscGroup, pptGroup) {
+      var statistic = helper.organizeData([initGroup, checkoutGroup, rscGroup, pptGroup]);
       var exp = score.entropy.getScoreOf(statistic, userId);
       callback(null, exp)
     })
