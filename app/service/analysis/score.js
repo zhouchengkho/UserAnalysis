@@ -120,6 +120,26 @@ function Entropy() {
     }
   }
 
+  function transitionOfOne(datasets) {
+    for(var i in datasets) {
+      for(var j in datasets[i]) {
+        datasets[i][j] += 1;
+      }
+    }
+    return datasets
+  }
+
+  function transition(datasets) {
+    var transitioned = deepCopy(datasets);
+    for(var j in datasets[0]) {
+      var columnJ = column(transitioned, j);
+      if(sum(columnJ) === 0) {
+        transitioned = transitionOfOne(transitioned);
+      }
+    }
+    return transitioned;
+  }
+
   this.scale = function(datasets) {
     var scaled = deepCopy(datasets);
     for(var i in datasets) {
@@ -171,12 +191,14 @@ function Entropy() {
   }
 
   this.getWeights  = function(datasets) {
-    var scaled = this.scale(datasets);
+    var transitioned = transition(datasets);
+    var scaled = transitioned;
+    // var scaled = this.scale(transitioned);
     var weighted = getWeightedMeasure(scaled);
     var entropy = getInfoEntropy(weighted);
 
-    // var redundancy = getEntropyRedundancy(entropy);
-    var redundancy = entropy;
+    var redundancy = getEntropyRedundancy(entropy);
+    // var redundancy = entropy;
     console.log('redundancy: '+redundancy)
     var weights = [];
     if(sum(redundancy) === 0) {

@@ -25,7 +25,7 @@ function Summary() {
    * 作业经验值{{}}，贡献{{}}
    */
   this.getClassStudentSummary = function(classId, userId, callback) {
-    var summary = '<p>本门课的经验值是';
+    var summary = '<p>本门课经验值：';
     exp.getComputedClassStudentExp(classId, userId, function(err, expData) {
       query.getClassStudentRanking(classId, userId, function(err, rankData) {
         summary += expData.exp;

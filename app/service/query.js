@@ -589,12 +589,14 @@ function Query() {
    * [
    *  {
    *    "assignmentId": 127,
+   *    "title": "",
    *    "startTime": "2015-07-21T10:36:33.000Z",
    *    "endTime": "2015-07-22T16:00:00.000Z",
    *    "submitted": false
    *  },
    *  {
    *    "assignmentId": 126,
+   *    "title": "",
    *    "startTime": "2015-07-21T10:36:33.000Z",
    *    "endTime": "2015-07-22T16:00:00.000Z",
    *    "submitted": true,
@@ -607,7 +609,7 @@ function Query() {
    */
   this.getClassStudentAssignmentTimes = function(classId, userId, callback) {
     db.Assignment.findAll({
-      attributes: ['assignmentId', ['startDate', 'startTime'], ['endDate', 'endTime']],
+      attributes: ['assignmentId', ['startDate', 'startTime'], ['endDate', 'endTime'], 'title'],
       where: {classId: classId},
       include: [{model: db.StudentAssignment, attributes: [['time', 'submitTime'], ['count', 'submitCount']], where: {userId: userId}, required: false}],
       order: 'assignmentId desc'
@@ -617,6 +619,7 @@ function Query() {
       for(var i in result) {
         var temp = {};
         temp.assignmentId = result[i].assignmentId;
+        temp.title = result[i].title;
         temp.startTime = result[i].startTime;
         temp.endTime = result[i].endTime;
         if(result[i].StudentAssignments.length === 0)

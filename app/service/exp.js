@@ -92,7 +92,9 @@ function Exp() {
         homeworkExp: fixToTwo(homeworkExp)
       }
       callback(null, data)
-    }).catch(function(err) {callback(err)})
+    }).catch(function(err) {
+      console.log('error: '+err)
+      callback(err)})
   }
 
 
@@ -236,7 +238,6 @@ function Exp() {
     var self = this;
     var data = [];
     var exp = 0;
-    console.log('getting detailed for userId: '+userId)
     query.getStudentClasses(userId, function(err, classIds) {
       async.eachSeries(classIds, function(classId, done) {
         self.getDetailedClassStudentExp(classId, userId, function(err, result) {
@@ -330,9 +331,7 @@ function Exp() {
     var data = {};
     var self = this;
     query.getUserInfo(userId, function(err, result) {
-      console.log('yo')
       data = result;
-      console.log(data)
       self.getStudentExp(userId, function(err, d) {
         data.exp = d.exp;
         callback(null, data)
@@ -500,7 +499,6 @@ function Exp() {
             return callback(err)
           else {
             data.badExpers = result;
-            console.log(data)
             callback(null, data)
           }
         })

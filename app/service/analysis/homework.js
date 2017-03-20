@@ -26,6 +26,26 @@ function HomeWork() {
     return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(3/5) * interval))
   }
 
+  /**
+   *
+   * @param str
+   * @returns {boolean}
+   */
+  function containsKeyword(str) {
+    var keywords = ['加分题', '参考答案', '作业本', '汇总', '完成课本'];
+    for(var i in keywords) {
+      if(str.indexOf(keywords[i]) >= 0)
+        return true;
+    }
+    return false;
+  }
+
+  /**
+   *
+   */
+  function needSubmitting(title) {
+    return !containsKeyword(title)
+  }
 
   /**
    * get all assignments of this class, estimate score of 0-10 according to hand in time
@@ -41,10 +61,15 @@ function HomeWork() {
 
         var scores = [];
         for(var i in result) {
-          if(result[i].submitted === false)
-            scores.push(0)
-          else
+          if(!result[i].submitted) {
+            if(!needSubmitting(result[i].title))
+              scores.push(10)
+            else
+              scores.push(0)
+          }
+          else {
             scores.push(getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
+          }
         }
         if(scores.length === 0)
           callback(null, 0)

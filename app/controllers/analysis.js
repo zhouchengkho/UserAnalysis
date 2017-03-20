@@ -137,7 +137,7 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  activity.test('C180001201601', '10152510238', function(err, result) {
+  activity.test('C180001201403', '10112510101', function(err, result) {
     res.json(result)
   })
 });
