@@ -3,7 +3,8 @@ var express = require('express'),
   login = require('../service/login'),
   teacher = require('../service/teacher'),
   student  = require('../service/student'),
-  exp = require('../service/exp');
+  exp = require('../service/exp'),
+  counsellor = require('../service/counsellor');
 module.exports = function (app) {
   app.use('/', router);
 };
@@ -36,7 +37,14 @@ router.get('/', function (req, res, next) {
           '<script type="text/javascript" src="/js/teacher.js"></script>' +
           '<script type="text/javascript" src="/js/handlebars-v4.0.5.js"></script>' +
           '<script type="text/javascript" src="/js/partials/class_detail.js"></script>'
-          }));
+        }));
+      })
+      break;
+    case 'counsellor':
+      counsellor.getData(req.session.login.userId, function(err, data) {
+        res.render('counsellor', getRenderOption(req, {
+          data: data
+        }));
       })
       break;
     default:
@@ -48,7 +56,7 @@ router.get('/', function (req, res, next) {
 router.get('/student/overall/:id', function(req, res) {
   // check if is teacher
   console.log(req.url)
-  if(req.session.login.character == 'teacher') {
+  if(req.session.login.character == 'teacher' || req.session.login.character == 'counsellor') {
     console.log('id: '+req.params.id)
     student.getData(req.params.id, function(err, data) {
       if(err)
@@ -68,7 +76,7 @@ router.get('/student/overall/:id', function(req, res) {
 
 router.get('/student/class/:studentId/:classId', function(req, res) {
   // check if is teacher
-  if(req.session.login.character == 'teacher' || req.session.login.userId == req.params.studentId) {
+  if(req.session.login.character == 'teacher' || req.session.login.userId == req.params.studentId || req.session.login.character == 'counsellor') {
     student.getClassData(req.params.classId, req.params.studentId, function(err, data) {
       console.log(JSON.stringify(data))
       if(err)

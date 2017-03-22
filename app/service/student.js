@@ -44,7 +44,7 @@ function Student() {
     var data = {};
     query.getUserInfo(userId, function(err, result) {
       data.user = result;
-      data.user.faceIcon = prefix + data.user.faceIcon;
+      // data.user.faceIcon = prefix + data.user.faceIcon;
       exp.getDetailedStudentClassesExp(userId, function(err, result) {
         console.log(result)
         data.user.summary = result.classes;
@@ -76,7 +76,7 @@ function Student() {
     query.getClassDetail(classId, function(err, result) {
       data.className = result.className;
       query.getUserInfo(userId, function(err, result) {
-        data.faceIcon = prefix + result.faceIcon;
+        // data.faceIcon = prefix + result.faceIcon;
         data.userName = result.userName;
         summary.getClassStudentSummary(classId, userId, function(err, result) {
           data.summary = result;

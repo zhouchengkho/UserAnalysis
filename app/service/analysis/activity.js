@@ -37,6 +37,8 @@ function Activity() {
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
       var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
       var exp = score.entropy.getScoreOf(statistic, userId);
+      if (typeof  exp != 'number')
+        exp = 0;
       callback(null, exp)
     })
   }

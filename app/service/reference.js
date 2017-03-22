@@ -444,6 +444,12 @@ function Reference() {
     var endMoment = moment(endTime);
     return endMoment.diff(startMoment, 'hours')
   }
+
+
+  this.getLastFourYears = function() {
+    var thisYear = moment().year();
+    return [thisYear, thisYear - 1, thisYear - 2, thisYear - 3];
+  }
 }
 
 

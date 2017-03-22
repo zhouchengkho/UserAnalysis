@@ -5,6 +5,7 @@
 var db = require('../models/index')
 var Promise = require('bluebird')
 var helper = require('./helper');
+var prefix = require('../../config/config').prefix;
 
 function Query() {
 
@@ -206,9 +207,10 @@ function Query() {
 
 
   this.getUserInfo = function(userId, callback) {
-    db.User.findAll({where: {userId: userId}}).then(function(result) {
-      console.log('user info of: '+userId)
-      console.log(JSON.stringify(result))
+    db.User.findAll(
+      {
+        attributes: ['userId', 'userName', 'nickName', 'isTeacher', 'gender', 'departId', [db.sequelize.literal("CONCAT('" + prefix + "', faceIcon)"), 'faceIcon']],
+        where: {userId: userId}}).then(function(result) {
       callback(null, JSON.parse(JSON.stringify(result[0])))
     }).catch(function(err) {callback(err)})
   }
@@ -264,7 +266,7 @@ function Query() {
    * }
    */
   this.getTeacherClasses = function(teacherId, callback) {
-    db.Class.findAll({where: {userId: teacherId}, include: [db.Course]}).then(function(result) {
+    db.Class.findAll({where: {userId: teacherId}, include: [db.Course, db.Term], order: 'Term.termId desc'}).then(function(result) {
       callback(null, result)
     }).catch(function(err) {
       callback(err)
@@ -402,14 +404,14 @@ function Query() {
 
 
   this.getClassStatusCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select userId, count(userId) count from status where time > '"+gte+"' and time < '" + lte + "'group by userId) t on user.userId = t.userId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select userId, count(userId) count from status where time > '"+gte+"' and time < '" + lte + "' group by userId) t on user.userId = t.userId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
   }
 
   this.getClassStatusReplyCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from statusreply where time > '"+gte+"' and time < '" + lte + "'group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from statusreply where time > '"+gte+"' and time < '" + lte + "' group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {
@@ -420,7 +422,7 @@ function Query() {
   }
 
   this.getClassSourceReplyCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from sourcereply where time > '"+gte+"' and time < '" + lte + "'group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from sourcereply where time > '"+gte+"' and time < '" + lte + "' group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
@@ -428,7 +430,7 @@ function Query() {
   }
 
   this.getClassTopicReplyCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from topicreply where time > '"+gte+"' and time < '" + lte + "'group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from topicreply where time > '"+gte+"' and time < '" + lte + "' group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
@@ -804,6 +806,31 @@ function Query() {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
 
+  }
+
+  this.getInactiveUsers = function(enrollYear, callback) {
+    var userIdLike = '10' +enrollYear.toString().substring(2, 4) + '%'
+
+    var rawQuery = "select t.userId, user.userName, t.count from (SELECT COUNT('userId') AS `count`, `userId` FROM `action` AS `Action` WHERE `Action`.`actionCode` IN ('201', '202', '203', '301') AND `Action`.`userId` LIKE '" + userIdLike + "' GROUP BY userId ORDER BY count asc LIMIT 5) t left outer join user on t.userId = user.userId;";
+    db.sequelize.query(rawQuery).then(function(result) {
+      callback(null, result[0])
+    }).catch(function(err) {callback(err)})
+    // db.Action.findAll({
+    //   attributes: [[db.sequelize.fn('COUNT', 'userId'), 'count'], 'userId'],
+    //   where: {
+    //     actionCode: {
+    //       $in: ['201', '202', '203', '301']
+    //     },
+    //     userId: {
+    //       $like: userIdBegin + '%'
+    //     }
+    //   },
+    //   group: 'userId',
+    //   order: 'count asc',
+    //   limit: 5
+    // }).then(function(result) {
+    //   callback(null, result)
+    // }).catch(function(err) {callback(err)})
   }
 }
 

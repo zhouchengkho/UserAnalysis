@@ -13,7 +13,9 @@ var express = require('express'),
   exp = require('../service/exp'),
   graph = require('../service/graph'),
   query = require('../service/query'),
-  student = require('../service/student');
+  student = require('../service/student'),
+  counsellor = require('../service/counsellor');
+
 
 module.exports = function (app) {
   app.use('/analysis', router);
@@ -168,7 +170,7 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  graph.getClassExpDistribution('C180001201601', function(err, result) {
+  teacher.getData(req.session.login.userId, function(err, result) {
     if(err)
       console.log(err)
     res.json(result)

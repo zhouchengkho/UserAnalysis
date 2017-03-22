@@ -1,0 +1,82 @@
+<header>
+    <div class="container text-center">
+        <div class="fh5co-navbar-brand">
+            <a class="fh5co-logo" href="/">ECNU USER ANALYSIS</a>
+        </div>
+
+        <nav id="fh5co-main-nav" role="navigation">
+            <ul>
+                <li><a href="/" class="active">Home</a></li>
+                <li><a href="/settings">Settings</a></li>
+                <li><a href="/logout">Logout</a></li>
+
+            </ul>
+        </nav>
+    </div>
+    <link rel="stylesheet" href="/css/jquery.typeahead.min.css">
+    <script src="/js/jquery.typeahead.min.js"></script>
+    <script src="/js/search.js"></script>
+</header>
+
+<div class="col-xs-12">
+    <div class="col-xs-4 text-center">
+        <img src="{{data.userInfo.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
+        <h2>嗨 {{data.userInfo.userName}}</h2>
+    </div>
+
+    <div class="col-xs-8">
+        <div class="col-xs-12" style="padding-bottom: 10px">
+            <div class="col-xs-6"></div>
+            <div class="col-xs-6">
+                <var id="result-container" class="result-container"></var>
+
+                <form id="form-country_v2" >
+                    <div class="typeahead__container">
+                        <div class="typeahead__field">
+
+            <span class="typeahead__query">
+                <input class="student-search"  type="search" placeholder="搜索学生" autocomplete="off">
+            </span>
+                            <span class="typeahead__button">
+                <button type="submit">
+                    <i class="typeahead__search-icon"></i>
+                </button>
+            </span>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        <div class="col-xs-12">
+          {{#each data.inactiveUsers}}
+            {{#if data}}
+
+                    <table class="table table-striped">
+                    <caption>{{year}}级 低活跃度学生</caption>
+                    <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>活动数</th>
+                        <th>查看</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each data}}
+                        <tr>
+                            <td>{{userId}}</td>
+                            <td>{{userName}}</td>
+                            <td>{{count}}</td>
+                            <td><a href="/student/overall/{{userId}}" target="_blank"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
+                        </tr>
+                    {{/each}}
+                    </tbody>
+                </table>
+              {{/if}}
+          {{/each}}
+
+        </div>
+    </div>
+</div>
