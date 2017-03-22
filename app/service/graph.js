@@ -360,6 +360,42 @@ function Graph() {
 
   }
 
+
+  this.getClassExpDistribution = function(classId, callback) {
+
+    var barChartData = {
+      type: 'line',
+      option: {
+        title: {
+          text: 'Exp Distribution',
+          display: true
+        },
+        responsive: false
+      },
+      data: {
+        labels : ['0-1', '1-2','2-3', '3-4', '4-5', '5-6', '6-7' , '7-8', '8-9', '9-10'],
+        datasets : [
+          {
+            label: 'Exp Distribution',
+            backgroundColor : 'rgba(207,220,229,0.5)',
+            borderColor : 'rgba(160,185,204,1)',
+            pointBackgroundColor: 'rgba(160,185,204,1)',
+            pointBorderColor : 'rgba(255,255,255,1)',
+            data : []
+          }
+        ]
+      }
+    }
+
+    exp.getClassExpDistribution(classId, function(err, result) {
+      for(var i in result) {
+        barChartData.data.datasets[0].data.push(result[i].count)
+      }
+      callback(err, barChartData)
+    })
+
+  }
+
 }
 
 

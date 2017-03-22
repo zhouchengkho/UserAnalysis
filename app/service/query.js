@@ -748,6 +748,63 @@ function Query() {
     }).catch(function(err) {callback(err)})
 
   }
+
+  /**
+   *
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "userName": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "userName": ""
+   *  }
+   * ]
+   */
+  this.getStudents = function(callback) {
+    db.User.findAll({
+      attributes: ['userId', 'userName'],
+      where: {
+        isTeacher: 0
+      }
+    }).then(function(result) {
+      callback(null, JSON.parse(JSON.stringify(result)))
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "stage": "#1",
+   *    "count": 1
+   *  },
+   *  ...
+   * ]
+   */
+  this.getClassExpDistribution = function(classId, callback) {
+    var rawQuery = "select t.stage, t.count from "+
+    "(select elt(interval(exp, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
+    "from student_class where classId = '"+ classId + "' group by stage) t where t.stage in ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10');";
+
+    db.sequelize.query(rawQuery).then(function(result) {
+      var data = result[0];
+      var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      for(var i in arr) {
+        if(!data[i] || data[i].stage != '#'+arr[i]) {
+            data.splice(i, 0, {stage: '#'+arr[i], count: 0});
+        }
+      }
+      callback(null, result[0])
+    }).catch(function(err) {callback(err)})
+
+  }
 }
 
 module.exports = new Query();

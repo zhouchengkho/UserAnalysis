@@ -489,22 +489,44 @@ function Exp() {
   this.getClassPolariziedExpers = function(classId, callback) {
     var self = this;
     var data = {};
-    self.getClassGoodExpers(classId, function(err, result) {
+    self.fillClassExp(classId, function(err, result) {
       if(err)
-        return callback(err)
+        callback(err)
       else {
-        data.goodExpers = result;
-        self.getClassBadExpers(classId, function(err, result) {
-          if(err)
-            return callback(err)
-          else {
-            data.badExpers = result;
-            callback(null, data)
-          }
+          query.getClassGoodExpers(classId, function(err, result) {
+            data.goodExpers = result;
+            query.getClassBadExpers(classId, function(err, result) {
+              if(err)
+                return callback(err)
+              else {
+                data.badExpers = result;
+                callback(null, data)
+              }
+            })
+          })
+      }
+    })
+  }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   */
+  this.getClassExpDistribution = function(classId, callback) {
+    this.fillClassExp(classId, function(err) {
+      if(err)
+        callback(err)
+      else {
+        query.getClassExpDistribution(classId, function(err, result) {
+          callback(err, result)
         })
       }
     })
   }
+
+
 
 }
 

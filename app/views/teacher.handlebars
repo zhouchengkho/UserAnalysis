@@ -13,6 +13,9 @@
             </ul>
         </nav>
     </div>
+  <link rel="stylesheet" href="/css/jquery.typeahead.min.css">
+    <script src="/js/jquery.typeahead.min.js"></script>
+    <script src="/js/search.js"></script>
 </header>
 
 <div class="col-xs-12">
@@ -23,7 +26,31 @@
     </div>
 
     <div class="col-xs-8">
-        <div class="panel-group" id="accordion">
+        <div class="col-xs-12" style="padding-bottom: 10px">
+            <div class="col-xs-6"></div>
+          <div class="col-xs-6">
+              <var id="result-container" class="result-container"></var>
+
+              <form id="form-country_v2" >
+                  <div class="typeahead__container">
+                      <div class="typeahead__field">
+
+            <span class="typeahead__query">
+                <input class="student-search"  type="search" placeholder="搜索学生" autocomplete="off">
+            </span>
+                          <span class="typeahead__button">
+                <button type="submit">
+                    <i class="typeahead__search-icon"></i>
+                </button>
+            </span>
+
+                      </div>
+                  </div>
+              </form>
+          </div>
+
+        </div>
+        <div class="panel-group col-xs-12" id="accordion">
           {{#each data.data}}
               <div class="panel panel-default">
                   <div class="panel-heading">
@@ -35,7 +62,12 @@
                   </div>
                   <div id="{{classInfo.classId}}" class="panel-collapse collapse">
                       <div class="panel-body">
-                          <!-- load with handlebars here, see js file -->
+                          <canvas class="exp-graph">
+
+                          </canvas>
+                          <div class="exp-table">
+
+                          </div>
                       </div>
                   </div>
               </div>

@@ -22,7 +22,7 @@ router.get('/', function (req, res, next) {
           res.render('student', getRenderOption(req, {
             data: data,
             script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
-            '<script type="text/javascript" src="/js/home.js"></script>'
+            '<script type="text/javascript" src="/js/student.js"></script>'
           }));
         }
       })
@@ -32,7 +32,8 @@ router.get('/', function (req, res, next) {
         console.log(data)
         res.render('teacher', getRenderOption(req, {
           data: data,
-          script: '<script type="text/javascript" src="/js/teacher.js"></script>' +
+          script: '<script type="text/javascript" src="/js/Chart.js"></script>'+
+          '<script type="text/javascript" src="/js/teacher.js"></script>' +
           '<script type="text/javascript" src="/js/handlebars-v4.0.5.js"></script>' +
           '<script type="text/javascript" src="/js/partials/class_detail.js"></script>'
           }));
@@ -49,14 +50,14 @@ router.get('/student/overall/:id', function(req, res) {
   console.log(req.url)
   if(req.session.login.character == 'teacher') {
     console.log('id: '+req.params.id)
-    exp.getStudentExp(req.params.id, function(err, data) {
+    student.getData(req.params.id, function(err, data) {
       if(err)
         res.json(err)
       else {
         res.render('student', getRenderOption(req, {
           data: data,
           script: '<script type="text/javascript" src="/js/Chart.js"></script>' +
-          '<script type="text/javascript" src="/js/home.js"></script>'
+          '<script type="text/javascript" src="/js/student_overall.js"></script>'
         }));
       }
     })
