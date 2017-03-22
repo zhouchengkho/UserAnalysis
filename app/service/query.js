@@ -815,22 +815,13 @@ function Query() {
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
-    // db.Action.findAll({
-    //   attributes: [[db.sequelize.fn('COUNT', 'userId'), 'count'], 'userId'],
-    //   where: {
-    //     actionCode: {
-    //       $in: ['201', '202', '203', '301']
-    //     },
-    //     userId: {
-    //       $like: userIdBegin + '%'
-    //     }
-    //   },
-    //   group: 'userId',
-    //   order: 'count asc',
-    //   limit: 5
-    // }).then(function(result) {
-    //   callback(null, result)
-    // }).catch(function(err) {callback(err)})
+
+  }
+
+  this.getAllClassStudents = function(callback) {
+    db.StudentClass.findAll({}).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) {callback(err)})
   }
 }
 

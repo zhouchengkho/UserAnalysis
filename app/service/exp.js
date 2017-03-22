@@ -36,10 +36,7 @@ function Exp() {
   }
 
 
-  /**
-   * scheduled task, fill data in low traffic time
-   * @param callback
-   */
+
   this.fillAllExp = function(callback) {
     var self = this;
     query.getClassesInDb(function(err, result) {
@@ -52,6 +49,29 @@ function Exp() {
       }, function done() {
         callback(null, 'success')
       })
+    })
+  }
+
+  /**
+   * scheduled task, fill data in low traffic time
+   * @param callback
+   */
+  this.updateAllExp = function(callback) {
+    var self = this;
+    query.getAllClassStudents(function(err, result) {
+      if(err)
+        callback(err)
+      else {
+          async.eachSeries(result, function(data, done) {
+            computeClassStudentExp(data.classId, data.userId, function(err, result) {
+              db.StudentClass.update({exp: result.exp}, {where: {classId: data.classId, userId: data.userId}}).then(function(result) {
+                done()
+              }).catch(function(err) {callback(err)})
+            })
+          }, function done() {
+            callback(null, 'success')
+          })
+      }
     })
   }
 
@@ -184,7 +204,6 @@ function Exp() {
    */
   this.getComputedClassStudentExp = function(classId, userId, callback) {
     var data = {};
-    var self = this;
 
     query.getUserInfo(userId, function(err, result) {
       if(err)
@@ -197,14 +216,7 @@ function Exp() {
         data.classId = result.classId;
         data.className = result.className;
         computeClassStudentExp(classId, userId, function(err, result) {
-          if(err)
-            return callback(err)
-
-          data.exp = result.exp;
-          data.socialExp = result.socialExp;
-          data.homeworkExp = result.homeworkExp;
-          data.activityExp = result.activityExp;
-          callback(null, data)
+          callback(err, result)
         })
       })
     })

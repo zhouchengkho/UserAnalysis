@@ -2,8 +2,8 @@
 
 var express = require('express'),
   config = require('./config/config'),
-  db = require('./app/models');
-
+  db = require('./app/models'),
+  schedule = require('./app/service/schedule');
 var app = express();
 
 

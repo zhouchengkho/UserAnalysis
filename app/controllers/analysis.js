@@ -178,7 +178,7 @@ router.get('/test', function(req, res) {
 });
 
 router.get('/fill-all', function(req, res) {
-  exp.fillAllExp(function(err, result) {
+  exp.updateAllExp(function(err, result) {
     res.json({message: 'success'})
   })
 })
