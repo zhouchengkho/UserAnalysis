@@ -7,7 +7,6 @@ var express = require('express'),
   social = require('../service/analysis/social'),
   homework = require('../service/analysis/homework'),
   refer = require('../service/reference'),
-  dorm = require('../service/analysis/dorm'),
   teacher = require('../service/teacher'),
   db = require('../models/index'),
   exp = require('../service/exp'),
@@ -169,8 +168,9 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  query.getClassActionCountGroup('C180001201601', ['201', '202', '203'], function(err, result) {
-    res.json(result)
+  activity.consecutiveActionPunishment('C180027161703', '10165101277', [], function(err, result) {
+    console.log(err)
+    res.json(JSON.parse(JSON.stringify(result)))
   })
 });
 

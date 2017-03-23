@@ -139,6 +139,37 @@ function Helper() {
     return Number(num.substring(0, num.indexOf(".") + 3));
 
   }
+
+  this.sum = function(arr) {
+    var sum = 0;
+    for(var i in arr)
+      sum += arr[i]
+    return sum;
+  }
+
+  /**
+   *
+   * @param arr
+   * @param key [optional]
+   * @returns {number}
+   */
+  this.getStandardDeviation = function(arr, key) {
+    if(arr.length == 0 || arr == null)
+      return 0;
+    var data = [];
+    if(key) {
+      for(var i in arr)
+        data.push(arr[i][key])
+    } else {
+      data = arr;
+    }
+    var avg = this.avg(data);
+    var sum = 0;
+    for(var i in data) {
+      sum += (data[i] - avg) * (data[i] - avg)
+    }
+    return Math.sqrt(sum / data.length)
+  }
 }
 
 module.exports = new Helper();

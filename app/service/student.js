@@ -2,8 +2,7 @@
  * Created by zhoucheng on 3/4/17.
  */
 
-var dorm = require('./analysis/dorm'),
-  activity = require('./analysis/activity'),
+  var activity = require('./analysis/activity'),
   social = require('./analysis/social'),
   summary = require('./summary'),
   homework = require('./analysis/homework'),

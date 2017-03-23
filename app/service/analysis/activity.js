@@ -1,4 +1,3 @@
-var db = require('../../models/index');
 var moment  = require('moment');
 var reference = require('./../reference');
 var Promise = require('bluebird');
@@ -31,18 +30,62 @@ function Activity() {
     Promise.all([
       query.getClassActionWeightedCountGroupAsync(classId, ['201', '202', '203'], [1, 0.5, 1]),
       query.getClassActionWeightedCountGroupAsync(classId, ['301'], [1]),
-      query.getClassActionWeightedCountGroupAsync(classId, ['401', '402', '403', '404', '405'], [1.5, 0.5, 1, 0.5, 1]),
-      query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [1, 1, 1.5, 0.5, 1, 1.5, 1.5])
+      query.getClassActionWeightedCountGroupAsync(classId, ['401', '402', '403', '404', '405'], [2, 0.5, 2, 1.5, 1]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [2, 1, 1.5, 0.5, 1, 2, 1.5])
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
+      // var group = [homeworkGroup, pptGroup, discussionGroup, sourceGroup];
       var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
-      var exp = score.entropy.getScoreOf(statistic, userId);
-      if (typeof  exp != 'number')
-        exp = 0;
-      callback(null, exp)
+      var originExp = score.entropy.getScoreOf(statistic, userId);
+
+      consecutiveActionPunishment(classId, userId, ['301'], [pptGroup], function(err) {
+        if(err)
+          callback(err)
+        else {
+          var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
+          var exp = score.entropy.getScoreOf(statistic, userId);
+          console.log('two exp: '+originExp +' '+ exp)
+          if (typeof  exp != 'number')
+            exp = 0;
+          callback(null, exp)
+        }
+      })
+
     })
   }
 
 
+  /**
+   *
+   * punish with time distribution standard deviation
+   * @param classId
+   * @param userId
+   * @param actionCode {Array}
+   * @param group {Array}
+   * @param callback
+   */
+  function consecutiveActionPunishment(classId, userId, actionCode, group, callback) {
+
+    query.getClassActionTimeDistribution(classId, actionCode, function(err, result) {
+      if(err)
+        callback(err)
+      else {
+        var generalDeviation = helper.getStandardDeviation(result, 'time');
+        query.getClassStudentActionTimeDistribution(classId, userId, actionCode, function(err, result) {
+          var myDeviation = helper.getStandardDeviation(result, 'time');
+          var fraction = myDeviation / generalDeviation;
+          console.log('fraction: '+fraction)
+          for(var i in group) {
+            for(var j in group[i]) {
+              if(group[i][j].userId == userId) {
+                group[i][j].count *= fraction
+              }
+            }
+          }
+          callback(err)
+        })
+      }
+    })
+  }
 
 
 

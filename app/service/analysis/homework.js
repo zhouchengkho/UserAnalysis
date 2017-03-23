@@ -54,7 +54,7 @@ function HomeWork() {
    * @param callback {function} (err, exp)
    */
   this.getClassStudentExp = function(classId, userId, callback) {
-    query.getClassStudentAssignmentTimes(classId, userId, function(err, result) {
+    query.getClassStudentAssignmentDetails(classId, userId, function(err, result) {
       if(err)
         return callback(err)
       else {
@@ -66,7 +66,8 @@ function HomeWork() {
               scores.push(0)
           }
           else {
-            scores.push(getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
+            var adjust = result[i].submitCount == 1 ? 1 : (result[i].submitCount / (result[i].submitCount + 1));
+            scores.push(adjust * getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
           }
         }
         if(scores.length === 0)

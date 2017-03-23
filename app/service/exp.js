@@ -4,7 +4,6 @@
 var db = require('./../models/index')
 var Promise = require('bluebird');
 var social = Promise.promisifyAll(require('./analysis/social'));
-var dorm = require('./analysis/dorm');
 var activity = Promise.promisifyAll(require('./analysis/activity'));
 var homework = Promise.promisifyAll(require('./analysis/homework'));
 var EventProxy = require('eventproxy');
@@ -135,7 +134,7 @@ function Exp() {
     db.StudentClass.findAll({where: {classId: classId, userId: userId}}).then(function(result) {
       if(result.length === 0)
         return callback(new Error('user not in this class or not exist'))
-      if(result[0].exp) {
+      if(result[0].exp != null) {
         var data = result[0].exp
         callback(null, {exp: data})
       } else {

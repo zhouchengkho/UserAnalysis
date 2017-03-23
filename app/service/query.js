@@ -628,7 +628,8 @@ function Query() {
    *    "title": "",
    *    "startTime": "2015-07-21T10:36:33.000Z",
    *    "endTime": "2015-07-22T16:00:00.000Z",
-   *    "submitted": false
+   *    "submitted": false,
+   *    "submitCount": 0
    *  },
    *  {
    *    "assignmentId": 126,
@@ -636,14 +637,15 @@ function Query() {
    *    "startTime": "2015-07-21T10:36:33.000Z",
    *    "endTime": "2015-07-22T16:00:00.000Z",
    *    "submitted": true,
-   *    "submitTime": "2015-07-22T15:36:16.000Z"
+   *    "submitTime": "2015-07-22T15:36:16.000Z",
+   *    "submitCount": 5
    *  },
    *  {
    *    ...
    *  }
    * ]
    */
-  this.getClassStudentAssignmentTimes = function(classId, userId, callback) {
+  this.getClassStudentAssignmentDetails = function(classId, userId, callback) {
     db.Assignment.findAll({
       attributes: ['assignmentId', ['startDate', 'startTime'], ['endDate', 'endTime'], 'title'],
       where: {classId: classId},
@@ -658,8 +660,10 @@ function Query() {
         temp.title = result[i].title;
         temp.startTime = result[i].startTime;
         temp.endTime = result[i].endTime;
-        if(result[i].StudentAssignments.length === 0)
+        if(result[i].StudentAssignments.length === 0) {
           temp.submitted = false;
+          temp.submitCount = 0;
+        }
         else {
           temp.submitTime = result[i].StudentAssignments[0].submitTime;
           temp.submitCount = result[i].StudentAssignments[0].submitCount;
@@ -856,6 +860,39 @@ function Query() {
     db.StudentClass.findAll({}).then(function(result) {
       callback(null, result)
     }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param classId
+   * @param actionCode {Array}
+   * @param callback
+   *
+   * [
+   *  {"time": unix_timestamp},
+   *  {"time": unix_timestamp},
+   *  ...
+   * ]
+   */
+  this.getClassActionTimeDistribution = function(classId, actionCode, callback) {
+    db.Action.findAll({
+      attributes: [[db.sequelize.literal('unix_timestamp(time)'), 'time']],
+      where: {classId: classId, actionCode: {$in: actionCode}}
+    }).then(function(result) {callback(null, result)}).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param classId
+   * @param userId
+   * @param actionCode {Array}
+   * @param callback
+   */
+  this.getClassStudentActionTimeDistribution = function(classId, userId, actionCode, callback) {
+    db.Action.findAll({
+      attributes: [[db.sequelize.literal('unix_timestamp(time)'), 'time']],
+      where: {classId: classId, userId: userId, actionCode: {$in: actionCode}}
+    }).then(function(result) {callback(null, result)}).catch(function(err) {callback(err)})
   }
 }
 
