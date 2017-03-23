@@ -33,17 +33,14 @@ function Activity() {
       query.getClassActionWeightedCountGroupAsync(classId, ['401', '402', '403', '404', '405'], [2, 0.5, 2, 1.5, 1]),
       query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [2, 1, 1.5, 0.5, 1, 2, 1.5])
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
-      // var group = [homeworkGroup, pptGroup, discussionGroup, sourceGroup];
-      var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
-      var originExp = score.entropy.getScoreOf(statistic, userId);
 
       consecutiveActionPunishment(classId, userId, ['301'], [pptGroup], function(err) {
         if(err)
           callback(err)
         else {
           var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
-          var exp = score.entropy.getScoreOf(statistic, userId);
-          console.log('two exp: '+originExp +' '+ exp)
+          var exp = score.entropy.getScoreOf(statistic, userId, [0.10, 0.10, 0.6, 0.20]);
+          console.log('two exp: '+' '+ exp)
           if (typeof  exp != 'number')
             exp = 0;
           callback(null, exp)

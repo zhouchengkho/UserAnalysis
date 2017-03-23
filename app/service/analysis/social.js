@@ -27,7 +27,7 @@ function Social() {
       ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
 
         var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
-        var exp = score.entropy.getScoreOf(statistic, userId)
+        var exp = score.entropy.getScoreOf(statistic, userId, [0.15, 0.15, 0.15, 0.30, 0.25])
         if (typeof  exp != 'number')
           exp = 0;
         callback(null, exp)

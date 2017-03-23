@@ -232,12 +232,19 @@ function Entropy() {
    * [8, 1.8, 11, 5, 7, 5],
    * [12, 2.5, 18, 7, 5, 5]
    * ]
+   * @param presetWeights
    * @returns {Array}
    * [ 1.0272226069300192, 5.32290665674021, 5.298627985099701, 3.5214514374594414 ]
    *
    */
-  this.getScores = function(datasets) {
+  this.getScores = function(datasets, presetWeights) {
     var weights = this.getWeights(datasets);
+    if(presetWeights) {
+      for(var i in weights) {
+        weights[i] = (weights[i] + presetWeights[i]) / 2
+      }
+    }
+
     var scaled = minMaxStandardize(datasets);
     var scores = [];
     for(var i in scaled) {
@@ -266,6 +273,7 @@ function Entropy() {
    *  }
    * ]
    * @param userId
+   * @param presetWeights
    * @returns
    *
    * [
@@ -279,11 +287,11 @@ function Entropy() {
    *  }
    * ]
    */
-  this.getScoreOf = function(data, userId) {
+  this.getScoreOf = function(data, userId, presetWeights) {
     var split = splitDatasetsAndUserIds(data);
     var datasets = split.datasets;
     var userIds = split.userIds;
-    var scores = this.getScores(datasets)
+    var scores = this.getScores(datasets, presetWeights)
     return scores[getIndex(userIds, userId)]
   }
 }
