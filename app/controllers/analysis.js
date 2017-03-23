@@ -137,7 +137,6 @@ router.get('/homework-html-data/:studentId', function(req, res) {
 
 router.get('/student-class-homework/:studentId/:classId', function(req, res) {
   homework.getClassStudentHomeworkData(req.params.classId, req.params.studentId, function(err, result) {
-    console.log(result)
     if(err)
       res.json({status: 400, message: err.message})
     else {
@@ -170,9 +169,7 @@ router.get('/activity-html-data', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  teacher.getData(req.session.login.userId, function(err, result) {
-    if(err)
-      console.log(err)
+  query.getClassActionCountGroup('C180001201601', ['201', '202', '203'], function(err, result) {
     res.json(result)
   })
 });

@@ -34,7 +34,6 @@ function Social() {
         var exp = score.entropy.getScoreOf(statistic, userId)
         if (typeof  exp != 'number')
           exp = 0;
-        console.log(exp)
         callback(null, exp)
       })
     });

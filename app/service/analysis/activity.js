@@ -29,11 +29,10 @@ function Activity() {
   this.getClassStudentExp = function(classId, userId, callback) {
 
     Promise.all([
-      query.getClassActionCountGroupAsync(classId, ['201', '202', '203']),
-      query.getClassActionCountGroupAsync(classId, ['301']),
-      query.getClassActionCountGroupAsync(classId, ['401', '402', '403', '404', '405']),
-      query.getClassActionCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507']),
-      query.getClassActionCountGroupAsync(classId, ['201', '202', '203'])
+      query.getClassActionWeightedCountGroupAsync(classId, ['201', '202', '203'], [1, 0.5, 1]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['301'], [1]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['401', '402', '403', '404', '405'], [1.5, 0.5, 1, 0.5, 1]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [1, 1, 1.5, 0.5, 1, 1.5, 1.5])
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
       var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
       var exp = score.entropy.getScoreOf(statistic, userId);

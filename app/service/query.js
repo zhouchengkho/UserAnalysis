@@ -6,7 +6,7 @@ var db = require('../models/index')
 var Promise = require('bluebird')
 var helper = require('./helper');
 var prefix = require('../../config/config').prefix;
-
+var async = require('async');
 function Query() {
 
   this.getClassTermName = function(classId, callback) {
@@ -169,9 +169,43 @@ function Query() {
     }
     actionCodes = actionCodes.slice(0, -1);
     actionCodes+=")";
+
+
     var rawQuery = "select student_class.userId, ifnull(t.count, 0) count from student_class left outer join (select count(userId) count, userId from action where classId = '"+ classId +"' and actionCode in"+actionCodes+" group by userId) t on student_class.userId = t.userId where classId = '"+classId+"' order by student_class.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
         callback(null, JSON.parse(JSON.stringify(result[0])))
+    }).catch(function(err) {callback(err)})
+  }
+
+  /**
+   *
+   * @param classId
+   * @param actionCode {Array}
+   * @param weights {Array}
+   * @param callback
+   * [
+   *  {
+   *    "userId": "",
+   *    "count": 5
+   *  },
+   *  {
+   *    "userId": "",
+   *    "count" 3
+   *  }
+   * ]
+   */
+  this.getClassActionWeightedCountGroup = function(classId, actionCode, weights, callback) {
+    var finalQuery = "select userId, sum(sum_table.count) count from ( ";
+    for(var i in actionCode) {
+      var rawQuery = i == 0 ? " " : " union all ";
+      rawQuery +=  "select * from( " +
+        "select student_class.userId, "+ weights[i] +" * ifnull(t.count, 0) count from student_class left outer join (select count(userId) count, userId from action "+
+        "where classId = '" + classId + "' and actionCode = '" + actionCode[i] + "' group by userId) t on student_class.userId = t.userId where classId = '" + classId + "' order by student_class.userId desc) table"+i+" ";
+      finalQuery += rawQuery;
+    }
+    finalQuery += " ) sum_table group by sum_table.userId order by sum_table.userId desc;";
+    db.sequelize.query(finalQuery).then(function(result) {
+      callback(null, result[0])
     }).catch(function(err) {callback(err)})
   }
   /**

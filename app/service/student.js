@@ -46,7 +46,6 @@ function Student() {
       data.user = result;
       // data.user.faceIcon = prefix + data.user.faceIcon;
       exp.getDetailedStudentClassesExp(userId, function(err, result) {
-        console.log(result)
         data.user.summary = result.classes;
         data.user.exp = result.exp;
         callback(null, data)
@@ -78,14 +77,11 @@ function Student() {
       query.getUserInfo(userId, function(err, result) {
         // data.faceIcon = prefix + result.faceIcon;
         data.userName = result.userName;
+        data.faceIcon = result.faceIcon;
         summary.getClassStudentSummary(classId, userId, function(err, result) {
           data.summary = result;
           exp.getClassStudentExp(classId, userId, function(err, result) {
-            console.log(result)
             data.exp = result.exp;
-            data.socialExp = result.socialExp;
-            data.homeworkExp = result.homeworkExp;
-            data.activityExp = result.activityExp;
             callback(null, data)
           })
 
