@@ -10,11 +10,8 @@ function HomeWork() {
 
   /**
    * on a scale from 0-10, based on submitted time
-   * y = 10 * e^ ((1/totalInterval) * In(3/5) * interval)
-   * meaning submit on startTime, score = 10
-   *         submit on endTime, score = 6
-   *         lower after
-   *         not submitted score is 0
+   * y = 10 * e^ ((1/totalInterval) * In(4/5) * interval) this is for regular submission
+   * y = 10 * e^ ((1/totalInterval) * In(4/5) * interval) * 0.5 this is for deadline submission
    *
    * @param startTime
    * @param endTime
@@ -23,7 +20,10 @@ function HomeWork() {
   function getNewtonCoolingScore(startTime, endTime, submitTime) {
     var totalInterval = reference.getTimeInterval(startTime, endTime);
     var interval = reference.getTimeInterval(startTime, submitTime);
-    return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(3/5) * interval))
+    if(interval / totalInterval < 9/10)
+      return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval))
+    else
+      return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval)) * 0.5
   }
 
   /**
@@ -62,9 +62,7 @@ function HomeWork() {
         var scores = [];
         for(var i in result) {
           if(!result[i].submitted) {
-            if(!needSubmitting(result[i].title))
-              scores.push(10)
-            else
+            if(needSubmitting(result[i].title))
               scores.push(0)
           }
           else {
