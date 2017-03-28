@@ -226,18 +226,15 @@ router.get('/teacher_search', function(req, res) {
 
     }
   })
-  // var data = {"status":true,"error":null,"data": {
-  //   student: [
-  //     {
-  //       userId: '10152510238',
-  //       userName: '匡申升'
-  //     },
-  //     {
-  //       userId: '10152510142',
-  //       userName: '胡楠'
-  //     }
-  //   ]
-  // }}
-  //
-  // res.json(data)
+})
+
+
+router.get('/class-exp-data/:classId', function(req, res) {
+  query.getClassStudentsExp(req.params.classId, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else {
+      res.json(result)
+    }
+  })
 })

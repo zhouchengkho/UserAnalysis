@@ -955,4 +955,12 @@ tbody tr td {
 .table tbody tr td {
   padding-bottom: 2px;
 }
+
+.pagination-detail span{
+  font-size: 15px;
+}
+
+.pagination-detail .btn{
+  padding: 5px;
+}
 /*# sourceMappingURL=style.css.map */

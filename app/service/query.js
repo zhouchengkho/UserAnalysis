@@ -894,6 +894,34 @@ function Query() {
       where: {classId: classId, userId: userId, actionCode: {$in: actionCode}}
     }).then(function(result) {callback(null, result)}).catch(function(err) {callback(err)})
   }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "exp": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "exp": ""
+   *  }
+   * ]
+   */
+  this.getClassStudentsExp = function(classId, callback) {
+    db.StudentClass.findAll({
+      attributes: ['userId', 'exp', [db.sequelize.literal('User.userName'), 'userName'], 'classId'],
+      where: {classId: classId},
+      include: [{model: db.User, attributes: ['userName']}]
+    }).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) {callback(err)})
+  }
 }
 
 module.exports = new Query();

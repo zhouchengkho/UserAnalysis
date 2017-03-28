@@ -12,13 +12,17 @@ $(document).on('click', '.class-detail', function()
   // not collapsed
   var selector = '#'+id;
   if ($(selector).attr('aria-expanded') === "true") {
-    $.ajax({
-      type: 'GET',
-      contentType: 'application/json; charset=utf-8',
-      url: '/analysis/get-class-detail/'+id
-    }).done(function(res){
-      $('#'+id+' .panel-body .exp-table').html(res)
-    });
+
+    // exp table ajax
+    // $.ajax({
+    //   type: 'GET',
+    //   contentType: 'application/json; charset=utf-8',
+    //   url: '/analysis/get-class-detail/'+id
+    // }).done(function(res){
+    //   $('#'+id+' .panel-body .exp-table').html(res)
+    // });
+
+    // exp graph ajax
     $.ajax({
       type: 'GET',
       contentType: 'application/json; charset=utf-8',
@@ -29,7 +33,43 @@ $(document).on('click', '.class-detail', function()
       console.log(graphData)
       var lineChart = new Chart(graph, graphData);
     });
+
+
+    // exp graph ajax
+
+      $('#'+id+' .panel-body #class-table').bootstrapTable({
+        url: '/analysis/class-exp-data/'+id,
+        columns: [
+          {
+            userId: '111',
+            userName: 'zhou',
+            exp: 3.44
+          },
+          {
+            userId: '111',
+            userName: 'zhou',
+            exp: 3.44
+          }
+        ]
+    });
+
+    window.actionFormatter = function(value, row, index) {
+      return [
+        '<a class="view" href="javascript:void(0)" title="Like">',
+        '<i class="glyphicon glyphicon-eye-open"></i>',
+        '</a>'
+      ].join('');
+    }
+
+    window.actionEvents = {
+      'click .view': function (e, value, row, index) {
+        window.open('/student/class/'+row.userId+'/'+row.classId)
+      }
+    };
+
   }
+
+
   // var html = Handlebars.templates["class_detail"](data);
   // $('#'+id).html(html)
 
