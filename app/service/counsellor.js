@@ -19,13 +19,10 @@ function Counsellor() {
       data.inactiveUsers = [];
       var lastFourYears = ref.getLastFourYears();
       async.eachSeries(lastFourYears, function(year, done) {
-        query.getInactiveUsers(year, function(err, result) {
           data.inactiveUsers.push({
-            year: year,
-            data: result
+            year: year
           })
           done()
-        })
       }, function done() {
         callback(null, data)
       })

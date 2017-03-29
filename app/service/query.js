@@ -847,10 +847,29 @@ function Query() {
 
   }
 
+  /**
+   *
+   * @param enrollYear
+   * @param callback
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "activityLevel": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "userName": "",
+   *    "activityLevel": ""
+   *  }
+   * ]
+   */
   this.getInactiveUsers = function(enrollYear, callback) {
     var userIdLike = '10' +enrollYear.toString().substring(2, 4) + '%'
 
-    var rawQuery = "select t.userId, user.userName, t.count from (SELECT COUNT('userId') AS `count`, `userId` FROM `action` AS `Action` WHERE `Action`.`actionCode` IN ('201', '202', '203', '301') AND `Action`.`userId` LIKE '" + userIdLike + "' GROUP BY userId ORDER BY count asc LIMIT 5) t left outer join user on t.userId = user.userId;";
+    // var rawQuery = "select t.userId, user.userName, t.count from (SELECT COUNT('userId') AS `count`, `userId` FROM `action` AS `Action` WHERE `Action`.`actionCode` IN ('201', '202', '203', '301') AND `Action`.`userId` LIKE '" + userIdLike + "' GROUP BY userId ORDER BY count asc LIMIT 5) t left outer join user on t.userId = user.userId;";
+    var rawQuery = "select student_class.userId, user.userName, round(sum(activityExp)/count(activityExp)) activityLevel from student_class left outer join user on student_class.userId = user.userId where student_class.userId like '" + userIdLike + "' group by student_class.userId order by activityLevel asc;"
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})

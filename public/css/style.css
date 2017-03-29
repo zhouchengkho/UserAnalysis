@@ -963,4 +963,9 @@ tbody tr td {
 .pagination-detail .btn{
   padding: 5px;
 }
+
+table thead {
+  border-top: 1px solid #dddddd;
+}
+
 /*# sourceMappingURL=style.css.map */

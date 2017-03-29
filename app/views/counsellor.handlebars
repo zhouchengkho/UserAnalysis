@@ -51,32 +51,40 @@
         </div>
         <div class="col-xs-12">
           {{#each data.inactiveUsers}}
-            {{#if data}}
-
-                    <table class="table table-striped">
-                    <caption>{{year}}级 低活跃度学生</caption>
+               <table id="class-table"
+                       data-toggle="table"
+                       data-url="analysis/counsellor-table-data/{{year}}"
+                       data-striped="true"
+                       data-pagination="true"
+                       data-page-size="5"
+                >
+                    <caption class="text-center">{{year}}级 学生活跃度</caption>
                     <thead>
                     <tr>
-                        <th>学号</th>
-                        <th>姓名</th>
-                        <th>活动数</th>
-                        <th>查看</th>
+                        <th data-field="userId" data-sortable="true">学号</th>
+                        <th data-field="userName" data-sortable="true">姓名</th>
+                        <th data-field="activityLevel" data-sortable="true">活跃度</th>
+                        <th data-formatter="actionFormatter" data-events="actionEvents">查看</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    {{#each data}}
-                        <tr>
-                            <td>{{userId}}</td>
-                            <td>{{userName}}</td>
-                            <td>{{count}}</td>
-                            <td><a href="/student/overall/{{userId}}" target="_blank"><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a></td>
-                        </tr>
-                    {{/each}}
-                    </tbody>
                 </table>
-              {{/if}}
           {{/each}}
 
         </div>
+        <script>
+            window.actionFormatter = function(value, row, index) {
+                return [
+                    '<a class="view" href="javascript:void(0)">',
+                    '<i class="glyphicon glyphicon-eye-open"></i>',
+                    '</a>'
+                ].join('');
+            }
+
+            window.actionEvents = {
+                'click .view': function (e, value, row, index) {
+                    window.open('/student/overall/'+row.userId)
+                }
+            };
+        </script>
     </div>
 </div>

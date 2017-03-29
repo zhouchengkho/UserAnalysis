@@ -233,6 +233,16 @@ router.get('/class-exp-data/:classId', function(req, res) {
   })
 })
 
+router.get('/counsellor-table-data/:year', function(req, res) {
+  query.getInactiveUsers(req.params.year, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else {
+      res.json(result)
+    }
+  })
+})
+
 
 router.get('/test', function(req, res) {
   activity.getClassExps('C180001201601', function(err, result) {
