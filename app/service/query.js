@@ -922,7 +922,8 @@ function Query() {
     db.StudentClass.findAll({
       attributes: ['userId', 'exp', [db.sequelize.literal('User.userName'), 'userName'], 'classId'],
       where: {classId: classId},
-      include: [{model: db.User, attributes: ['userName']}]
+      include: [{model: db.User, attributes: ['userName']}],
+      order: 'exp desc'
     }).then(function(result) {
       callback(null, result)
     }).catch(function(err) {callback(err)})

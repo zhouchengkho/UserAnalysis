@@ -38,19 +38,7 @@ $(document).on('click', '.class-detail', function()
     // exp graph ajax
 
       $('#'+id+' .panel-body #class-table').bootstrapTable({
-        url: '/analysis/class-exp-data/'+id,
-        columns: [
-          {
-            userId: '111',
-            userName: 'zhou',
-            exp: 3.44
-          },
-          {
-            userId: '111',
-            userName: 'zhou',
-            exp: 3.44
-          }
-        ]
+        url: '/analysis/class-exp-data/'+id
     });
 
     window.actionFormatter = function(value, row, index) {
