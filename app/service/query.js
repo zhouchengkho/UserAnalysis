@@ -215,12 +215,16 @@ function Query() {
    *
    * {
    *  "classId": "",
-   *  "className": ""
+   *  "className": "",
+   *  "credit": "",
+   *  "time: ""
    * }
    */
   this.getClassDetail = function(classId, callback) {
-    db.Class.findAll({where: {classId: classId}, include:[db.Course]}).then(function(result) {
-      callback(null, {classId: result[0].classId, className: result[0].Course.courseName})
+    db.Class.findAll({
+      attributes: ['classId', [db.sequelize.literal('Course.courseName'), 'className'], [db.sequelize.literal('Course.courseCredit'), 'credit'], [db.sequelize.literal('Course.courseWeekTime'), 'time']],
+      where: {classId: classId}, include:[db.Course]}).then(function(result) {
+      callback(null, result[0])
     })
   }
 

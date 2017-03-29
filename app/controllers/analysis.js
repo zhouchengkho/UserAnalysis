@@ -245,7 +245,7 @@ router.get('/counsellor-table-data/:year', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  activity.getClassExps('C180001201601', function(err, result) {
+  student.getData('10152510142', function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else {

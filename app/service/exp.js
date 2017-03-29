@@ -203,8 +203,12 @@ function Exp() {
       query.getClassDetail(classId, function(err, result) {
         if(err)
           return callback(err)
+
+        result = JSON.parse(JSON.stringify(result))
         data.classId = result.classId;
         data.className = result.className;
+        data.credit = result.credit;
+        data.time = result.time;
         self.getClassStudentExp(classId, userId, function(err, result) {
           if(err)
             return callback(err)
@@ -213,6 +217,7 @@ function Exp() {
           data.socialExp = result.socialExp;
           data.homeworkExp = result.homeworkExp;
           data.activityExp = result.activityExp;
+          console.log(data)
           callback(null, data)
         })
       })
@@ -285,18 +290,21 @@ function Exp() {
     var self = this;
     var data = [];
     var exp = 0;
+    var sum = 0;
     query.getStudentClasses(userId, function(err, classIds) {
       async.eachSeries(classIds, function(classId, done) {
         self.getDetailedClassStudentExp(classId, userId, function(err, result) {
           data.push(result)
-          exp += result.exp;
+          exp += result.exp * (result.credit + result.time);
+          sum += result.credit + result.time;
           done()
         })
       }, function done() {
         if(data.length === 0)
           exp = 0;
-        else
-          exp = Math.round(exp/data.length)
+        else {
+          exp = Math.round(exp / sum)
+        }
         callback(null, {exp: exp, classes: data})
       })
     })
