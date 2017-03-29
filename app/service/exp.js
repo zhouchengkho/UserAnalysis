@@ -34,6 +34,37 @@ function Exp() {
     })
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.computeAndFillClassExp = function(classId, callback) {
+    Promise.all([
+      activity.getClassExpsAsync(classId),
+      social.getClassExpsAsync(classId),
+      homework.getClassExpsAsync(classId)
+    ]).spread(function(activityScore, socialScore, homeworkScore) {
+      query.getClassStudentIdsDesc(classId, function(err, studentIds) {
+        async.eachSeries(studentIds, function(studentId, done) {
+          var index = studentIds.indexOf(studentId);
+          var activityExp = activityScore[index].score;
+          var socialExp = socialScore[index].score;
+          var homeworkExp = homeworkScore[index].score;
+          var exp = (activityExp + socialExp + homeworkExp) / 3;
+          db.StudentClass.update({exp: exp, activityExp: activityExp, homeworkExp: homeworkExp, socialExp: socialExp}, {where: {classId: data.classId, userId: data.userId}}).then(function(result) {
+            done()
+          }).catch(function(err) {callback(err)})
+        }, function done(err) {
+          if(err)
+            callback(err)
+          else
+            callback(null, {message: 'success'})
+        })
+      })
+    })
+  }
+
 
 
   this.fillAllExp = function(callback) {
@@ -57,26 +88,22 @@ function Exp() {
    */
   this.updateAllExp = function(callback) {
     var self = this;
-    query.getAllClassStudents(function(err, result) {
+    query.getClassesInDb(function(err, result) {
       if(err)
-        callback(err)
-      else {
-          async.eachSeries(result, function(data, done) {
-            computeClassStudentExp(data.classId, data.userId, function(err, result) {
-              db.StudentClass.update({exp: result.exp}, {where: {classId: data.classId, userId: data.userId}}).then(function(result) {
-                done()
-              }).catch(function(err) {callback(err)})
-            })
-          }, function done() {
-            callback(null, 'success')
-          })
-      }
+        return callback(err)
+      async.eachSeries(result, function(classId, done) {
+        self.computeAndFillClassExp(classId, function() {
+          done()
+        })
+      }, function done() {
+        callback(null, 'success')
+      })
     })
   }
 
   this.fillClassStudentExp = function(classId, userId, callback) {
     this.getClassStudentExp(classId, userId, function(err, exp) {
-      db.StudentClass.update({exp: exp.exp}, {where: {classId: classId, userId: userId}}).then(function(result) {
+      db.StudentClass.update({exp: exp.exp, activityExp: exp.activityExp, homeworkExp: exp.homeworkExp, socialExp: exp.socialExp}, {where: {classId: classId, userId: userId}}).then(function(result) {
         callback(null, 'success')
       }).catch(function(err) {callback(err)})
     })
@@ -103,12 +130,12 @@ function Exp() {
     ]).spread(function (activityExp, socialExp, homeworkExp) {
       console.log('result: ' + activityExp + ' ' + ' ' + socialExp + ' ' + homeworkExp);
 
-      var overallExp = fixToTwo((activityExp + socialExp + homeworkExp ) / 3)
+      var overallExp = Math.round((activityExp + socialExp + homeworkExp ) / 3)
       var data = {
         exp: overallExp,
-        activityExp: fixToTwo(activityExp),
-        socialExp: fixToTwo(socialExp),
-        homeworkExp: fixToTwo(homeworkExp)
+        activityExp: Math.round(activityExp),
+        socialExp: Math.round(socialExp),
+        homeworkExp: Math.round(homeworkExp)
       }
       callback(null, data)
     }).catch(function(err) {
@@ -135,8 +162,12 @@ function Exp() {
       if(result.length === 0)
         return callback(new Error('user not in this class or not exist'))
       if(result[0].exp != null) {
-        var data = result[0].exp
-        callback(null, {exp: data})
+        callback(null, {
+          exp: result[0].exp,
+          activityExp: result[0].exp,
+          socialExp: result[0].socialExp,
+          homeworkExp: result[0].homeworkExp
+        })
       } else {
         computeClassStudentExp(classId, userId, function(err, result) {
           callback(err, result)
@@ -260,7 +291,7 @@ function Exp() {
         if(data.length === 0)
           exp = 0;
         else
-          exp = fixToTwo(exp/data.length)
+          exp = Math.round(exp/data.length)
         callback(null, {exp: exp, classes: data})
       })
     })
@@ -314,7 +345,7 @@ function Exp() {
             })
           }, function done() {
             // calculate avg
-            exp = fixToTwo(exp / classCount);
+            exp = Math.round(exp / classCount);
             resolve()
           })
         })
@@ -544,7 +575,10 @@ function Exp() {
 
 function fixToTwo(exp) {
   exp  = exp + '';
-  return Number(exp.substring(0, exp.indexOf(".") + 3));
+  if(exp.indexOf(".") < 0)
+    return Number(exp)
+  else
+    return Number(exp.substring(0, exp.indexOf(".")));
 }
 
 

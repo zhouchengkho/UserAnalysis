@@ -6,6 +6,8 @@ var score = require('./score');
 var helper = require('../helper');
 function Social() {
 
+
+  const presetWeights = [0.15, 0.15, 0.15, 0.30, 0.25];
   /**
    *
    * Friends, Status, Status Reply, Topic Reply, Source Reply
@@ -27,13 +29,48 @@ function Social() {
       ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
 
         var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
-        var exp = score.entropy.getScoreOf(statistic, userId, [0.15, 0.15, 0.15, 0.30, 0.25])
-        if (typeof  exp != 'number')
+        var exp = score.entropy.getScoreOf(statistic, userId, presetWeights)
+        if (exp == Number.NaN)
           exp = 0;
         callback(null, exp)
       })
     });
 
+  }
+
+  /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.getClassExps = function(classId, callback) {
+    reference.getTimeForClass(classId, function(err, time) {
+      var gte = time.gte;
+      var lte = time.lte;
+
+      Promise.all([
+        query.getClassFriendsCountGroupAsync(classId),
+        query.getClassStatusCountGroupInTimeAsync(classId, gte, lte),
+        query.getClassStatusReplyCountGroupInTimeAsync(classId, gte, lte),
+        query.getClassTopicReplyCountGroupInTimeAsync(classId, gte, lte),
+        query.getClassSourceReplyCountGroupInTimeAsync(classId, gte, lte)
+      ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
+
+        console.log(friendsCount)
+        console.log(statusCount)
+        console.log(statusReplyCount)
+        console.log(TopicReplyCount)
+        console.log(SourceReplyCount)
+        var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
+        console.log(statistic)
+        var result = score.entropy.getClassScores(statistic, presetWeights);
+        for(var i in result) {
+          if (result[i].score == Number.NaN)
+            result[i].score = 0;
+        }
+        callback(null, result)
+      })
+    });
   }
 }
 

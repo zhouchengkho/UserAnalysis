@@ -252,7 +252,7 @@ function Entropy() {
       for(var j in weights) {
         score += weights[j] * scaled[i][j]
       }
-      scores.push(score * 10)
+      scores.push(score * 1000)
     }
     return scores;
   }
@@ -276,16 +276,7 @@ function Entropy() {
    * @param presetWeights
    * @returns
    *
-   * [
-   *  {
-   *    "userId": "10132510237",
-   *    "score": 1.0272226069300192
-   *  },
-   *  {
-   *    "userId": "10132510238",
-   *    "score": 5.32290665674021
-   *  }
-   * ]
+   * {Number}
    */
   this.getScoreOf = function(data, userId, presetWeights) {
     var split = splitDatasetsAndUserIds(data);
@@ -293,6 +284,45 @@ function Entropy() {
     var userIds = split.userIds;
     var scores = this.getScores(datasets, presetWeights)
     return scores[getIndex(userIds, userId)]
+  }
+
+  /**
+   *
+   * @param data
+   * [
+   *  {
+   *    "userId": "10132510237",
+   *    "data": [5, 1.4, 6, 3, 5, 7]
+   *  },
+   *  {
+   *    "userId": "10132510238",
+   *    "data": [9, 2, 30, 7, 5, 9]
+   *  }
+   * ]
+   * @param presetWeights
+   * @returns
+   *
+   * [
+   *  {
+   *    "userId": "",
+   *    "score": ""
+   *  },
+   *  {
+   *    "userId": "",
+   *    "score": ""
+   *  }
+   * ]
+   */
+  this.getClassScores = function(data, presetWeights) {
+    var split = splitDatasetsAndUserIds(data);
+    var datasets = split.datasets;
+    var userIds = split.userIds;
+    var scores = this.getScores(datasets, presetWeights);
+    var result = [];
+    for(var i in userIds) {
+      result.push({userId: userIds[i], score: scores[i]})
+    }
+    return result
   }
 }
 

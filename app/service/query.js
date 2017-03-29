@@ -38,7 +38,6 @@ function Query() {
    *  {
    *    "userId": "1231231",
    *    "classId": "CA4131",
-   *    "exp": number | null
    *  },
    *  {
    *    ...
@@ -49,6 +48,7 @@ function Query() {
     db.StudentClass.findAll({where: {classId: classId}}).then(function(result) {
       callback(null, result)
     })
+
   }
 
   /**
@@ -430,7 +430,7 @@ function Query() {
    * ]
    */
   this.getClassFriendsCountGroup = function(classId, callback) {
-    var rawQuery = "select user.userId, ifnull(t.friendCount, 0) count from user left outer join (select userId, count(userId) friendCount from friend group by userId) t on user.userId = t.userId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select student_class.userId, ifnull(t.friendCount, 0) count from student_class left outer join (select userId, count(userId) friendCount from friend group by userId) t on student_class.userId = t.userId where student_class.classId = '" + classId + "' order by student_class.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
@@ -438,14 +438,14 @@ function Query() {
 
 
   this.getClassStatusCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select userId, count(userId) count from status where time > '"+gte+"' and time < '" + lte + "' group by userId) t on user.userId = t.userId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select student_class.userId, ifnull(t.count, 0) count from student_class left outer join (select userId, count(userId) count from status where time > '" + gte + "' and time < '" + lte + "' group by userId) t on student_class.userId = t.userId where student_class.classId = '" + classId + "' order by student_class.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
   }
 
   this.getClassStatusReplyCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from statusreply where time > '"+gte+"' and time < '" + lte + "' group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select student_class.userId, ifnull(t.count, 0) count from student_class left outer join (select fromId, count(fromId) count from statusreply where time > '" + gte + "' and time < '" + lte + "' group by fromId) t on student_class.userId = t.fromId where student_class.classId = '" + classId + "' order by student_class.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {
@@ -456,7 +456,7 @@ function Query() {
   }
 
   this.getClassSourceReplyCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from sourcereply where time > '"+gte+"' and time < '" + lte + "' group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select student_class.userId, ifnull(t.count, 0) count from student_class left outer join (select fromId, count(fromId) count from sourcereply where time > '" + gte + "' and time < '" + lte + "' group by fromId) t on student_class.userId = t.fromId where student_class.classId = '" + classId + "' order by student_class.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
@@ -464,7 +464,7 @@ function Query() {
   }
 
   this.getClassTopicReplyCountGroupInTime = function(classId, gte, lte, callback) {
-    var rawQuery = "select user.userId, ifnull(t.count, 0) count from user left outer join (select fromId, count(fromId) count from topicreply where time > '"+gte+"' and time < '" + lte + "' group by fromId) t on user.userId = t.fromId where user.userId in (select userId from student_class where classId = '"+classId+"') order by user.userId desc;";
+    var rawQuery = "select student_class.userId, ifnull(t.count, 0) count from student_class left outer join (select fromId, count(fromId) count from topicreply where time > '" + gte + "' and time < '" + lte + "' group by fromId) t on student_class.userId = t.fromId where student_class.classId = '" + classId + "' order by student_class.userId desc;";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0])
     }).catch(function(err) {callback(err)})
@@ -830,7 +830,7 @@ function Query() {
    */
   this.getClassExpDistribution = function(classId, callback) {
     var rawQuery = "select t.stage, t.count from "+
-    "(select elt(interval(exp, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
+    "(select elt(interval(exp, 0, 100, 200, 300, 400, 500, 60, 700, 800, 900, 1000), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
     "from student_class where classId = '"+ classId + "' group by stage) t where t.stage in ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10');";
 
     db.sequelize.query(rawQuery).then(function(result) {

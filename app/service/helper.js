@@ -170,6 +170,8 @@ function Helper() {
     }
     return Math.sqrt(sum / data.length)
   }
+
+
 }
 
 module.exports = new Helper();

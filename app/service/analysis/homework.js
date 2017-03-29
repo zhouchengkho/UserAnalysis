@@ -2,6 +2,7 @@ var db = require('../../models/index');
 var query = require('./../query');
 var reference = require('./../reference');
 var helper = require('../helper');
+var async = require('async');
 /**
  * 1. Finished Assignment
  * @constructor
@@ -21,9 +22,9 @@ function HomeWork() {
     var totalInterval = reference.getTimeInterval(startTime, endTime);
     var interval = reference.getTimeInterval(startTime, submitTime);
     if(interval / totalInterval < 9/10)
-      return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval))
+      return 1000 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval))
     else
-      return 10 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval)) * 0.5
+      return 1000 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval)) * 0.5
   }
 
   /**
@@ -66,7 +67,7 @@ function HomeWork() {
               scores.push(0)
           }
           else {
-            var adjust = result[i].submitCount == 1 ? 1 : (result[i].submitCount / (result[i].submitCount + 1));
+            var adjust = Math.log10(result[i].submitCount)
             scores.push(adjust * getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
           }
         }
@@ -78,6 +79,28 @@ function HomeWork() {
     })
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.getClassExps = function(classId, callback) {
+    var self = this;
+    var result = [];
+    query.getClassStudentIdsDesc(classId, function(err, studentIds) {
+      async.eachSeries(studentIds, function(studentId, done) {
+        self.getClassStudentExp(classId, studentId, function(err, score) {
+          result.push({
+            userId: studentId,
+            score: score
+          })
+          done();
+        })
+      }, function done() {
+        callback(null, result)
+      })
+    })
+  }
   /**
    *
    * @param userId

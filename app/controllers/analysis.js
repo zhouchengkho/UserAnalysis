@@ -167,12 +167,6 @@ router.get('/activity-html-data', function(req, res) {
 
 
 
-router.get('/test', function(req, res) {
-  activity.consecutiveActionPunishment('C180027161703', '10165101277', [], function(err, result) {
-    console.log(err)
-    res.json(JSON.parse(JSON.stringify(result)))
-  })
-});
 
 router.get('/fill-all', function(req, res) {
   exp.updateAllExp(function(err, result) {
@@ -238,3 +232,14 @@ router.get('/class-exp-data/:classId', function(req, res) {
     }
   })
 })
+
+
+router.get('/test', function(req, res) {
+  activity.getClassExps('C180027161703', function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else {
+      res.json(result)
+    }
+  })
+});

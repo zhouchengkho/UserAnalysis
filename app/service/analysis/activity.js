@@ -8,6 +8,7 @@ var helper = require('../helper');
 function Activity() {
 
 
+  const presetWeights = [0.10, 0.10, 0.6, 0.20];
 
   /**
    * class student exp
@@ -39,8 +40,8 @@ function Activity() {
           callback(err)
         else {
           var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
-          var exp = score.entropy.getScoreOf(statistic, userId, [0.10, 0.10, 0.6, 0.20]);
-          console.log('two exp: '+' '+ exp)
+          var exp = score.entropy.getScoreOf(statistic, userId, presetWeights);
+          console.log('two exp: '+' '+ exp + ' '+ typeof exp)
           if (typeof  exp != 'number')
             exp = 0;
           callback(null, exp)
@@ -69,7 +70,7 @@ function Activity() {
         var generalDeviation = helper.getStandardDeviation(result, 'time');
         query.getClassStudentActionTimeDistribution(classId, userId, actionCode, function(err, result) {
           var myDeviation = helper.getStandardDeviation(result, 'time');
-          var fraction = myDeviation / generalDeviation;
+          var fraction = generalDeviation == 0 ? 0 : myDeviation / generalDeviation;
           console.log('fraction: '+fraction)
           for(var i in group) {
             for(var j in group[i]) {
@@ -84,6 +85,35 @@ function Activity() {
     })
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.getClassExps = function(classId, callback) {
+    Promise.all([
+      query.getClassActionWeightedCountGroupAsync(classId, ['201', '202', '203'], [1, 0.5, 1]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['301'], [1]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['401', '402', '403', '404', '405'], [1, 0.25, 1, 0.75, 0.5]),
+      query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [1, 0.5, 0.75, 0.25, 0.5, 1, 0.75])
+    ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
+      query.getClassStudentIdsDesc(classId, function(err, studentIds) {
+        async.eachSeries(studentIds, function(studentId, done) {
+          consecutiveActionPunishment(classId, studentId, ['301'], [pptGroup], function(err) {
+            done()
+          })
+        }, function done() {
+          var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
+          var result = score.entropy.getClassScores(statistic, presetWeights);
+          for(var i in result) {
+            if (result[i].score == Number.NaN)
+              result[i].score = 0;
+          }
+          callback(null, result)
+        })
+      })
+    })
+  }
 
 
 }
