@@ -81,9 +81,8 @@ function Student() {
           data.summary = result;
           exp.getClassStudentExp(classId, userId, function(err, result) {
             data.exp = result.exp;
-            callback(null, data)
+            callback(err, data)
           })
-
         })
 
       })

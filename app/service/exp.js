@@ -40,19 +40,25 @@ function Exp() {
    * @param callback
    */
   this.computeAndFillClassExp = function(classId, callback) {
+
     Promise.all([
       activity.getClassExpsAsync(classId),
       social.getClassExpsAsync(classId),
       homework.getClassExpsAsync(classId)
     ]).spread(function(activityScore, socialScore, homeworkScore) {
       query.getClassStudentIdsDesc(classId, function(err, studentIds) {
+
         async.eachSeries(studentIds, function(studentId, done) {
           var index = studentIds.indexOf(studentId);
-          var activityExp = activityScore[index].score;
-          var socialExp = socialScore[index].score;
-          var homeworkExp = homeworkScore[index].score;
-          var exp = (activityExp + socialExp + homeworkExp) / 3;
-          db.StudentClass.update({exp: exp, activityExp: activityExp, homeworkExp: homeworkExp, socialExp: socialExp}, {where: {classId: data.classId, userId: data.userId}}).then(function(result) {
+
+          var roundDown = getRoundDownExpData(activityScore[index].score, socialScore[index].score, homeworkScore[index].score);
+
+          var activityExp = roundDown.activityExp;
+          var socialExp = roundDown.socialExp;
+          var homeworkExp = roundDown.homeworkExp;
+          var exp = roundDown.exp;
+
+          db.StudentClass.update({exp: exp, activityExp: activityExp, homeworkExp: homeworkExp, socialExp: socialExp}, {where: {classId: classId, userId: studentId}}).then(function(result) {
             done()
           }).catch(function(err) {callback(err)})
         }, function done(err) {
@@ -130,13 +136,8 @@ function Exp() {
     ]).spread(function (activityExp, socialExp, homeworkExp) {
       console.log('result: ' + activityExp + ' ' + ' ' + socialExp + ' ' + homeworkExp);
 
-      var overallExp = Math.round((activityExp + socialExp + homeworkExp ) / 3)
-      var data = {
-        exp: overallExp,
-        activityExp: Math.round(activityExp),
-        socialExp: Math.round(socialExp),
-        homeworkExp: Math.round(homeworkExp)
-      }
+      // var overallExp = Math.round((activityExp + socialExp + homeworkExp ) / 3)
+      var data = getRoundDownExpData(activityExp, socialExp, homeworkExp);
       callback(null, data)
     }).catch(function(err) {
       console.log('error: '+err)
@@ -246,7 +247,11 @@ function Exp() {
         data.classId = result.classId;
         data.className = result.className;
         computeClassStudentExp(classId, userId, function(err, result) {
-          callback(err, result)
+          data.exp = result.exp;
+          data.activityExp = result.activityExp;
+          data.socialExp = result.socialExp;
+          data.homeworkExp = result.homeworkExp;
+          callback(err, data)
         })
       })
     })
@@ -573,13 +578,17 @@ function Exp() {
 }
 
 
-function fixToTwo(exp) {
-  exp  = exp + '';
-  if(exp.indexOf(".") < 0)
-    return Number(exp)
-  else
-    return Number(exp.substring(0, exp.indexOf(".")));
+function getRoundDownExpData(activityExp, socialExp, homeworkExp) {
+  activityExp = Math.round(activityExp);
+  socialExp = Math.round(socialExp);
+  homeworkExp = Math.round(homeworkExp);
+  var exp = Math.round((activityExp + socialExp + homeworkExp) / 3);
+  return {
+    exp: exp,
+    activityExp: activityExp,
+    socialExp: socialExp,
+    homeworkExp: homeworkExp
+  }
 }
-
 
 module.exports = new Exp();

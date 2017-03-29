@@ -67,7 +67,7 @@ function HomeWork() {
               scores.push(0)
           }
           else {
-            var adjust = Math.log10(result[i].submitCount)
+            var adjust = 1 / (Math.log10(result[i].submitCount) + 1);
             scores.push(adjust * getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
           }
         }

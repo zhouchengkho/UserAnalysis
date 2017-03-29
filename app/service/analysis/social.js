@@ -55,14 +55,7 @@ function Social() {
         query.getClassTopicReplyCountGroupInTimeAsync(classId, gte, lte),
         query.getClassSourceReplyCountGroupInTimeAsync(classId, gte, lte)
       ]).spread(function(friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount) {
-
-        console.log(friendsCount)
-        console.log(statusCount)
-        console.log(statusReplyCount)
-        console.log(TopicReplyCount)
-        console.log(SourceReplyCount)
         var statistic = helper.organizeData([friendsCount, statusCount, statusReplyCount, TopicReplyCount, SourceReplyCount]);
-        console.log(statistic)
         var result = score.entropy.getClassScores(statistic, presetWeights);
         for(var i in result) {
           if (result[i].score == Number.NaN)

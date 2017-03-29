@@ -134,11 +134,6 @@ function Helper() {
     return sum/arr.length;
   }
 
-  this.fixToTwo = function(num){
-    num  = num + '';
-    return Number(num.substring(0, num.indexOf(".") + 3));
-
-  }
 
   this.sum = function(arr) {
     var sum = 0;

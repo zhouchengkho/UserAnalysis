@@ -35,21 +35,24 @@ function Activity() {
       query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [1, 0.5, 0.75, 0.25, 0.5, 1, 0.75])
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
 
-      consecutiveActionPunishment(classId, userId, ['301'], [pptGroup], function(err) {
-        if(err)
-          callback(err)
-        else {
-          var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
-          var exp = score.entropy.getScoreOf(statistic, userId, presetWeights);
-          console.log('two exp: '+' '+ exp + ' '+ typeof exp)
-          if (typeof  exp != 'number')
-            exp = 0;
-          callback(null, exp)
-        }
+      console.log('fine')
+      getPunishmentFraction(classId, userId, ['301'], function(err, fraction) {
+        console.log(fraction)
+        var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
+        var exp = score.entropy.getScoreOf(statistic, userId, presetWeights);
+        // punish
+        var weights = score.entropy.getWeightsFromData(statistic, presetWeights);
+        console.log(weights)
+        exp = getPunishedExp(exp, weights[1], fraction)
+        console.log(exp)
+        if (exp == Number.NaN)
+          exp = 0;
+        callback(err, exp)
       })
 
     })
   }
+
 
 
   /**
@@ -58,31 +61,27 @@ function Activity() {
    * @param classId
    * @param userId
    * @param actionCode {Array}
-   * @param group {Array}
    * @param callback
+   *
+   * {number}
    */
-  function consecutiveActionPunishment(classId, userId, actionCode, group, callback) {
-
-    query.getClassActionTimeDistribution(classId, actionCode, function(err, result) {
+  function getPunishmentFraction(classId, userId, actionCode, callback) {
+    query.getClassActionTimeDistribution(classId, actionCode, function(err, classDistribution) {
       if(err)
         callback(err)
       else {
-        var generalDeviation = helper.getStandardDeviation(result, 'time');
-        query.getClassStudentActionTimeDistribution(classId, userId, actionCode, function(err, result) {
-          var myDeviation = helper.getStandardDeviation(result, 'time');
+        var generalDeviation = helper.getStandardDeviation(classDistribution, 'time');
+        query.getClassStudentActionTimeDistribution(classId, userId, actionCode, function(err, studentDistribution) {
+          var myDeviation = helper.getStandardDeviation(studentDistribution, 'time');
           var fraction = generalDeviation == 0 ? 0 : myDeviation / generalDeviation;
-          console.log('fraction: '+fraction)
-          for(var i in group) {
-            for(var j in group[i]) {
-              if(group[i][j].userId == userId) {
-                group[i][j].count *= fraction
-              }
-            }
-          }
-          callback(err)
+          callback(err, fraction)
         })
       }
     })
+  }
+
+  function getPunishedExp(exp, punishWeight, fraction) {
+    return (exp * punishWeight * fraction) + (exp * (1 - punishWeight))
   }
 
   /**
@@ -98,16 +97,22 @@ function Activity() {
       query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [1, 0.5, 0.75, 0.25, 0.5, 1, 0.75])
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
       query.getClassStudentIdsDesc(classId, function(err, studentIds) {
+        var fractions = [];
         async.eachSeries(studentIds, function(studentId, done) {
-          consecutiveActionPunishment(classId, studentId, ['301'], [pptGroup], function(err) {
-            done()
+          getPunishmentFraction(classId, studentId, ['301'], function(err, fraction) {
+            fractions.push(fraction)
+            done(err)
           })
         }, function done() {
           var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
+          var weights = score.entropy.getWeightsFromData(statistic, presetWeights);
           var result = score.entropy.getClassScores(statistic, presetWeights);
           for(var i in result) {
             if (result[i].score == Number.NaN)
               result[i].score = 0;
+            else {
+              result[i].score = getPunishedExp(result[i].score, weights[1], fractions[i])
+            }
           }
           callback(null, result)
         })

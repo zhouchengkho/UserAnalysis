@@ -235,7 +235,7 @@ router.get('/class-exp-data/:classId', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  activity.getClassExps('C180027161703', function(err, result) {
+  activity.getClassExps('C180001201601', function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else {

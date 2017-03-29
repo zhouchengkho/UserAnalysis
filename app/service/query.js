@@ -233,8 +233,9 @@ function Query() {
   this.getClassesInDb = function(callback) {
     db.Class.findAll({}).then(function(result) {
       var data = [];
-      for(var index in result)
+      for(var index in result) {
         data.push(result[index].classId)
+      }
       callback(null, data)
     }).catch(function(err) {callback(err)})
   }
@@ -892,7 +893,11 @@ function Query() {
     db.Action.findAll({
       attributes: [[db.sequelize.literal('unix_timestamp(time)'), 'time']],
       where: {classId: classId, userId: userId, actionCode: {$in: actionCode}}
-    }).then(function(result) {callback(null, result)}).catch(function(err) {callback(err)})
+    }).then(function(result) {callback(null, result)}).catch(function(err) {
+      console.log('error')
+      console.log(err)
+      callback(err)
+    })
   }
 
   /**

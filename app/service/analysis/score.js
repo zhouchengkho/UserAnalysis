@@ -197,7 +197,7 @@ function Entropy() {
     return redundancy;
   }
 
-  this.getWeights  = function(datasets) {
+  this.getWeights  = function(datasets, presetWeights) {
     var transitioned = transition(datasets);
     var scaled = transitioned;
     // var scaled = this.scale(transitioned);
@@ -220,7 +220,19 @@ function Entropy() {
       }
     }
 
+    if(presetWeights) {
+      for(var i in weights) {
+        weights[i] = (weights[i] + presetWeights[i]) / 2
+      }
+    }
+
     return weights;
+  }
+
+  this.getWeightsFromData = function(data, presetWeights) {
+    var split = splitDatasetsAndUserIds(data);
+    var datasets = split.datasets;
+    return this.getWeights(datasets, presetWeights);
   }
 
   /**
@@ -238,12 +250,7 @@ function Entropy() {
    *
    */
   this.getScores = function(datasets, presetWeights) {
-    var weights = this.getWeights(datasets);
-    if(presetWeights) {
-      for(var i in weights) {
-        weights[i] = (weights[i] + presetWeights[i]) / 2
-      }
-    }
+    var weights = this.getWeights(datasets, presetWeights);
 
     var scaled = minMaxStandardize(datasets);
     var scores = [];
