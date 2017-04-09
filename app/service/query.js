@@ -97,6 +97,18 @@ function Query() {
   }
 
   /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.getClassStudentCount = function(classId, callback) {
+    db.StudentClass.count({where: {classId: classId}}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  /**
    * @param classId
    * @param userId
    * @param actionCode
@@ -387,6 +399,15 @@ function Query() {
     })
   }
 
+  this.getClassStudentFriendsCountAvg = function(classId, callback) {
+    this.getClassStudentCount(classId, function(err, userCount) {
+      var rawQuery = "select count(*) as count from friend left outer join student_class on friend.userId = student_class.userId where classId = '" + classId + "';";
+      db.sequelize.query(rawQuery).then(function(result) {
+        callback(err, result[0][0].count/userCount)
+      })
+    })
+  }
+
   /**
    * Callback userId s are in desc order
    * @param classId
@@ -505,12 +526,39 @@ function Query() {
     })
   }
 
+  this.getClassStudentStatusCountInTimeAvg = function(classId, gte, lte, callback) {
+    this.getClassStudentCount(classId, function(err, userCount) {
+      var rawQuery = "select count(*) as count from status left outer join student_class on status.userId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
+      db.sequelize.query(rawQuery).then(function(result) {
+        callback(err, result[0][0].count/userCount)
+      })
+    })
+  }
+
+
+
   this.getStudentStatusReplyCountInTime = function(userId, gte, lte, callback) {
     db.StatusReply.count({where: {fromId: userId, time: {gte: gte, lte: lte}}}).then(function(count) {
       callback(null, count)
     }).catch(function(err) {callback(err)})
   }
 
+  this.getStudentStatusReplyCountInTimeAvg = function(gte, lte, callback) {
+    this.getTotalUserCount(function(err, userCount) {
+      db.StatusReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
+        callback(null, count/userCount)
+      })
+    })
+  }
+
+  this.getClassStudentStatusReplyCountInTimeAvg = function(classId, gte, lte, callback) {
+    this.getClassStudentCount(classId, function(err, userCount) {
+      var rawQuery = "select count(*) as count from statusreply left outer join student_class on statusreply.fromId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
+      db.sequelize.query(rawQuery).then(function(result) {
+        callback(err, result[0][0].count/userCount)
+      })
+    })
+  }
   /**
    *
    * @param userId
@@ -535,6 +583,15 @@ function Query() {
       db.TopicReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
         callback(null, count/userCount)
       }).catch(function(err) {callback(err)})
+    })
+  }
+
+  this.getClassStudentTopicReplyCountInTimeAvg = function(classId, gte, lte, callback) {
+    this.getClassStudentCount(classId, function(err, userCount) {
+      var rawQuery = "select count(*) as count from topicreply left outer join student_class on topicreply.fromId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
+      db.sequelize.query(rawQuery).then(function(result) {
+        callback(err, result[0][0].count/userCount)
+      })
     })
   }
 
@@ -565,6 +622,14 @@ function Query() {
     })
   }
 
+  this.getClassStudentSourceReplyCountInTimeAvg = function(classId, gte, lte, callback) {
+    this.getClassStudentCount(classId, function(err, userCount) {
+      var rawQuery = "select count(*) as count from sourcereply left outer join student_class on sourcereply.fromId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
+      db.sequelize.query(rawQuery).then(function(result) {
+        callback(err, result[0][0].count/userCount)
+      })
+    })
+  }
   /**
    *
    * @param classId

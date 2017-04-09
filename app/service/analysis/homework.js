@@ -71,7 +71,7 @@ function HomeWork() {
             scores.push(adjust * getNewtonCoolingScore(result[i].startTime, result[i].endTime, result[i].submitTime))
           }
         }
-        if(scores.length === 0)
+        if(scores.length == 0)
           callback(null, 0)
         else
           callback(null, helper.avg(scores))
@@ -185,3 +185,5 @@ function HomeWork() {
 
 
 module.exports = new HomeWork();
+
+

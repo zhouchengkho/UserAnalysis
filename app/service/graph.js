@@ -184,7 +184,7 @@ function Graph() {
     var radarChartData = {
       type: 'radar',
       data: {
-        labels: ['好友', '签到', '资源回复', '话题回复'],
+        labels: ['好友', '签到', '签到回复',  '资源回复', '话题回复'],
         datasets: [
           {
             label: 'Mine',
@@ -210,26 +210,37 @@ function Graph() {
     var lte = reference.getTimePeriod(timePeriod, userId).lte;
     console.log('getting chart social for: '+userId)
 
+    console.log(gte)
+    console.log(lte)
     Promise.all([
       query.getStudentFriendsCountAsync(userId),
-      query.getStudentFriendsCountAvgAsync(),
       query.getStudentStatusCountInTimeAsync(userId, gte, lte),
-      query.getStudentStatusCountInTimeAvgAsync(gte, lte),
+      query.getStudentStatusReplyCountInTimeAsync(userId, gte, lte),
       query.getStudentSourceReplyCountInTimeAsync(userId, gte, lte),
-      query.getStudentSourceReplyCountInTimeAvgAsync(gte, lte),
       query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte),
-      query.getStudentTopicReplyCountInTimeAvgAsync(gte, lte)
-    ]).spread(function(friendsCount, friendsAvg, statusCount, statusAvg, sourceReplyCount, sourceReplyAvg, topicReplyCount, topicReplyAvg) {
-      console.log('friends count: '+friendsCount)
-      radarChartData.data.datasets[0].data.push(friendsCount)
-      radarChartData.data.datasets[0].data.push(statusCount)
-      radarChartData.data.datasets[0].data.push(sourceReplyCount)
-      radarChartData.data.datasets[0].data.push(topicReplyCount)
-      radarChartData.data.datasets[1].data.push(friendsAvg)
-      radarChartData.data.datasets[1].data.push(statusAvg)
-      radarChartData.data.datasets[1].data.push(sourceReplyAvg)
-      radarChartData.data.datasets[1].data.push(topicReplyAvg)
-      callback(null, radarChartData)
+    ]).spread(function(friendsCount, statusCount, statusReplyCount, sourceReplyCount, topicReplyCount) {
+      Promise.all([
+        query.getStudentFriendsCountAvgAsync(),
+        query.getStudentStatusCountInTimeAvgAsync(gte, lte),
+        query.getStudentStatusReplyCountInTimeAvgAsync(gte, lte),
+        query.getStudentSourceReplyCountInTimeAvgAsync(gte, lte),
+        query.getStudentTopicReplyCountInTimeAvgAsync(gte, lte)
+      ]).spread(function(friendsAvg, statusAvg, statusReplyAvg, sourceReplyAvg, topicReplyAvg) {
+        console.log('friends count: '+friendsCount)
+        console.log(friendsAvg + ' '+ friendsCount)
+        radarChartData.data.datasets[0].data.push(friendsCount)
+        radarChartData.data.datasets[0].data.push(statusCount)
+        radarChartData.data.datasets[0].data.push(statusReplyCount)
+        radarChartData.data.datasets[0].data.push(sourceReplyCount)
+        radarChartData.data.datasets[0].data.push(topicReplyCount)
+        radarChartData.data.datasets[1].data.push(friendsAvg)
+        radarChartData.data.datasets[1].data.push(statusAvg)
+        radarChartData.data.datasets[1].data.push(statusReplyAvg)
+        radarChartData.data.datasets[1].data.push(sourceReplyAvg)
+        radarChartData.data.datasets[1].data.push(topicReplyAvg)
+        callback(null, radarChartData)
+      })
+
     }).catch(function(err) {callback(err)})
 
   }
@@ -309,7 +320,7 @@ function Graph() {
       var radarChartData = {
         type: 'radar',
         data: {
-          labels: ['好友', '签到', ' 资源回复', '话题回复'],
+          labels: ['好友', '签到', '签到回复', ' 资源回复', '话题回复'],
           datasets: [
             {
               label: 'Mine',
@@ -336,24 +347,33 @@ function Graph() {
 
       Promise.all([
         query.getStudentFriendsCountAsync(userId),
-        query.getStudentFriendsCountAvgAsync(),
         query.getStudentStatusCountInTimeAsync(userId, gte, lte),
-        query.getStudentStatusCountInTimeAvgAsync(gte, lte),
+        query.getStudentStatusReplyCountInTimeAsync(userId, gte, lte),
         query.getStudentSourceReplyCountInTimeAsync(userId, gte, lte),
-        query.getStudentSourceReplyCountInTimeAvgAsync(gte, lte),
-        query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte),
-        query.getStudentTopicReplyCountInTimeAvgAsync(gte, lte)
-      ]).spread(function(friendsCount, friendsAvg, statusCount, statusAvg, sourceReplyCount, sourceReplyAvg, topicReplyCount, topicReplyAvg) {
+        query.getStudentTopicReplyCountInTimeAsync(userId, gte, lte)
+      ]).spread(function(friendsCount, statusCount, statusReplyCount, sourceReplyCount, topicReplyCount) {
         console.log('friends count: '+friendsCount)
-        radarChartData.data.datasets[0].data.push(friendsCount)
-        radarChartData.data.datasets[0].data.push(statusCount)
-        radarChartData.data.datasets[0].data.push(sourceReplyCount)
-        radarChartData.data.datasets[0].data.push(topicReplyCount)
-        radarChartData.data.datasets[1].data.push(friendsAvg)
-        radarChartData.data.datasets[1].data.push(statusAvg)
-        radarChartData.data.datasets[1].data.push(sourceReplyAvg)
-        radarChartData.data.datasets[1].data.push(topicReplyAvg)
-        callback(null, radarChartData)
+        Promise.all([
+          query.getClassStudentFriendsCountAvgAsync(classId),
+          query.getClassStudentStatusCountInTimeAvgAsync(classId, gte, lte),
+          query.getClassStudentStatusReplyCountInTimeAvgAsync(classId, gte, lte),
+          query.getClassStudentSourceReplyCountInTimeAvgAsync(classId, gte, lte),
+          query.getClassStudentTopicReplyCountInTimeAvgAsync(classId, gte, lte)
+        ]).spread(function(friendsAvg, statusAvg, statusReplyAvg, sourceReplyAvg, topicReplyAvg) {
+          console.log('friends count: '+friendsCount)
+          console.log(friendsAvg + ' '+ friendsCount)
+          radarChartData.data.datasets[0].data.push(friendsCount)
+          radarChartData.data.datasets[0].data.push(statusCount)
+          radarChartData.data.datasets[0].data.push(statusReplyCount)
+          radarChartData.data.datasets[0].data.push(sourceReplyCount)
+          radarChartData.data.datasets[0].data.push(topicReplyCount)
+          radarChartData.data.datasets[1].data.push(friendsAvg)
+          radarChartData.data.datasets[1].data.push(statusAvg)
+          radarChartData.data.datasets[1].data.push(statusReplyAvg)
+          radarChartData.data.datasets[1].data.push(sourceReplyAvg)
+          radarChartData.data.datasets[1].data.push(topicReplyAvg)
+          callback(null, radarChartData)
+        })
       }).catch(function(err) {callback(err)})
     })
 

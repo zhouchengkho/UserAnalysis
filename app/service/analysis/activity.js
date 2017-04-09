@@ -12,11 +12,10 @@ function Activity() {
 
   /**
    * class student exp
-   * initiate discussion - code: 401
-   * checkout discussion - code: 402
-   * resource (check out / edit / download / rate) - (502  / 503 / 505 / 507)
-   * ppt download  - code: 301
-   * assignment (submit / resubmit / download) -  (201 / 202 / 203)
+   * homework - code: 201, 202, 203
+   * ppt - code: 301
+   * discussion - 401, 402, 403, 404, 405
+   * ppt - code: 501, 502, 503, 504, 505, 506, 507
    *
    *
    * @param classId {string}
@@ -24,7 +23,7 @@ function Activity() {
    * @param callback {function} (err, exp)
    *
    *
-   * 5.21  {Number} 0-10
+   * 521  {Number} 0-1000
    */
   this.getClassStudentExp = function(classId, userId, callback) {
 
@@ -35,7 +34,6 @@ function Activity() {
       query.getClassActionWeightedCountGroupAsync(classId, ['501', '502', '503', '504', '505', '506', '507'], [1, 0.5, 0.75, 0.25, 0.5, 1, 0.75])
     ]).spread(function(homeworkGroup, pptGroup, discussionGroup, sourceGroup) {
 
-      console.log('fine')
       getPunishmentFraction(classId, userId, ['301'], function(err, fraction) {
         console.log(fraction)
         var statistic = helper.organizeData([homeworkGroup, pptGroup, discussionGroup, sourceGroup]);
@@ -125,3 +123,6 @@ function Activity() {
 
 
 module.exports = new Activity();
+
+
+

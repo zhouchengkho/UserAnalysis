@@ -1,7 +1,7 @@
 /**
  * Created by zhoucheng on 3/8/17.
  */
-
+var reference = require('../reference');
 function deepCopy(obj) {
   var out = [],i = 0,len = obj.length;
   for (; i < len; i++) {
@@ -333,14 +333,21 @@ function Entropy() {
   }
 }
 
-function PCA() {
 
+
+function Newton() {
+  this.getScore =  function(startTime, endTime, submitTime) {
+    var totalInterval = reference.getTimeInterval(startTime, endTime);
+    var interval = reference.getTimeInterval(startTime, submitTime);
+    if(interval / totalInterval < 9/10)
+      return 1000 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval))
+    else
+      return 1000 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval)) * 0.5
+  }
 }
-
-
 var Score = {
   entropy: new Entropy(),
-  pca: new PCA()
+  newton: new Newton()
 }
 
 

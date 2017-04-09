@@ -1,7 +1,7 @@
 var auth = {
   isAuthenticated: function(req, res, next) {
     if(req.session.login)
-      next()
+      return next()
     else
       return res.redirect('/login')
   }
