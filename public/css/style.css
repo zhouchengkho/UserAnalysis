@@ -968,4 +968,17 @@ table thead {
   border-top: 1px solid #dddddd;
 }
 
+/*.fixed-table-toolbar {*/
+  /*display: inline-block;*/
+/*}*/
+
+#table-choose {
+  font-size: initial;
+}
+
+
+#table-choose .active {
+  color: #2563ab;
+}
+
 /*# sourceMappingURL=style.css.map */

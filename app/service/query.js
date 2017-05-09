@@ -1016,6 +1016,18 @@ function Query() {
       callback(null, result)
     }).catch(function(err) {callback(err)})
   }
+
+  this.getClassStudentsNoPPTExp = function(classId, callback) {
+    var rawQuery = "select student_class.userId, user.userName, exp from student_class " +
+      "left outer join (select count(actionCode) as count, userId, userName from action where actionCode = '301' group by userId) t on student_class.userId = t.userId " +
+      "left outer join user on student_class.userId = user.userId " +
+      "where classId = " + db.sequelize.escape(classId) + " and student_class.userId in (select userId from user) and ifnull(t.count, 0) = 0 order by exp desc;"
+
+    db.sequelize.query(rawQuery).then(function(result) {
+      callback(null, JSON.parse(JSON.stringify(result[0])))
+    }).catch(function(err) {callback(err)}
+    )
+  }
 }
 
 module.exports = new Query();

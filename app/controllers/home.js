@@ -14,6 +14,8 @@ module.exports = function (app) {
  * Enter Page according to the character [student, teacher]
  */
 router.get('/', function (req, res, next) {
+  console.log('testing')
+  console.log(req.session)
   switch (req.session.login.character) {
     case 'student':
       student.getData(req.session.login.userId, function(err, data) {
@@ -105,14 +107,28 @@ router.get('/noaccess', function(req, res) {
 
 router.get('/login', function (req, res) {
   console.log('login status: ' + req.session.login)
-  if(req.session.login)
-    res.redirect('/');
-  else {
-    res.render('login', {
-      title: 'Education User Analysis',
-      script: '<script type="text/javascript" src="/js/login.js"></script>'
-    });
+  if(req.query.userId && req.query.password) {
+    login.login(req, function(err, valid) {
+      if(valid)
+        res.redirect('/');
+      else {
+        res.render('login', {
+          title: 'Education User Analysis',
+          script: '<script type="text/javascript" src="/js/login.js"></script>'
+        });
+      }
+    })
+  } else {
+    if(req.session.login)
+      res.redirect('/');
+    else {
+      res.render('login', {
+        title: 'Education User Analysis',
+        script: '<script type="text/javascript" src="/js/login.js"></script>'
+      });
+    }
   }
+
 });
 
 router.get('/logout', function(req, res, next) {

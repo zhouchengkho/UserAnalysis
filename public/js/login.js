@@ -29,7 +29,6 @@ function loginAjax() {
     data: JSON.stringify({userId: userId, psd: psd}),
     dataType: 'json'
   }).done(function(res){
-    // alert(JSON.stringify(res))
     if(res.status === 200)
       location.reload()
     else {

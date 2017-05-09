@@ -11,16 +11,9 @@ $(document).on('click', '.class-detail', function()
   var id = href.substr(1, href.length - 1)
   // not collapsed
   var selector = '#'+id;
-  if ($(selector).attr('aria-expanded') === "true") {
 
-    // exp table ajax
-    // $.ajax({
-    //   type: 'GET',
-    //   contentType: 'application/json; charset=utf-8',
-    //   url: '/analysis/get-class-detail/'+id
-    // }).done(function(res){
-    //   $('#'+id+' .panel-body .exp-table').html(res)
-    // });
+
+  if ($(selector).attr('aria-expanded') === "true") {
 
     // exp graph ajax
     $.ajax({
@@ -35,10 +28,13 @@ $(document).on('click', '.class-detail', function()
     });
 
 
-    // exp graph ajax
 
-      $('#'+id+' .panel-body #class-table').bootstrapTable({
-        url: '/analysis/class-exp-data/'+id
+    $('#'+id+' .panel-body #class-table table').bootstrapTable({
+      url: '/analysis/class-exp-data/'+id
+    });
+
+    $('#'+id+' .panel-body #class-table-no-ppt table').bootstrapTable({
+      url: '/analysis/class-exp-data/no-ppt/'+id
     });
 
     window.actionFormatter = function(value, row, index) {
@@ -55,7 +51,20 @@ $(document).on('click', '.class-detail', function()
       }
     };
 
+    // load different data
+    $('#'+id+' .panel-body #table-choose').on('change', function() {
+      var val = $(this).val();
+      if(val == 'all') {
+        $('#'+id+' .panel-body #class-table').show();
+        $('#'+id+' .panel-body #class-table-no-ppt').hide();
+      } else {
+        $('#'+id+' .panel-body #class-table').hide();
+        $('#'+id+' .panel-body #class-table-no-ppt').show();
+      }
+    })
+
   }
+
 
 
   // var html = Handlebars.templates["class_detail"](data);

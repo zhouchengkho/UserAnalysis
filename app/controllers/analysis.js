@@ -233,6 +233,16 @@ router.get('/class-exp-data/:classId', function(req, res) {
   })
 })
 
+router.get('/class-exp-data/no-ppt/:classId', function(req, res) {
+  query.getClassStudentsNoPPTExp(req.params.classId, function(err, result) {
+    if(err)
+      res.json({status: 400, message: err.message})
+    else {
+      res.json(result)
+    }
+  })
+})
+
 router.get('/counsellor-table-data/:year', function(req, res) {
   query.getInactiveUsers(req.params.year, function(err, result) {
     if(err)
@@ -245,7 +255,5 @@ router.get('/counsellor-table-data/:year', function(req, res) {
 
 
 router.get('/test', function(req, res) {
-  query.getClassExpDistribution('C180001201601', function(err, result) {
-    res.json(result)
-  })
+    res.json(req.session)
 });
