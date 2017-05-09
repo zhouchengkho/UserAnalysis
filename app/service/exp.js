@@ -6,7 +6,6 @@ var Promise = require('bluebird');
 var social = Promise.promisifyAll(require('./analysis/social'));
 var activity = Promise.promisifyAll(require('./analysis/activity'));
 var homework = Promise.promisifyAll(require('./analysis/homework'));
-var EventProxy = require('eventproxy');
 var query = Promise.promisifyAll(require('./query'));
 var async = require('async');
 function Exp() {
@@ -64,8 +63,11 @@ function Exp() {
         }, function done(err) {
           if(err)
             callback(err)
-          else
+          else {
             callback(null, {message: 'success'})
+          }
+
+
         })
       })
     })
@@ -102,7 +104,19 @@ function Exp() {
           done()
         })
       }, function done() {
-        callback(null, 'success')
+        // update experience in user table
+        query.getStudentsExp(function(err, data) {
+          async.eachSeries(data, function(user, done) {
+            db.User.update({experience: user.exp}, {where: {userId: user.userId}}).then(function(result) {
+              done()
+            }).catch(function(err) {
+              done(err)
+            })
+          }, function done() {
+            callback(null, 'success')
+          })
+        })
+
       })
     })
   }

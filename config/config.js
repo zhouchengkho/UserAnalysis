@@ -8,7 +8,7 @@ var config = {
     app: {
       name: 'useranalysis'
     },
-    port: 4000,
+    port: 8080,
     // db: 'mysql://root:123456@localhost/useranalysis-development?user=root&password=123456',
     db: {
       database: 'useranalysis-development',

@@ -1028,6 +1028,18 @@ function Query() {
     }).catch(function(err) {callback(err)}
     )
   }
+
+  this.getStudentsExp = function(callback) {
+    var sql = "select student_class.userId, round(sum( (courseCredit + courseWeekTime) * student_class.exp)/sum(courseCredit + courseWeekTime)) as exp from student_class " +
+      "left outer join class on student_class.classId = class.classId " +
+      "left outer join course on class.courseId = course.courseId group by userId;"
+    db.sequelize.query(sql).then(function(result) {
+      var data = JSON.parse(JSON.stringify(result[0]));
+      callback(null, data)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
 }
 
 module.exports = new Query();

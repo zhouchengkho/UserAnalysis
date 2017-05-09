@@ -19,7 +19,8 @@ module.exports = function (sequelize, DataTypes) {
     homepage: DataTypes.STRING,
     hobbies: DataTypes.STRING,
     motto: DataTypes.STRING,
-    email: DataTypes.STRING
+    email: DataTypes.STRING,
+    experience: DataTypes.INTEGER
   },
     {
     classMethods: {
