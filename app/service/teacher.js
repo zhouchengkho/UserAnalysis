@@ -3,7 +3,8 @@
  */
 var db = require('../models/index');
 var async = require('async');
-var query = require('./query')
+var query = require('./query');
+var exp = require('./exp');
 // var prefix = require('../../config/config').prefix;
 function Teacher() {
 
@@ -89,6 +90,47 @@ function Teacher() {
         })
       })
 
+    })
+  }
+
+  this.getClassExpData = function(classId, callback) {
+    query.getClassStudentsExp(classId, function(err, result) {
+      if(err)
+        return callback(err)
+      if(!result[0].activity) {
+        exp.computeAndFillClassExp(classId, function(err) {
+          if(err)
+            return callback(err)
+          else {
+            query.getClassStudentsExp(classId, function(err, result) {
+              callback(null, result)
+            })
+          }
+        })
+      } else {
+        return callback(null, result)
+      }
+    })
+  }
+
+  this.getClassExpNoPPTData = function(classId, callback) {
+    query.getClassStudentsExp(classId, function(err, result) {
+      if(err)
+        return callback(err)
+      if(!result[0].activity) {
+        exp.computeAndFillClassExp(classId, function(err) {
+          if(err)
+            return callback(err)
+          else {
+            query.getClassStudentsNoPPTExp(classId, function(err, result) {
+              callback(err, result)
+            })
+          }
+        })
+      } else {
+        query.getClassStudentsNoPPTExp(classId, function(err, result) {
+          callback(err, result)
+        })      }
     })
   }
 

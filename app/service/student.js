@@ -25,15 +25,15 @@ function Student() {
    *      "userId": "10132510237",
    *      "userName": "",
    *      "faceIcon": "",
-   *      "exp": 3,
+   *      "activity": 3,
    *      "summary": [
    *        {
    *          "className": "",
-   *          "exp": 2
+   *          "activity": 2
    *        },
    *        {
    *          "className": "",
-   *          "exp": 4
+   *          "activity": 4
    *        }
    *      ]
    *    }
@@ -46,7 +46,7 @@ function Student() {
       // data.user.faceIcon = prefix + data.user.faceIcon;
       exp.getDetailedStudentClassesExp(userId, function(err, result) {
         data.user.summary = result.classes;
-        data.user.exp = result.exp;
+        data.user.activity = result.activity;
         callback(null, data)
       })
 
@@ -65,7 +65,7 @@ function Student() {
    *    "userName": "",
    *    "className": "",
    *    "faceIcon": "",
-   *    "exp": "",
+   *    "activity": "",
    *    "summary": ""
    *   }
    */
@@ -80,7 +80,7 @@ function Student() {
         summary.getClassStudentSummary(classId, userId, function(err, result) {
           data.summary = result;
           exp.getClassStudentExp(classId, userId, function(err, result) {
-            data.exp = result.exp;
+            data.activity = result.activity;
             callback(err, data)
           })
         })

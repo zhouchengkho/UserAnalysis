@@ -28,11 +28,11 @@ function Summary() {
     var summary = '<p>本门课经验值：';
     exp.getComputedClassStudentExp(classId, userId, function(err, expData) {
       query.getClassStudentRanking(classId, userId, function(err, rankData) {
-        summary += expData.exp;
+        summary += expData.activity;
         summary = summary + '，全班排名第' + rankData.rank + '</p>';
-        var activityContribution = Math.round((expData.activityExp / expData.exp)  * 100 / 3);
-        var homeworkConttribution = Math.round((expData.homeworkExp / expData.exp ) * 100 / 3);
-        var socialContribution = Math.round((expData.socialExp / expData.exp) * 100 / 3);
+        var activityContribution = Math.round((expData.activityExp / expData.activity)  * 100 / 3);
+        var homeworkConttribution = Math.round((expData.homeworkExp / expData.activity ) * 100 / 3);
+        var socialContribution = Math.round((expData.socialExp / expData.activity) * 100 / 3);
         summary += '<p>活跃度经验值' + expData.activityExp + '，贡献' + activityContribution + '%</p>';
         summary += '<p>社交经验值' + expData.socialExp + '，贡献' + socialContribution + '%</p>';
         summary += '<p>作业经验值' + expData.homeworkExp + '，贡献' + homeworkConttribution + '%</p>';

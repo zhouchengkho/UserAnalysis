@@ -10,8 +10,8 @@ var query = Promise.promisifyAll(require('./query'));
 var async = require('async');
 function Exp() {
   /**
-   * fill exp according to classId
-   * write exp data to database, so next time loading will be faster
+   * fill activity according to classId
+   * write activity data to database, so next time loading will be faster
    * @param classId
    * @param callback
    */
@@ -20,7 +20,7 @@ function Exp() {
     query.getStudentsByClass(classId, function(err, students) {
 
       async.eachSeries(students, function(student, done) {
-        if(!student.exp) {
+        if(!student.activity) {
           self.fillClassStudentExp(classId, student.userId, function(err, result) {
             done()
           })
@@ -55,9 +55,9 @@ function Exp() {
           var activityExp = roundDown.activityExp;
           var socialExp = roundDown.socialExp;
           var homeworkExp = roundDown.homeworkExp;
-          var exp = roundDown.exp;
+          var activity = roundDown.activity;
 
-          db.StudentClass.update({exp: exp, activityExp: activityExp, homeworkExp: homeworkExp, socialExp: socialExp}, {where: {classId: classId, userId: studentId}}).then(function(result) {
+          db.StudentClass.update({activity: activity, activityExp: activityExp, homeworkExp: homeworkExp, socialExp: socialExp}, {where: {classId: classId, userId: studentId}}).then(function(result) {
             done()
           }).catch(function(err) {callback(err)})
         }, function done(err) {
@@ -107,7 +107,7 @@ function Exp() {
         // update experience in user table
         query.getStudentsExp(function(err, data) {
           async.eachSeries(data, function(user, done) {
-            db.User.update({experience: user.exp}, {where: {userId: user.userId}}).then(function(result) {
+            db.User.update({experience: user.activity}, {where: {userId: user.userId}}).then(function(result) {
               done()
             }).catch(function(err) {
               done(err)
@@ -122,8 +122,8 @@ function Exp() {
   }
 
   this.fillClassStudentExp = function(classId, userId, callback) {
-    this.getClassStudentExp(classId, userId, function(err, exp) {
-      db.StudentClass.update({exp: exp.exp, activityExp: exp.activityExp, homeworkExp: exp.homeworkExp, socialExp: exp.socialExp}, {where: {classId: classId, userId: userId}}).then(function(result) {
+    this.getClassStudentExp(classId, userId, function(err, activity) {
+      db.StudentClass.update({activity: activity.activity, activityExp: activity.activityExp, homeworkExp: activity.homeworkExp, socialExp: activity.socialExp}, {where: {classId: classId, userId: userId}}).then(function(result) {
         callback(null, 'success')
       }).catch(function(err) {callback(err)})
     })
@@ -136,7 +136,7 @@ function Exp() {
    * @param callback
    *
    * {
-   *  "exp": 3.55,
+   *  "activity": 3.55,
    *  "socialExp": "",
    *  "homeworkExp": "",
    *  "activityExp": ""
@@ -166,7 +166,7 @@ function Exp() {
    * @param callback
    *
    * {
-   *  "exp": 3.55,
+   *  "activity": 3.55,
    *  "socialExp": "",
    *  "homeworkExp": "",
    *  "activityExp": ""
@@ -176,10 +176,10 @@ function Exp() {
     db.StudentClass.findAll({where: {classId: classId, userId: userId}}).then(function(result) {
       if(result.length === 0)
         return callback(new Error('user not in this class or not exist'))
-      if(result[0].exp != null) {
+      if(result[0].activity != null) {
         callback(null, {
-          exp: result[0].exp,
-          activityExp: result[0].exp,
+          activity: result[0].activity,
+          activityExp: result[0].activityExp,
           socialExp: result[0].socialExp,
           homeworkExp: result[0].homeworkExp
         })
@@ -202,7 +202,7 @@ function Exp() {
    *  "userName": "",
    *  "classId": "",
    *  "className": ""
-   *  "exp": 3.44
+   *  "activity": 3.44
    * }
    */
   this.getDetailedClassStudentExp = function(classId, userId, callback) {
@@ -227,7 +227,7 @@ function Exp() {
           if(err)
             return callback(err)
 
-          data.exp = result.exp;
+          data.activity = result.activity;
           data.socialExp = result.socialExp;
           data.homeworkExp = result.homeworkExp;
           data.activityExp = result.activityExp;
@@ -249,7 +249,7 @@ function Exp() {
    *  "userName": "",
    *  "classId": "",
    *  "className": ""
-   *  "exp": 3.44
+   *  "activity": 3.44
    * }
    */
   this.getComputedClassStudentExp = function(classId, userId, callback) {
@@ -266,7 +266,7 @@ function Exp() {
         data.classId = result.classId;
         data.className = result.className;
         computeClassStudentExp(classId, userId, function(err, result) {
-          data.exp = result.exp;
+          data.activity = result.activity;
           data.activityExp = result.activityExp;
           data.socialExp = result.socialExp;
           data.homeworkExp = result.homeworkExp;
@@ -281,20 +281,20 @@ function Exp() {
    * @param userId
    * @param callback
    * {
-   *  "exp": 3,
+   *  "activity": 3,
    *  "classes":
    *  [
    *    {
    *      "userId": "",
    *      "userName": "",
    *      "className": ""
-   *      "exp": 2.46
+   *      "activity": 2.46
    *    },
    *    {
    *      "userId": "",
    *      "userName": "",
    *      "className": ""
-   *      "exp": 2.46
+   *      "activity": 2.46
    *    }
    *  ]
    * }
@@ -303,23 +303,23 @@ function Exp() {
   this.getDetailedStudentClassesExp = function(userId, callback) {
     var self = this;
     var data = [];
-    var exp = 0;
+    var activity = 0;
     var sum = 0;
     query.getStudentClasses(userId, function(err, classIds) {
       async.eachSeries(classIds, function(classId, done) {
         self.getDetailedClassStudentExp(classId, userId, function(err, result) {
           data.push(result)
-          exp += result.exp * (result.credit + result.time);
+          activity += result.activity * (result.credit + result.time);
           sum += result.credit + result.time;
           done()
         })
       }, function done() {
         if(data.length === 0)
-          exp = 0;
+          activity = 0;
         else {
-          exp = Math.round(exp / sum)
+          activity = Math.round(activity / sum)
         }
-        callback(null, {exp: exp, classes: data})
+        callback(null, {activity: activity, classes: data})
       })
     })
   }
@@ -331,14 +331,14 @@ function Exp() {
    *
    *
    * {
-   *  "exp": 6.84,
+   *  "activity": 6.84,
    *  "userName": "cheng",
    *  "userId": "some_userId",
    *  "classes": [
    *    {
    *      "classId": "",
    *      "userId": "",
-   *      "exp": ""
+   *      "activity": ""
    *    }
    *  ]
    * }
@@ -350,7 +350,7 @@ function Exp() {
       userId: userId,
       classes: []
     };
-    var exp = 0;
+    var activity = 0;
     var classCount;
     db.User.findAll({where: {userId: userId}}).then(function(result) {
       return new Promise(function(resolve, reject) {
@@ -364,21 +364,21 @@ function Exp() {
               var temp = {
                 classId: classId,
                 userId: userId,
-                exp: result.exp
+                activity: result.activity
               }
               data.classes.push(temp)
-              exp += Number(result.exp);
+              activity += Number(result.activity);
               done();
             })
           }, function done() {
             // calculate avg
-            exp = Math.round(exp / classCount);
+            activity = Math.round(activity / classCount);
             resolve()
           })
         })
       })
     }).then(function() {
-      data.exp = exp;
+      data.activity = activity;
       callback(null, data)
     }).catch(function(err){
       console.log('err here')
@@ -393,7 +393,7 @@ function Exp() {
    * {
    *  "userId": "",
    *  "userName": "",
-   *  "exp": ""
+   *  "activity": ""
    * }
    */
   this.getDetailedStudentExp = function(userId, callback) {
@@ -402,7 +402,7 @@ function Exp() {
     query.getUserInfo(userId, function(err, result) {
       data = result;
       self.getStudentExp(userId, function(err, d) {
-        data.exp = d.exp;
+        data.activity = d.activity;
         callback(null, data)
       })
     })
@@ -421,7 +421,7 @@ function Exp() {
     query.getRoommates(userId, function(err, userIds) {
       async.eachSeries(userIds, function(roommateId, done) {
         self.getStudentExp(roommateId, function(err, result) {
-          data.push(result.exp)
+          data.push(result.activity)
           done();
         })
       }, function done() {
@@ -436,7 +436,7 @@ function Exp() {
     query.getRoommates(userId, function(err, userIds) {
       async.eachSeries(userIds, function(roommateId, done) {
         self.getClassStudentExp(roommateId, function(err, result) {
-          data.push(result.exp)
+          data.push(result.activity)
           done();
         })
       }, function done() {
@@ -454,12 +454,12 @@ function Exp() {
    *  {
    *    "userId": "",
    *    "userName": "",
-   *    "exp": ""
+   *    "activity": ""
    *  },
    *  {
    *    "userId": "",
    *    "userName": "",
-   *    "exp": ""
+   *    "activity": ""
    *  }
    * ]
    */
@@ -488,12 +488,12 @@ function Exp() {
    *  {
    *    "userId": "",
    *    "userName": "",
-   *    "exp": ""
+   *    "activity": ""
    *  },
    *  {
    *    "userId": "",
    *    "userName": "",
-   *    "exp": ""
+   *    "activity": ""
    *  }
    * ]
    */
@@ -604,9 +604,9 @@ function getRoundDownExpData(activityExp, socialExp, homeworkExp) {
   activityExp = Math.round(activityExp);
   socialExp = Math.round(socialExp);
   homeworkExp = Math.round(homeworkExp);
-  var exp = Math.round((activityExp + socialExp + homeworkExp) / 3);
+  var activity = Math.round((activityExp + socialExp + homeworkExp) / 3);
   return {
-    exp: exp,
+    activity: activity,
     activityExp: activityExp,
     socialExp: socialExp,
     homeworkExp: homeworkExp

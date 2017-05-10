@@ -225,7 +225,7 @@ router.get('/teacher_search', function(req, res) {
 
 
 router.get('/class-exp-data/:classId', function(req, res) {
-  query.getClassStudentsExp(req.params.classId, function(err, result) {
+  teacher.getClassExpData(req.params.classId, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else {
@@ -235,7 +235,7 @@ router.get('/class-exp-data/:classId', function(req, res) {
 })
 
 router.get('/class-exp-data/no-ppt/:classId', function(req, res) {
-  query.getClassStudentsNoPPTExp(req.params.classId, function(err, result) {
+  teacher.getClassExpNoPPTData(req.params.classId, function(err, result) {
     if(err)
       res.json({status: 400, message: err.message})
     else {

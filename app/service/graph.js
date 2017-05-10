@@ -36,11 +36,11 @@ function Graph() {
 
     exp.getDetailedStudentExp(userId, function(err, result) {
       barChartData.data.labels.push(result.userName)
-      barChartData.data.datasets[0].data.push(result.exp)
+      barChartData.data.datasets[0].data.push(result.activity)
       exp.getDetailedDormExp(userId, function(err, result) {
         for(var i in result) {
           barChartData.data.labels.push(result[i].userName)
-          barChartData.data.datasets[0].data.push(result[i].exp)
+          barChartData.data.datasets[0].data.push(result[i].activity)
         }
         callback(null, barChartData)
       })
@@ -82,12 +82,12 @@ function Graph() {
       console.log('in dorm')
       console.log(result)
       barChartData.data.labels.push(result.userName)
-      barChartData.data.datasets[0].data.push(result.exp)
+      barChartData.data.datasets[0].data.push(result.activity)
       exp.getDetailedClassDormExp(classId, userId, function(err, result) {
         console.log(JSON.stringify(result))
         for(var i in result) {
           barChartData.data.labels.push(result[i].userName)
-          barChartData.data.datasets[0].data.push(result[i].exp)
+          barChartData.data.datasets[0].data.push(result[i].activity)
         }
         callback(null, barChartData)
       })

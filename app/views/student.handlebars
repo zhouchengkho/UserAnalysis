@@ -29,10 +29,10 @@
         <!--<h1>Summary</h1>-->
         <img src="{{data.user.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
         <h4>Hey {{data.user.userName}}</h4>
-        <h4>Your exp is {{data.user.exp}}</h4>
+        <h4>Your exp is {{data.user.activity}}</h4>
       <div class="text-left">
         {{#each data.user.summary}}
-            <h5>{{className}} {{exp}} <a href="/student/class/{{userId}}/{{classId}}" target="_blank">view</a></h5>
+            <h5>{{className}} {{activity}} <a href="/student/class/{{userId}}/{{classId}}" target="_blank">view</a></h5>
         {{/each}}
       </div>
     </div>
@@ -60,7 +60,7 @@
 
           <!--{{#each data.dorm}}-->
           <!--<div class="col-xs-6 text-left ">-->
-              <!--<p class="lesser-margins">exp: {{exp}}</p>-->
+              <!--<p class="lesser-margins">activity: {{activity}}</p>-->
           <!--</div>-->
           <!--{{/each}}-->
 

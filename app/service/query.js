@@ -59,7 +59,7 @@ function Query() {
    *  {
    *    "classId": "C180001201403",
    *    "className": "数据结构"
-   *    "exp":2.86
+   *    "activity":2.86
    *  },
    *  {
    *    ...
@@ -73,7 +73,7 @@ function Query() {
         var temp = {};
         temp.classId = result[i].classId;
         temp.className = result[i].Class.Course.courseName;
-        temp.exp = result[i].exp;
+        temp.activity = result[i].activity;
       }
       callback(null, result)
     }).catch(function(err) {callback(err)})
@@ -638,14 +638,14 @@ function Query() {
    * {
    *  "userId": "",
    *  "classId": "",
-   *  "exp": 0,
+   *  "activity": 0,
    *  "User": {
    *    "userName": ""
    *  }
    * }
    */
   this.getClassBadExpers = function(classId, callback) {
-    db.StudentClass.findAll({where: {classId: classId}, limit: 3, include: [db.User], order: 'exp asc'}).then(function(result) {
+    db.StudentClass.findAll({where: {classId: classId}, limit: 3, include: [db.User], order: 'activity asc'}).then(function(result) {
       callback(null, JSON.parse(JSON.stringify(result)))
     }).catch(function(err) {callback(err)})
   }
@@ -658,14 +658,14 @@ function Query() {
    * {
    *  "userId": "",
    *  "classId": "",
-   *  "exp": 0,
+   *  "activity": 0,
    *  "User": {
    *    "userName": ""
    *  }
    * }
    */
   this.getClassGoodExpers = function(classId, callback) {
-    db.StudentClass.findAll({where: {classId: classId}, limit: 3, include: [db.User], order: 'exp desc'}).then(function(result) {
+    db.StudentClass.findAll({where: {classId: classId}, limit: 3, include: [db.User], order: 'activity desc'}).then(function(result) {
       callback(null, JSON.parse(JSON.stringify(result)))
     }).catch(function(err) {callback(err)})
   }
@@ -823,7 +823,7 @@ function Query() {
    * }
    */
   this.getClassStudentRanking = function(classId, userId, callback) {
-    var rawQuery = "select userId, rank from (SELECT userId, @curRank := @curRank + 1 AS rank FROM student_class s, (SELECT @curRank := 0) r where classId = '"+classId+"' ORDER BY  exp desc) t where userId = '"+userId+"';";
+    var rawQuery = "select userId, rank from (SELECT userId, @curRank := @curRank + 1 AS rank FROM student_class s, (SELECT @curRank := 0) r where classId = '"+classId+"' ORDER BY  activity desc) t where userId = '"+userId+"';";
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, result[0][0])
     }).catch(function(err) {callback(err)})
@@ -900,7 +900,7 @@ function Query() {
    */
   this.getClassExpDistribution = function(classId, callback) {
     var rawQuery = "select t.stage, t.count from "+
-    "(select elt(interval(exp, 0, 100, 200, 300, 400, 500, 60, 700, 800, 900, 1000), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
+    "(select elt(interval(activity, 0, 100, 200, 300, 400, 500, 60, 700, 800, 900, 1000), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
     "from student_class where classId = '"+ classId + "' group by stage) t where t.stage in ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10');";
 
     db.sequelize.query(rawQuery).then(function(result) {
@@ -997,31 +997,31 @@ function Query() {
    *  {
    *    "userId": "",
    *    "userName": "",
-   *    "exp": ""
+   *    "activity": ""
    *  },
    *  {
    *    "userId": "",
    *    "userName": "",
-   *    "exp": ""
+   *    "activity": ""
    *  }
    * ]
    */
   this.getClassStudentsExp = function(classId, callback) {
     db.StudentClass.findAll({
-      attributes: ['userId', 'exp', [db.sequelize.literal('User.userName'), 'userName'], 'classId'],
+      attributes: ['userId', 'activity', [db.sequelize.literal('User.userName'), 'userName'], 'classId'],
       where: {classId: classId},
       include: [{model: db.User, attributes: ['userName']}],
-      order: 'exp desc'
+      order: 'activity desc'
     }).then(function(result) {
       callback(null, result)
     }).catch(function(err) {callback(err)})
   }
 
   this.getClassStudentsNoPPTExp = function(classId, callback) {
-    var rawQuery = "select student_class.userId, user.userName, exp from student_class " +
+    var rawQuery = "select student_class.userId, user.userName, activity from student_class " +
       "left outer join (select count(actionCode) as count, userId, userName from action where actionCode = '301' group by userId) t on student_class.userId = t.userId " +
       "left outer join user on student_class.userId = user.userId " +
-      "where classId = " + db.sequelize.escape(classId) + " and student_class.userId in (select userId from user) and ifnull(t.count, 0) = 0 order by exp desc;"
+      "where classId = " + db.sequelize.escape(classId) + " and student_class.userId in (select userId from user) and ifnull(t.count, 0) = 0 order by activity desc;"
 
     db.sequelize.query(rawQuery).then(function(result) {
       callback(null, JSON.parse(JSON.stringify(result[0])))
@@ -1030,7 +1030,7 @@ function Query() {
   }
 
   this.getStudentsExp = function(callback) {
-    var sql = "select student_class.userId, round(sum( (courseCredit + courseWeekTime) * student_class.exp)/sum(courseCredit + courseWeekTime)) as exp from student_class " +
+    var sql = "select student_class.userId, round(sum( (courseCredit + courseWeekTime) * student_class.activity)/sum(courseCredit + courseWeekTime)) as activity from student_class " +
       "left outer join class on student_class.classId = class.classId " +
       "left outer join course on class.courseId = course.courseId group by userId;"
     db.sequelize.query(sql).then(function(result) {
