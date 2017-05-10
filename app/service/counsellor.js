@@ -28,6 +28,25 @@ function Counsellor() {
       })
     })
   }
+
+  /**
+   *
+   * @param data [{
+   *  userId: "",
+   *  dormId: "",
+   *  enrollYear: ""
+   * }]
+   * @param callback
+   */
+  this.importDormData = function(data, callback) {
+    async.eachSeries(data, function(row, done) {
+      query.createDormRow(row, function(err, id) {
+        done(err)
+      })
+    }, function done(err) {
+      callback(err)
+    })
+  }
 }
 
 

@@ -1040,6 +1040,13 @@ function Query() {
       callback(err)
     })
   }
+  this.createDormRow = function(data, callback) {
+    db.Dorm.create(data).then(function(result) {
+      callback(null, result.id)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
 }
 
 module.exports = new Query();

@@ -13,7 +13,8 @@ var express = require('express'),
   graph = require('../service/graph'),
   query = require('../service/query'),
   student = require('../service/student'),
-  counsellor = require('../service/counsellor');
+  counsellor = require('../service/counsellor'),
+  auth = require('../helper/auth');
 
 
 module.exports = function (app) {
@@ -168,7 +169,7 @@ router.get('/activity-html-data', function(req, res) {
 
 
 
-router.get('/fill-all', function(req, res) {
+router.post('/fill-all', function(req, res) {
   exp.updateAllExp(function(err, result) {
     res.json({message: 'success'})
   })
@@ -257,3 +258,19 @@ router.get('/counsellor-table-data/:year', function(req, res) {
 router.get('/test', function(req, res) {
     res.json(req.session)
 });
+
+router.post('/import-dorm-data', [auth.isCounsellor, function(req, res) {
+  counsellor.importDormData(req.body, function(err) {
+    if(err) {
+      res.send({
+        status: 400,
+        message: err.message
+      })
+    } else {
+      res.send({
+        status: 200,
+        message: 'success'
+      })
+    }
+  })
+}])
