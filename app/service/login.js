@@ -4,6 +4,7 @@
 
 var db = require('../models');
 var refer = require('./reference');
+var md5 = require('md5');
 function Login() {
   /**
    * login
@@ -74,7 +75,8 @@ function Login() {
    * @returns {*}
    */
   function getEncryptPassword(password) {
-    return password;
+
+    return md5(password);
   }
 
 }
