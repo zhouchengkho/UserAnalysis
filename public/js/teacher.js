@@ -33,8 +33,8 @@ $(document).on('click', '.class-detail', function()
       url: '/analysis/class-exp-data/'+id
     });
 
-    $('#'+id+' .panel-body #class-table-no-ppt table').bootstrapTable({
-      url: '/analysis/class-exp-data/no-ppt/'+id
+    $('#'+id+' .panel-body #class-table-more-energy table').bootstrapTable({
+      url: '/analysis/class-exp-data/more-energy/'+id
     });
 
     window.actionFormatter = function(value, row, index) {
@@ -56,10 +56,10 @@ $(document).on('click', '.class-detail', function()
       var val = $(this).val();
       if(val == 'all') {
         $('#'+id+' .panel-body #class-table').show();
-        $('#'+id+' .panel-body #class-table-no-ppt').hide();
+        $('#'+id+' .panel-body #class-table-more-energy').hide();
       } else {
         $('#'+id+' .panel-body #class-table').hide();
-        $('#'+id+' .panel-body #class-table-no-ppt').show();
+        $('#'+id+' .panel-body #class-table-more-energy').show();
       }
     })
 

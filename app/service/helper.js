@@ -166,6 +166,10 @@ function Helper() {
     return Math.sqrt(sum / data.length)
   }
 
+  this.toFixed = function(num) {
+    return Number(num).toFixed(2);
+  }
+
 
 }
 

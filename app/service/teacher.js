@@ -134,6 +134,58 @@ function Teacher() {
     })
   }
 
+  /**
+   *
+   * @param classId
+   * @param callback
+   */
+  this.getClassNeedMoreEnergyStudents = function(classId, callback) {
+    function filter(result, avg1, avg2) {
+      var data = [];
+      for(var i in result) {
+
+        var count = 0 + Number(result[i].homeworkCount) + Number(result[i].pptCount);
+        var avg = 0 + Number(avg1) + Number(avg2);
+        console.log(count)
+        console.log(avg)
+        if(count < 0.7 * avg) {
+          data.push(result[i])
+        }
+      }
+      console.log(data)
+      return data;
+    }
+    query.getClassStudentsExp(classId, function(err, result) {
+      if(err)
+        return callback(err)
+      if(!result[0].activity) {
+        exp.computeAndFillClassExp(classId, function(err) {
+          if(err)
+            return callback(err)
+          else {
+            query.getClassStudentsHomeworkAndPPTGroup(classId, function(err, result) {
+              query.getClassActionCountAvg(classId, [201, 202, 203], function(err, homeworkAvg) {
+                query.getClassActionCountAvg(classId, [301], function(err, pptAvg) {
+
+                  callback(err, filter(result, homeworkAvg, pptAvg))
+                })
+              })
+            })
+          }
+        })
+      } else {
+        query.getClassStudentsHomeworkAndPPTGroup(classId, function(err, result) {
+          query.getClassActionCountAvg(classId, [201, 202, 203], function(err, homeworkAvg) {
+            query.getClassActionCountAvg(classId, [301], function(err, pptAvg) {
+              callback(err, filter(result, homeworkAvg, pptAvg))
+            })
+          })
+        })
+
+      }
+    })
+  }
+
 
 
 }

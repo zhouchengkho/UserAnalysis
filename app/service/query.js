@@ -145,7 +145,7 @@ function Query() {
       studentCount = result;
       return db.Action.count({where: {classId: classId, actionCode: {$in: actionCode}}})
     }).then(function(count) {
-      callback(null, studentCount == 0 ? 0 : count / studentCount)
+      callback(null, helper.toFixed(studentCount == 0 ? 0 : count / studentCount))
     }).catch(function(err) {
       callback(err)
     })
@@ -366,7 +366,7 @@ function Query() {
       db.Action.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
 
 
-        callback(null, count/userCount)
+        callback(null, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       }).catch(function(err) {callback(err)})
     })
   }
@@ -394,7 +394,7 @@ function Query() {
   this.getStudentFriendsCountAvg = function(callback) {
     this.getTotalUserCount(function(err, userCount) {
       db.Friend.count({}).then(function(count) {
-        callback(null, count/userCount)
+        callback(null, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       }).catch(function(err) {callback(err)})
     })
   }
@@ -403,7 +403,8 @@ function Query() {
     this.getClassStudentCount(classId, function(err, userCount) {
       var rawQuery = "select count(*) as count from friend left outer join student_class on friend.userId = student_class.userId where classId = '" + classId + "';";
       db.sequelize.query(rawQuery).then(function(result) {
-        callback(err, result[0][0].count/userCount)
+        var count = result[0][0].count;
+        callback(err, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -521,7 +522,7 @@ function Query() {
   this.getStudentStatusCountInTimeAvg = function(gte, lte, callback) {
     this.getTotalUserCount(function(err, userCount) {
       db.Status.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
-        callback(null, count/userCount)
+        callback(null, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -530,7 +531,8 @@ function Query() {
     this.getClassStudentCount(classId, function(err, userCount) {
       var rawQuery = "select count(*) as count from status left outer join student_class on status.userId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
       db.sequelize.query(rawQuery).then(function(result) {
-        callback(err, result[0][0].count/userCount)
+        var count = result[0][0].count;
+        callback(err, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -546,7 +548,7 @@ function Query() {
   this.getStudentStatusReplyCountInTimeAvg = function(gte, lte, callback) {
     this.getTotalUserCount(function(err, userCount) {
       db.StatusReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
-        callback(null, count/userCount)
+        callback(null, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -555,7 +557,8 @@ function Query() {
     this.getClassStudentCount(classId, function(err, userCount) {
       var rawQuery = "select count(*) as count from statusreply left outer join student_class on statusreply.fromId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
       db.sequelize.query(rawQuery).then(function(result) {
-        callback(err, result[0][0].count/userCount)
+        var count = result[0][0].count;
+        callback(err, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -581,7 +584,7 @@ function Query() {
   this.getStudentTopicReplyCountInTimeAvg = function(gte, lte, callback) {
     this.getTotalUserCount(function(err, userCount) {
       db.TopicReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
-        callback(null, count/userCount)
+        callback(null, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       }).catch(function(err) {callback(err)})
     })
   }
@@ -590,7 +593,8 @@ function Query() {
     this.getClassStudentCount(classId, function(err, userCount) {
       var rawQuery = "select count(*) as count from topicreply left outer join student_class on topicreply.fromId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
       db.sequelize.query(rawQuery).then(function(result) {
-        callback(err, result[0][0].count/userCount)
+        var count = result[0][0].count;
+        callback(err, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -617,7 +621,7 @@ function Query() {
   this.getStudentSourceReplyCountInTimeAvg = function(gte, lte, callback) {
     this.getTotalUserCount(function(err, userCount) {
       db.SourceReply.count({where: {time: {gte: gte, lte: lte}}}).then(function(count) {
-        callback(null, count/userCount)
+        callback(null, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       }).catch(function(err) {callback(err)})
     })
   }
@@ -626,7 +630,8 @@ function Query() {
     this.getClassStudentCount(classId, function(err, userCount) {
       var rawQuery = "select count(*) as count from sourcereply left outer join student_class on sourcereply.fromId = student_class.userId where classId = '" + classId + "' and time > '" + gte + "' and time < '" + lte + "';";
       db.sequelize.query(rawQuery).then(function(result) {
-        callback(err, result[0][0].count/userCount)
+        var count = result[0][0].count;
+        callback(err, helper.toFixed(userCount == 0 ? 0 : count / userCount))
       })
     })
   }
@@ -1012,6 +1017,52 @@ function Query() {
       callback(err)
     })
   }
+
+  this.getClassStudentsActionCountGroup = function(classId, actionCode, callback) {
+    var action = '';
+    if (typeof actionCode == 'string') {
+      action = '(' + actionCode + ')';
+    } else {
+      action = '(';
+      for(var i in actionCode) {
+        action+=actionCode+','
+      }
+      action = action.substring(0, action.length - 1);
+      action += ')'
+    }
+    // var sql = "select userId, count(*) as count from action where actionCode in " + action + " and classId = 'C180027161703' and userId in (select userId from user) group by userId;"
+    var sql = "select action.userId, userName , student_class.activity, count(*) as count from action left outer join student_class on action.userId = student_class.userId and action.classId = action.classId where actionCode in "+ action +" and action.classId = '" + classId + "' and action.userId in (select userId from user) group by userId;"
+    db.sequelize.query(sql).then(function(result) {
+      var data = JSON.parse(JSON.stringify(result[0]));
+      callback(null, data)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
+  this.getClassStudentsHomeworkAndPPTGroup = function(classId, callback) {
+    var sql = "select t1.userId, t1.userName, t1.classId, t1.activity, ifnull(t2.actionCount, 0) as homeworkCount, ifnull(t3.actionCount, 0) as pptCount from ( " +
+      "select student_class.userId, user.userName, student_class.activity, student_class.classId from student_class " +
+      "left outer join user on student_class.userId = user.userId where classId = '" + classId + "' and student_class.userId in (select userId from user) " +
+      ") t1 " +
+      "left outer join (select userId, sum(actionCount) as actionCount from ( " +
+      "select student_class.userId, student_class.activity, actionCode, count(actionCode) as actionCount from student_class " +
+      "left join action on student_class.userId = action.userId and student_class.classId = action.classId " +
+      "where student_class.classId = '" + classId + "' and student_class.userId in (select userId from user) " +
+      "group by userId, actionCode) t where actionCode in (201, 202, 203) group by userId) t2 on t1.userId = t2.userId " +
+      "left outer join ( " +
+      "select userId, sum(actionCount) as actionCount from ( select student_class.userId, student_class.activity, actionCode, count(actionCode) as actionCount from student_class " +
+      "left join action on student_class.userId = action.userId and student_class.classId = action.classId " +
+      "where student_class.classId = '" + classId + "' and student_class.userId in (select userId from user) " +
+      "group by userId, actionCode) t where actionCode in (301) group by userId) t3 on t1.userId = t3.userId";
+    db.sequelize.query(sql).then(function(result) {
+      var data = JSON.parse(JSON.stringify(result[0]));
+      callback(null, data)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
 }
 
 module.exports = new Query();
