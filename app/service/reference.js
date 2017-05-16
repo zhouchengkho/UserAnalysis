@@ -8,7 +8,7 @@ function Reference() {
 
 
 
-  var currentYear = '2015'; // set current year at 2015 for test
+  var currentYear = (new Date()).getFullYear().toString(); // set current year at 2015 for test
   var lastYear = (Number(currentYear) - 1).toString();
   var theYearBeforeLast = (Number(currentYear) - 2).toString();
   var currentMonth = moment().month();
@@ -449,6 +449,10 @@ function Reference() {
   this.getLastFourYears = function() {
     var thisYear = moment().year();
     return [thisYear, thisYear - 1, thisYear - 2, thisYear - 3];
+  }
+
+  this.getNowString = function() {
+    return moment().format('YYYY-MM-DD hh:mm:ss');
   }
 }
 

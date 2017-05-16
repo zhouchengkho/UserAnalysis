@@ -206,8 +206,10 @@ function Graph() {
       }
     };
 
-    var gte = reference.getTimePeriod(timePeriod, userId).gte;
-    var lte = reference.getTimePeriod(timePeriod, userId).lte;
+    // var gte = reference.getTimePeriod(timePeriod, userId).gte;
+    // var lte = reference.getTimePeriod(timePeriod, userId).lte;
+    var gte = '1995-01-01 00:00:00';
+    var lte = reference.getNowString();
     console.log('getting chart social for: '+userId)
 
     console.log(gte)
