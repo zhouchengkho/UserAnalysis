@@ -899,20 +899,36 @@ function Query() {
    * ]
    */
   this.getClassExpDistribution = function(classId, callback) {
-    var rawQuery = "select t.stage, t.count from "+
-    "(select elt(interval(activity, 0, 100, 200, 300, 400, 500, 60, 700, 800, 900, 1000), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
-    "from student_class where classId = '"+ classId + "' group by stage) t where t.stage in ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10');";
+    // var rawQuery = "select t.stage, t.count from "+
+    // "(select elt(interval(activity, 0, 100, 200, 300, 400, 500, 60, 700, 800, 900, 1000), '#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10') as stage, count(userId) count " +
+    // "from student_class where classId = '"+ classId + "' group by stage) t where t.stage in ('#1', '#2', '#3', '#4', '#5', '#6', '#7', '#8', '#9', '#10');";
+    // db.sequelize.query(rawQuery).then(function(result) {
+    //   var data = result[0];
+    //   var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    //   for(var i in arr) {
+    //     if(!data[i] || data[i].stage != '#'+arr[i]) {
+    //         data.splice(i, 0, {stage: '#'+arr[i], count: 0});
+    //     }
+    //   }
+    //   callback(null, result[0])
+    // }).catch(function(err) {callback(err)})
+    var stages = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+    var data = [];
+    async.eachSeries(stages, function(stage, done) {
+      var sql = "select count(*) as count from student_class where  activity > " + stage+"  and activity < " + (Number(stage) + 100) +" and classId = '" + classId + "' and userId in (select userId from user);"
+      console.log(sql);
+      db.sequelize.query(sql).then(function(result) {
+        console.log(JSON.stringify(result[0][0].count))
+        data.push({
+          stage: '#'+stage,
+          count: result[0][0].count
+        })
+        done()
+      }).catch(function(err) {done(err)})
+    }, function done() {
+      callback(null, data);
+    })
 
-    db.sequelize.query(rawQuery).then(function(result) {
-      var data = result[0];
-      var arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      for(var i in arr) {
-        if(!data[i] || data[i].stage != '#'+arr[i]) {
-            data.splice(i, 0, {stage: '#'+arr[i], count: 0});
-        }
-      }
-      callback(null, result[0])
-    }).catch(function(err) {callback(err)})
 
   }
 
