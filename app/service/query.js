@@ -746,33 +746,7 @@ function Query() {
     }).catch(function(err) {callback(err)})
   }
 
-  /**
-   *
-   * @param classId
-   * @param userId
-   * @param callback
-   *
-   * [
-   *  {
-   *    "assignmentId": 127,
-   *    "title": "第二周作业",
-   *    "startTime": "2015-07-21T10:36:33.000Z",
-   *    "endTime": "2015-07-22T16:00:00.000Z",
-   *    "submitted": false
-   *  },
-   *  {
-   *    "assignmentId": 126,
-   *    "title": "第三周作业",
-   *    "startTime": "2015-07-21T10:36:33.000Z",
-   *    "endTime": "2015-07-22T16:00:00.000Z",
-   *    "submitted": true,
-   *    "submitTime": "2015-07-22T15:36:16.000Z"
-   *  },
-   *  {
-   *    ...
-   *  }
-   * ]
-   */
+
   this.getDetailedClassStudentAssignments = function(classId, userId, callback) {
     console.log('getting detailed assignments for '+classId +' '+userId)
     db.Assignment.findAll({
@@ -781,32 +755,7 @@ function Query() {
       include: [{model: db.StudentAssignment, attributes: [[db.sequelize.fn('date_format', db.sequelize.col('time'), '%Y-%m-%d %h:%i:%s'), 'submitTime'], ['count', 'submitCount']], where: {userId: userId}, required: false}],
       order: 'assignmentId desc'
     }).then(function(result){
-      var data = [];
-      result = JSON.parse(JSON.stringify(result))
-      var submitCount = 0;
-      for(var i in result) {
-        var temp = {};
-        temp.assignmentId = result[i].assignmentId;
-        temp.title = result[i].title;
-        temp.startTime = result[i].startTime;
-        temp.endTime = result[i].endTime;
-        if(result[i].StudentAssignments.length === 0)
-          temp.submitted = false;
-        else {
-          temp.submitTime = result[i].StudentAssignments[0].submitTime;
-          temp.submitCount = result[i].StudentAssignments[0].submitCount;
-          temp.submitted = true;
-          submitCount++;
-        }
-
-        data.push(temp)
-      }
-      var final = {
-        total: data.length,
-        submitCount: submitCount,
-        data: data
-      }
-      callback(null, final)
+      callback(null, result)
     }).catch(function(err) {callback(err)})
   }
 

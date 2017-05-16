@@ -27,24 +27,25 @@ function HomeWork() {
       return 1000 * Math.pow(Math.E, ( (1/totalInterval) * Math.log(4/5) * interval)) * 0.5
   }
 
-  /**
-   *
-   * @param str
-   * @returns {boolean}
-   */
-  function containsKeyword(str) {
-    var keywords = ['加分题', '参考答案', '作业本', '汇总', '完成课本'];
-    for(var i in keywords) {
-      if(str.indexOf(keywords[i]) >= 0)
-        return true;
-    }
-    return false;
-  }
+
 
   /**
    *
    */
   function needSubmitting(title) {
+    /**
+     *
+     * @param str
+     * @returns {boolean}
+     */
+    function containsKeyword(str) {
+      var keywords = ['加分题', '参考答案', '作业本', '汇总', '完成课本'];
+      for(var i in keywords) {
+        if(str.indexOf(keywords[i]) >= 0)
+          return true;
+      }
+      return false;
+    }
     return !containsKeyword(title)
   }
 
@@ -172,10 +173,57 @@ function HomeWork() {
    * @param classId
    * @param userId
    * @param callback
+   *
+   * [
+   *  {
+   *    "assignmentId": 127,
+   *    "title": "第二周作业",
+   *    "startTime": "2015-07-21T10:36:33.000Z",
+   *    "endTime": "2015-07-22T16:00:00.000Z",
+   *    "submitted": false
+   *  },
+   *  {
+   *    "assignmentId": 126,
+   *    "title": "第三周作业",
+   *    "startTime": "2015-07-21T10:36:33.000Z",
+   *    "endTime": "2015-07-22T16:00:00.000Z",
+   *    "submitted": true,
+   *    "submitTime": "2015-07-22T15:36:16.000Z"
+   *  },
+   *  {
+   *    ...
+   *  }
+   * ]
    */
   this.getClassStudentHomeworkData = function(classId, userId, callback) {
     query.getDetailedClassStudentAssignments(classId, userId, function(err, result) {
-      callback(err, result)
+      var data = [];
+      result = JSON.parse(JSON.stringify(result))
+      var submitCount = 0;
+      for(var i in result) {
+        var temp = {};
+        temp.assignmentId = result[i].assignmentId;
+        temp.title = result[i].title;
+        temp.startTime = result[i].startTime;
+        temp.endTime = result[i].endTime;
+        temp.needSubmitting = needSubmitting(temp.title);
+        if(result[i].StudentAssignments.length === 0)
+          temp.submitted = false;
+        else {
+          temp.submitTime = result[i].StudentAssignments[0].submitTime;
+          temp.submitCount = result[i].StudentAssignments[0].submitCount;
+          temp.submitted = true;
+          submitCount++;
+        }
+
+        data.push(temp)
+      }
+      var final = {
+        total: data.length,
+        submitCount: submitCount,
+        data: data
+      }
+      callback(err, final)
     })
   }
 

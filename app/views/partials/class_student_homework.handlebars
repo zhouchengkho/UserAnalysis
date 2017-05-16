@@ -15,7 +15,10 @@
             <td>{{title}}</td>
             <td>{{startTime}}</td>
             <td>{{endTime}}</td>
-            <td>{{#if submitted}}{{submitTime}}{{else}}Overdue/Optional{{/if}}</td>
+            <td>{{#if needSubmitting}}
+              {{#if submitted}}{{submitTime}}{{else}}未提交{{/if}}
+              {{else}}不需要交
+            {{/if}}</td>
         </tr>
       {{/each}}
     </tbody>
