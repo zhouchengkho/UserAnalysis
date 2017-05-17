@@ -32,7 +32,7 @@ function loginAjax() {
     if(res.status === 200)
       location.reload()
     else {
-      alert('login fail')
+      $.toaster({priority: 'danger', title: 'Error', message: res.message});
     }
   });
 }

@@ -9,6 +9,20 @@ var prefix = require('../../config/config').prefix;
 var async = require('async');
 function Query() {
 
+  this.login = function(userId, callback) {
+    db.User.findAll({
+      where: {
+        userId: userId
+      },
+      raw: true
+    }).then(function(users) {
+      if(users.length > 0) {
+        callback(null, users[0])
+      } else {
+        callback(null, null)
+      }
+    }).catch(function(err) {callback(err)})
+  }
   this.getClassTermName = function(classId, callback) {
     db.Class.findAll({where: {classId: classId}, include: [db.Term]}).then(function(result) {
       var termName = result[0].Term.termName

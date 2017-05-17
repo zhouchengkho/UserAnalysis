@@ -14,7 +14,6 @@ module.exports = function (app) {
  * Enter Page according to the character [student, teacher]
  */
 router.get('/', function (req, res, next) {
-  console.log('testing')
   console.log(req.session)
   switch (req.session.login.character) {
     case 'student':
@@ -137,14 +136,15 @@ router.get('/logout', function(req, res, next) {
 })
 
 router.post('/login', function (req, res, next) {
-  login.login(req, function(err, valid) {
-    if(valid)
-      res.send({status: 200})
-    else
-      res.status(200).send({status: 200})
+  login.login(req, function(err, result) {
+    res.send(result)
   })
 })
 
+
+router.get('/statistic', function(req, res) {
+  res.render('statistic');
+})
 /**
  * add common data to render
  * @param req: get session data
