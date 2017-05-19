@@ -25,6 +25,10 @@ var config = {
         define: {
           timestamps: false // education db doesn't use timestamps
         },
+        dialectOptions: {
+          dateStrings: true, // ban mysql conversion
+          typeCast: true //override sequelize conversion，affects date and geometry
+        },
         timezone: '+8:00',
         logging: false
       }
