@@ -27,7 +27,7 @@
 <div class="col-xs-12">
     <div class="col-xs-4">
         <div class=" text-center section-title">
-            <img src="{{data.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
+            <img src="{{#if data.faceIcon}}{{data.faceIcon}}{{else}}/img/blank.jpg{{/if}}" style="max-width: 150px" class="padding-bottom-2">
             <h4>Hey {{data.userName}}</h4>
             <h4>{{data.className}}</h4>
           <div id="summary" class="col-xs-12">
