@@ -109,30 +109,34 @@ router.get('/login', function (req, res) {
   if(req.session.login)
     res.redirect('/');
   else {
-    statistics.getSummary(function(err, summary) {
-      if(err) {
-        return res.send({
-          status: 500,
-          message: err.message
-        })
-      } else {
-        statistics.getRank(function(err, rank) {
-          if(err) {
-            return res.send({
-              status: 500,
-              message: err.message
-            })
-          } else {
-            res.render('login', {
-              title: 'Education User Analysis',
-              script: '<script type="text/javascript" src="/js/login.js"></script>',
-              summary: summary,
-              rank: rank
-            });
-          }
-        })
-      }
-    })
+    res.render('login', {
+      title: 'Education User Analysis',
+      script: '<script type="text/javascript" src="/js/login.js"></script>'
+    });
+    // statistics.getSummary(function(err, summary) {
+    //   if(err) {
+    //     return res.send({
+    //       status: 500,
+    //       message: err.message
+    //     })
+    //   } else {
+    //     statistics.getRank(function(err, rank) {
+    //       if(err) {
+    //         return res.send({
+    //           status: 500,
+    //           message: err.message
+    //         })
+    //       } else {
+    //         res.render('login', {
+    //           title: 'Education User Analysis',
+    //           script: '<script type="text/javascript" src="/js/login.js"></script>',
+    //           summary: summary,
+    //           rank: rank
+    //         });
+    //       }
+    //     })
+    //   }
+    // })
   }
 
   // console.log('login status: ' + req.session.login)

@@ -48,6 +48,9 @@ module.exports = function(app, config) {
   app.use(express.static(config.root + '/public'));
   app.use(methodOverride());
 
+  // statistics don't need login auth
+  require(config.root + '/app/controllers/statistics.js')(app);
+
   /**
    * Login Authentication
    * Add specialized logic here

@@ -126,7 +126,7 @@ var statistics = {
    * }
    */
   getRank: function(callback) {
-    var limit = 5;
+    var limit = 20;
     query.getOverallStudentRank(limit, function(err, overallRank) {
       if(err) {
         return callback(err)
