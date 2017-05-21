@@ -27,7 +27,7 @@
     <div class="col-xs-4 text-center">
         <!-- section title start-->
         <!--<h1>Summary</h1>-->
-        <img src="{{data.user.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
+        <img src="{{#if data.user.faceIcon}}{{data.user.faceIcon}}{{else}}/img/blank.jpg{{/if}}" style="max-width: 150px" class="padding-bottom-2">
         <h4>Hey {{data.user.userName}}</h4>
         <h4>Your exp is {{data.user.activity}}</h4>
       <div class="text-left">

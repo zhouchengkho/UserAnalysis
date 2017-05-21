@@ -274,9 +274,12 @@ function Query() {
   this.getUserInfo = function(userId, callback) {
     db.User.findAll(
       {
-        attributes: ['userId', 'userName', 'nickName', 'isTeacher', 'gender', 'departId', [db.sequelize.literal("CONCAT('" + prefix + "', faceIcon)"), 'faceIcon']],
+        attributes: ['userId', 'userName', 'nickName', 'isTeacher', 'gender', 'departId', [db.sequelize.literal("if(faceIcon=null, null,CONCAT('" + prefix + "', faceIcon))"), 'faceIcon']],
+        raw: true,
         where: {userId: userId}}).then(function(result) {
-      callback(null, JSON.parse(JSON.stringify(result[0])))
+          console.log('shout out')
+          console.log(result)
+          callback(null, result[0])
     }).catch(function(err) {callback(err)})
   }
 

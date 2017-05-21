@@ -20,7 +20,7 @@
 
 <div class="col-xs-12">
     <div class="col-xs-4 text-center">
-        <img src="{{data.teacherInfo.faceIcon}}" style="max-width: 150px" class="padding-bottom-2">
+        <img src="{{#if data.teacherInfo.faceIcon}}{{data.teacherInfo.faceIcon}}{{else}}/img/blank.jpg{{/if}}" style="max-width: 150px" class="padding-bottom-2">
         <h4>嗨 {{data.teacherInfo.userName}}</h4>
         <h4>您教了 {{data.classCount}} 门课</h4>
     </div>
