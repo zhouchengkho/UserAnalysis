@@ -1077,6 +1077,82 @@ function Query() {
     })
   }
 
+  this.getOverallStudentRank = function(limit, callback) {
+    db.User.findAll({
+      attributes: ['userId', 'nickName', 'experience'],
+      order: 'experience desc',
+      limit: limit,
+      raw: true
+    }).then(function(result) {
+      callback(null, result);
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  this.getSingleStudentsRank = function(limit, callback) {
+    db.StudentClass.findAll({
+      attributes: [
+        'userId',
+        [db.sequelize.literal('User.nickName'), 'nickName'],
+        [db.sequelize.literal('`Class.Course`.courseName'), 'courseName'],
+        'activity'
+      ],
+      order: 'activity desc',
+      limit: limit,
+      include: [{
+        model: db.Class,
+        attributes: [],
+        include: {
+          model: db.Course,
+          attributes: []
+        }
+      }, {
+        model: db.User,
+        attributes: []
+      }],
+      raw: true
+    }).then(function(result) {
+      callback(null, result)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  this.getUserCount = function(callback) {
+    db.User.count({}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  this.getCourseCount = function(callback) {
+    db.Course.count({}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  this.getSourceCount = function(callback) {
+    db.Source.count({}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  this.getAssignmentCount = function(callback) {
+    db.Assignment.count({}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+  this.getTopicCount = function(callback) {
+    db.Topic.count({}).then(function(count) {
+      callback(null, count)
+    }).catch(function(err) {
+      callback(err)
+    })
+  }
+
 }
 
 module.exports = new Query();

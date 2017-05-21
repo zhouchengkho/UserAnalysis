@@ -63,10 +63,13 @@ module.exports = function(app, config) {
   })
 
   // routes
-  var controllers = glob.sync(config.root + '/app/controllers/*.js');
-  controllers.forEach(function (controller) {
-    require(controller)(app);
-  });
+  // var controllers = glob.sync(config.root + '/app/controllers/*.js');
+  // controllers.forEach(function (controller) {
+  //   require(controller)(app);
+  // });
+  require(config.root + '/app/controllers/analysis.js')(app);
+  require(config.root + '/app/controllers/home.js')(app);
+  require(config.root + '/app/controllers/settings.js')(app);
 
 
   app.use(function (req, res, next) {

@@ -4,7 +4,8 @@ var express = require('express'),
   teacher = require('../service/teacher'),
   student  = require('../service/student'),
   exp = require('../service/exp'),
-  counsellor = require('../service/counsellor');
+  counsellor = require('../service/counsellor'),
+  statistics = require('../service/statistics');
 module.exports = function (app) {
   app.use('/', router);
 };
@@ -105,28 +106,77 @@ router.get('/noaccess', function(req, res) {
 
 
 router.get('/login', function (req, res) {
-  console.log('login status: ' + req.session.login)
-  if(req.query.userId && req.query.password) {
-    login.login(req, function(err, valid) {
-      if(valid)
-        res.redirect('/');
-      else {
-        res.render('login', {
-          title: 'Education User Analysis',
-          script: '<script type="text/javascript" src="/js/login.js"></script>'
-        });
+  if(req.session.login)
+    res.redirect('/');
+  else {
+    statistics.getSummary(function(err, summary) {
+      if(err) {
+        return res.send({
+          status: 500,
+          message: err.message
+        })
+      } else {
+        statistics.getRank(function(err, rank) {
+          if(err) {
+            return res.send({
+              status: 500,
+              message: err.message
+            })
+          } else {
+            res.render('login', {
+              title: 'Education User Analysis',
+              script: '<script type="text/javascript" src="/js/login.js"></script>',
+              summary: summary,
+              rank: rank
+            });
+          }
+        })
       }
     })
-  } else {
-    if(req.session.login)
-      res.redirect('/');
-    else {
-      res.render('login', {
-        title: 'Education User Analysis',
-        script: '<script type="text/javascript" src="/js/login.js"></script>'
-      });
-    }
   }
+
+  // console.log('login status: ' + req.session.login)
+  // if(req.query.userId && req.query.password) {
+  //   login.login(req, function(err, valid) {
+  //     if(valid)
+  //       res.redirect('/');
+  //     else {
+  //       statistics.getSummary(function(err, summary) {
+  //         if(err) {
+  //           return res.send({
+  //             status: 500,
+  //             message: err.message
+  //           })
+  //         } else {
+  //           statistics.getRank(function(err, rank) {
+  //             if(err) {
+  //               return res.send({
+  //                 status: 500,
+  //                 message: err.message
+  //               })
+  //             } else {
+  //               res.render('login', {
+  //                 title: 'Education User Analysis',
+  //                 script: '<script type="text/javascript" src="/js/login.js"></script>',
+  //                 summary: summary,
+  //                 rank: rank
+  //               });
+  //             }
+  //           })
+  //         }
+  //       })
+  //     }
+  //   })
+  // } else {
+  //   if(req.session.login)
+  //     res.redirect('/');
+  //   else {
+  //     res.render('login', {
+  //       title: 'Education User Analysis',
+  //       script: '<script type="text/javascript" src="/js/login.js"></script>'
+  //     });
+  //   }
+  // }
 
 });
 
