@@ -23,8 +23,6 @@ router.get('/rank/overall', function(req, res) {
 
 router.get('/summary', function(req, res) {
   statistics.getSummary(function(err, result) {
-    console.log('??')
-    console.log(result)
     res.send(result ? result : [])
   })
 })

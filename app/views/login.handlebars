@@ -52,6 +52,7 @@
                             <caption class="text-center">单门课程经验值榜</caption>
                             <thead style="display: none">
                             <tr>
+                                <th data-field="faceIcon" data-formatter="actionFormatter"></th>
                                 <th data-field="nickName"></th>
                                 <th data-field="courseName"></th>
                                 <th data-field="activity" data-sortable="true"></th>
@@ -68,6 +69,7 @@
                             <caption class="text-center">综合经验值榜</caption>
                             <thead>
                             <tr>
+                                <th data-field="faceIcon" data-formatter="actionFormatter"></th>
                                 <th data-field="nickName"></th>
                                 <th data-field="experience" data-sortable="true"></th>
                             </tr>
@@ -105,3 +107,11 @@
         </div>
     </div>
 </div>
+<script>
+    window.actionFormatter = function(value, row, index) {
+        return [
+            '<img src="'+value+'" style="max-width: 50px">',
+            '</img>'
+        ].join('');
+    }
+</script>

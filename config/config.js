@@ -33,7 +33,8 @@ var config = {
         logging: false
       }
     },
-    prefix: 'https://www.mynereus.com'
+    prefix: 'https://www.mynereus.com',
+    blank: '/img/blank.jpg'
   },
 
   test: {

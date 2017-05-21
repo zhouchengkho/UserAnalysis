@@ -6,6 +6,7 @@ var db = require('../models/index')
 var Promise = require('bluebird')
 var helper = require('./helper');
 var prefix = require('../../config/config').prefix;
+var blank = require('../../config/config').blank;
 var async = require('async');
 function Query() {
 
@@ -274,7 +275,7 @@ function Query() {
   this.getUserInfo = function(userId, callback) {
     db.User.findAll(
       {
-        attributes: ['userId', 'userName', 'nickName', 'isTeacher', 'gender', 'departId', [db.sequelize.literal("if(faceIcon=null, null,CONCAT('" + prefix + "', faceIcon))"), 'faceIcon']],
+        attributes: ['userId', 'userName', 'nickName', 'isTeacher', 'gender', 'departId', [db.sequelize.literal("if(faceIcon is null, '"+blank+"',CONCAT('" + prefix + "', faceIcon))"), 'faceIcon']],
         raw: true,
         where: {userId: userId}}).then(function(result) {
           console.log('shout out')
@@ -1082,7 +1083,7 @@ function Query() {
 
   this.getOverallStudentRank = function(limit, callback) {
     db.User.findAll({
-      attributes: ['userId', 'nickName', 'experience'],
+      attributes: ['userId', 'nickName', 'experience', [db.sequelize.literal("if(faceIcon is null, '"+blank+"', CONCAT('" + prefix + "', faceIcon))"), 'faceIcon']],
       order: 'experience desc',
       limit: limit,
       raw: true
@@ -1097,6 +1098,7 @@ function Query() {
       attributes: [
         'userId',
         [db.sequelize.literal('User.nickName'), 'nickName'],
+        [db.sequelize.literal("if(User.faceIcon is null, '"+blank+"', CONCAT('" + prefix + "', User.faceIcon))"), 'faceIcon'],
         [db.sequelize.literal('`Class.Course`.courseName'), 'courseName'],
         'activity'
       ],
